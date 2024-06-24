@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f526f4242185a34abae7a7f40d3cd90, type: 3}
+  m_Name: DefaultInputKeybind
+  m_EditorClassIdentifier: 
+  inputKeybindCategories:
+  - category_name: General
+    input_keybinds:
+    - translated_action_name: Move Next Selection
+      action_name: general.move_next_selection
+      key_code: 9
+    - translated_action_name: Move Previous Selection
+      action_name: general.move_previous_selection
+      key_code: 304
+    - translated_action_name: Go Select
+      action_name: general.go_select
+      key_code: 32
+    - translated_action_name: Go Back
+      action_name: general.go_back
+      key_code: 27
+  - category_name: Pacman
+    input_keybinds:
+    - translated_action_name: Face Up
+      action_name: pacman.face_up
+      key_code: 119
+    - translated_action_name: Face Down
+      action_name: pacman.face_down
+      key_code: 115
+    - translated_action_name: Face Left
+      action_name: pacman.face_left
+      key_code: 97
+    - translated_action_name: Face Right
+      action_name: pacman.face_right
+      key_code: 100

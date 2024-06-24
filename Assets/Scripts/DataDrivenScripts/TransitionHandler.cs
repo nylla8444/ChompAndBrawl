@@ -1,0 +1,34 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class TransitionHandler : MonoBehaviour
+{
+    private Animator transitionAnimator;
+    private void Start()
+    {
+        // Get the transition data
+        string transitionId = TransitionData.transitionId;
+        string endTransitionName = TransitionData.endTransitionName;
+        
+        try
+        {
+            transitionAnimator = GameObject.Find(transitionId).GetComponent<Animator>();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning("TransitionId: " + transitionId + " does not exist. " + ex.Message);
+        }
+        
+        PlayEndTransition(transitionAnimator, endTransitionName);
+    }
+
+    private void PlayEndTransition(Animator _transitionAnimator, string _endTransitionName)
+    {
+        if (_transitionAnimator != null && !string.IsNullOrEmpty(_endTransitionName))
+        {
+            _transitionAnimator.SetTrigger(_endTransitionName);
+        }
+    }
+}
