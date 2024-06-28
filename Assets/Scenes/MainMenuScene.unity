@@ -288,6 +288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e57a0c5b313b3e545b56f0f3f155d3e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultGameData: {fileID: 0}
   defaultPlayerData: {fileID: 11400000, guid: c4ba7b4a78539fd41bd2b9732179c7cb, type: 2}
   defaultInputKeybind: {fileID: 11400000, guid: 71e20637733cb534bb8bf5a0eacc2ebb, type: 2}
   menuPanel: {fileID: 0}
@@ -801,7 +802,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 1
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -911,7 +912,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: ce32c79834cbdaf4997d3b7a0573715b, type: 3}
-    m_FontSize: 32
+    m_FontSize: 24
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 2
@@ -1300,7 +1301,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1331551466}
-  - component: {fileID: 1331551467}
   m_Layer: 0
   m_Name: MainActivities
   m_TagString: Untagged
@@ -1323,18 +1323,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1331551467
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1331551465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d43e3cf002a3d347b24bae0d27a7f49, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1438215913
 GameObject:
   m_ObjectHideFlags: 0
@@ -1561,7 +1549,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 820, y: -470}
-  m_SizeDelta: {x: 180, y: 60}
+  m_SizeDelta: {x: 120, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1613986230
 MonoBehaviour:

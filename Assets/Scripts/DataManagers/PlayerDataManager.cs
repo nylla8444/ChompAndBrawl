@@ -101,6 +101,8 @@ public static class PlayerDataManager
 
         File.Delete(filePath);
         Debug.Log("Data file deleted successfully.");
+
+        LoadData();
     }
 
     // Function for initializing default data if no data is detected

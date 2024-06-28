@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class GeneralManager : MonoBehaviour
 {
+    [SerializeField] private DefaultGameData defaultGameData;
     [SerializeField] private DefaultPlayerData defaultPlayerData;
     [SerializeField] private DefaultInputKeybind defaultInputKeybind;
     [SerializeField] private GameObject menuPanel;
@@ -37,8 +38,9 @@ public class GeneralManager : MonoBehaviour
     private void PrepareAllData()
     {
         // Initialize data managers with the default data
-        PlayerDataManager.Initialize(defaultPlayerData);
-        KeybindDataManager.Initialize(defaultInputKeybind);
+        try { GameDataManager.Initialize(defaultGameData); } catch (Exception) { }
+        try { PlayerDataManager.Initialize(defaultPlayerData); } catch (Exception) { }
+        try { KeybindDataManager.Initialize(defaultInputKeybind); } catch (Exception) { }
     }
 
     private void PrepareObjectListeners()
@@ -56,10 +58,9 @@ public class GeneralManager : MonoBehaviour
 
     public void PrepareResetData()
     {
-        KeybindDataManager.DeleteKeyBindings();
+        GameDataManager.DeleteData();
         PlayerDataManager.DeleteData();
-        PlayerDataManager.Initialize(defaultPlayerData);
-        PlayerDataManager.LoadData();
+        KeybindDataManager.DeleteKeyBindings();
     }
 
 

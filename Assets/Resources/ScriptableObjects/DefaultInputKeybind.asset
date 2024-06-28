@@ -41,3 +41,29 @@ MonoBehaviour:
     - translated_action_name: Face Right
       action_name: pacman.face_right
       key_code: 100
+    - translated_action_name: Power Up
+      action_name: pacman.power_up
+      key_code: 101
+  - category_name: Ghost
+    input_keybinds:
+    - translated_action_name: Face Up
+      action_name: ghost.face_up
+      key_code: 273
+    - translated_action_name: Face Down
+      action_name: ghost.face_down
+      key_code: 274
+    - translated_action_name: Face Left
+      action_name: ghost.face_left
+      key_code: 276
+    - translated_action_name: Face Right
+      action_name: ghost.face_right
+      key_code: 275
+    - translated_action_name: Change Ghost
+      action_name: ghost.change_ghost
+      key_code: 13
+    - translated_action_name: Default Power Up
+      action_name: ghost.default_power_up
+      key_code: 303
+    - translated_action_name: Unique Power Up
+      action_name: ghost.unique_power_up
+      key_code: 305
