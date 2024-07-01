@@ -23,7 +23,7 @@ MonoBehaviour:
       key_code: 304
     - translated_action_name: Go Select
       action_name: general.go_select
-      key_code: 32
+      key_code: 13
     - translated_action_name: Go Back
       action_name: general.go_back
       key_code: 27

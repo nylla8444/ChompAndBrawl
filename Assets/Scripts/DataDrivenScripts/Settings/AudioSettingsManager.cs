@@ -6,10 +6,12 @@ using UnityEngine.UI;
 
 public class AudioSettingsManager : MonoBehaviour
 {
+    [Header("Music Miscellaneous")]
     [SerializeField] private Button musicButton;
     [SerializeField] private Slider musicSlider;
     [SerializeField] private List<Sprite> musicIcons; // 0: mute, 1: unmute
 
+    [Header("Sfx Miscellaneous")]
     [SerializeField] private Button sfxButton;
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private List<Sprite> sfxIcons; // 0: mute, 1: unmute

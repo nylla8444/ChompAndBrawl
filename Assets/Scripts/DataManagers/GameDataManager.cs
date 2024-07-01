@@ -11,20 +11,62 @@ public class GameData
 {
     public PacmanData pacman_data;
     public GhostData ghost_data;
+    public ItemData item_data;
 
     [Serializable]
     public class PacmanData
     {
-        public int pacman_score;
-        public int pacman_lives;
+        public int score;
+        public int lives;
+        public Vector2 coordinate;
+        public Vector2 direction;
+        public float speed_multiplier;
+        public float vision_multiplier;
+        public bool has_power_pellet;
+        public bool has_won_at_fight;
+        public string current_powerup_item;
     }
 
     [Serializable]
     public class GhostData
     {
-        public List<string> list_alive_ghost;
         public string current_controlling_ghost;
         public string current_fighting_ghost;
+        public List<string> list_alive_ghost;
+        public List<GhostPositions> ghost_positions;
+        public List<GhostSpeedMultipliers> ghost_speed_multipliers;
+        public bool is_control_inverted;
+
+        [Serializable]
+        public class GhostPositions
+        {
+            public string ghost_name;
+            public Vector2 coordinate;
+        }
+
+        [Serializable]
+        public class GhostSpeedMultipliers
+        {
+            public string ghost_name;
+            public float speed_multiplier;
+        }
+
+        public GhostData()
+        {
+            ghost_positions = new List<GhostPositions>();
+            ghost_speed_multipliers = new List<GhostSpeedMultipliers>();
+        }
+    }
+
+    [Serializable]
+    public class ItemData
+    {
+        public List<Vector2> pacdot_positions;
+
+        public ItemData()
+        {
+            pacdot_positions = new List<Vector2>();
+        }
     }
 }
 
@@ -59,7 +101,7 @@ public static class GameDataManager
                 binaryFormatter.Serialize(fileStream, jsonData);
             }
 
-            Debug.Log("Data saved successfully. " + jsonData);
+            // Debug.Log("Data saved successfully. " + jsonData);
         }
         catch (Exception ex)
         {
@@ -92,6 +134,7 @@ public static class GameDataManager
 
                 // Convert JSON to object
                 GameData loadedGameData = JsonUtility.FromJson<GameData>(jsonData);
+
                 // Debug.Log("Data loaded successfully.");
                 return loadedGameData;
             }
@@ -111,7 +154,7 @@ public static class GameDataManager
         }
 
         File.Delete(filePath);
-        Debug.Log("Data file deleted successfully.");
+        Debug.Log("GameData file deleted successfully.");
 
         LoadData();
     }

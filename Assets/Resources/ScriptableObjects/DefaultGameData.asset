@@ -14,12 +14,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameData:
     pacman_data:
-      pacman_lives: 3
+      score: 0
+      lives: 3
+      coordinate: {x: 0, y: 0}
+      direction: {x: 0, y: 0}
+      speed_multiplier: 1
+      vision_multiplier: 1
     ghost_data:
+      current_controlling_ghost: blinky
+      current_fighting_ghost: 
       list_alive_ghost:
       - blinky
       - clyde
       - inky
       - pinky
-      current_controlling_ghost: blinky
-      victim_ghost: 
+      ghost_positions: []
+      ghost_speed_multipliers:
+      - ghost_name: blinky
+        speed_multiplier: 1
+      - ghost_name: clyde
+        speed_multiplier: 1
+      - ghost_name: inky
+        speed_multiplier: 1
+      - ghost_name: pinky
+        speed_multiplier: 1
+      is_control_inverted: 0

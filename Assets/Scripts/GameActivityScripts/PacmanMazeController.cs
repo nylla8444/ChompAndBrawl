@@ -4,13 +4,19 @@ using UnityEngine;
 
 public class PacmanMazeController : MonoBehaviour
 {
+    [Header("Pacman Properties")]
     [SerializeField] private GameObject pacman;
-    [SerializeField] private float movementSpeed;
-    [SerializeField] private LayerMask collisionLayer;
+    [SerializeField] private float defaultSpeed;
+
+    [Header("Pacman Miscellaneous")]
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Animator animator;
+    [SerializeField] private LayerMask collisionLayer;
 
-    [SerializeField] private bool isRunning = false;
+    [Space(12)]
+    [SerializeField] private bool hasMazeStarted = false;
+    private bool isRunning = false;
+    
     private Vector2 direction;
     private Vector2 targetPosition;
     private Vector2 queuedDirection;
@@ -18,18 +24,12 @@ public class PacmanMazeController : MonoBehaviour
     private Rigidbody2D rb;
     private BoxCollider2D pacmanCollider;
 
+    private const float TILE_SIZE = 0.16f;
+
 
     private void Start()
     {
-        pacman.transform.position = spawnPoint.position;
-        direction = Vector2.right;
-        targetPosition = (Vector2)pacman.transform.position + direction * 0f;
-
-        rb = pacman.GetComponent<Rigidbody2D>();
-        pacmanCollider = pacman.GetComponent<BoxCollider2D>();
-
-        animator.SetTrigger("pacman.rest");
-        UpdateAnimation();
+        InitializePacman();
         RegisterKeyActions();
     }
 
@@ -38,29 +38,69 @@ public class PacmanMazeController : MonoBehaviour
         UnregisterKeyActions();
     }
 
+    public void StartPacmanController(bool triggerValue)
+    {
+        hasMazeStarted = triggerValue;
+    }
+
+    private void RegisterKeyActions()
+    {
+        KeybindDataManager.RegisterKeyAction("pacman.face_up", () => HandleInput("pacman.face_up"));
+        KeybindDataManager.RegisterKeyAction("pacman.face_down", () => HandleInput("pacman.face_down"));
+        KeybindDataManager.RegisterKeyAction("pacman.face_left", () => HandleInput("pacman.face_left"));
+        KeybindDataManager.RegisterKeyAction("pacman.face_right", () => HandleInput("pacman.face_right"));
+    }
+
+    private void UnregisterKeyActions()
+    {
+        KeybindDataManager.UnregisterKeyAction("pacman.face_up", () => HandleInput("pacman.face_up"));
+        KeybindDataManager.UnregisterKeyAction("pacman.face_down", () => HandleInput("pacman.face_down"));
+        KeybindDataManager.UnregisterKeyAction("pacman.face_left", () => HandleInput("pacman.face_left"));
+        KeybindDataManager.UnregisterKeyAction("pacman.face_right", () => HandleInput("pacman.face_right"));
+    }
+
     private void Update()
     {
-        KeybindDataManager.Update();
-
+        if (!hasMazeStarted) return;
+ 
         if (!isRunning && queuedDirection != Vector2.zero)
         {
             direction = queuedDirection;
-            targetPosition = (Vector2)pacman.transform.position + direction * 0.16f;
+            targetPosition = (Vector2)pacman.transform.position + direction * TILE_SIZE;
             isRunning = true;
-            UpdateAnimation();
+            UpdatePacmanAnimation();
         }
     }
 
     private void FixedUpdate()
     {
+        if (!hasMazeStarted) return;
+        
         if (isRunning)
         {
             MoveTowards();
         }
     }
 
+    private void InitializePacman()
+    {
+        GameData gameData = GameDataManager.LoadData();
+        Vector2 pacmanPosition = gameData.pacman_data.coordinate;
+
+        pacman.transform.position = (pacmanPosition != Vector2.zero)
+            ? pacmanPosition
+            : spawnPoint.position;
+        
+        pacmanCollider = pacman.GetComponent<BoxCollider2D>();
+        rb = pacman.GetComponent<Rigidbody2D>();
+
+        animator?.SetTrigger("pacman.rest");
+    }
+
     private void HandleInput(string action)
     {
+        if (!hasMazeStarted) return;
+        
         switch (action)
         {
             case "pacman.face_up":
@@ -91,29 +131,41 @@ public class PacmanMazeController : MonoBehaviour
 
         if ((Vector2)pacman.transform.position == targetPosition)
         {
-            if (CanMoveTo(currentPosition + queuedDirection * 0.16f))
+            if (IsAbleToMoveTo(currentPosition + queuedDirection * TILE_SIZE))
             {
                 direction = queuedDirection;
-                targetPosition = currentPosition + direction * 0.16f;
-                UpdateAnimation();
+                targetPosition = currentPosition + direction * TILE_SIZE;
+                UpdatePacmanAnimation();
             }
-            else if (CanMoveTo(currentPosition + direction * 0.16f))
+            else if (IsAbleToMoveTo(currentPosition + direction * TILE_SIZE))
             {
-                targetPosition = currentPosition + direction * 0.16f;
+                targetPosition = currentPosition + direction * TILE_SIZE;
+            }
+            else
+            {
+                isRunning = false;
+                return;
             }
         }
 
-        if (CanMoveTo(targetPosition))
+        if (IsAbleToMoveTo(targetPosition))
         {
-            pacman.transform.position = Vector2.MoveTowards(currentPosition, targetPosition, movementSpeed * Time.fixedDeltaTime);
+            float speedMultiplier = GameDataManager.LoadData().pacman_data.speed_multiplier;
+            Vector2 newPosition = Vector2.MoveTowards(currentPosition, targetPosition, (defaultSpeed * speedMultiplier) * Time.fixedDeltaTime);
+            pacman.transform.position = newPosition;
+
+            if (newPosition == targetPosition)
+            {
+                UpdatePacmanPosition(newPosition);
+            }
         }
         else
         {
-            Debug.Log("Collision detected, cannot move.");
+            isRunning = false;
         }
     }
 
-    private bool CanMoveTo(Vector2 targetPosition)
+    private bool IsAbleToMoveTo(Vector2 targetPosition)
     {
         Bounds pacmanBounds = pacmanCollider.bounds;
         pacmanBounds.center = targetPosition;
@@ -130,7 +182,15 @@ public class PacmanMazeController : MonoBehaviour
         return true;
     }
 
-    private void UpdateAnimation()
+    private void UpdatePacmanPosition(Vector2 position)
+    {
+        GameData gameData = GameDataManager.LoadData();
+        gameData.pacman_data.coordinate = position;
+        gameData.pacman_data.direction = direction;
+        GameDataManager.SaveData(gameData);
+    }
+
+    private void UpdatePacmanAnimation()
     {
         animator.ResetTrigger("pacman.rest");
         animator.ResetTrigger("pacman.normal_up");
@@ -161,38 +221,9 @@ public class PacmanMazeController : MonoBehaviour
     public void Respawn()
     {
         pacman.transform.position = spawnPoint.position;
-        direction = Vector2.right;
-        targetPosition = (Vector2)pacman.transform.position + direction * 0.16f;
-        queuedDirection = Vector2.right;
-        isRunning = false;
+        UpdatePacmanPosition(spawnPoint.position);
+
         animator.SetTrigger("pacman.rest");
-        UpdateAnimation();
-    }
-
-    public void StartRunning()
-    {
-        isRunning = true;
-        targetPosition = (Vector2)pacman.transform.position + direction * 0.16f;
-    }
-
-    public void StopRunning()
-    {
-        isRunning = false;
-    }
-
-    private void RegisterKeyActions()
-    {
-        KeybindDataManager.RegisterKeyAction("pacman.face_up", () => HandleInput("pacman.face_up"));
-        KeybindDataManager.RegisterKeyAction("pacman.face_down", () => HandleInput("pacman.face_down"));
-        KeybindDataManager.RegisterKeyAction("pacman.face_left", () => HandleInput("pacman.face_left"));
-        KeybindDataManager.RegisterKeyAction("pacman.face_right", () => HandleInput("pacman.face_right"));
-    }
-
-    private void UnregisterKeyActions()
-    {
-        KeybindDataManager.UnregisterKeyAction("pacman.face_up", () => HandleInput("pacman.face_up"));
-        KeybindDataManager.UnregisterKeyAction("pacman.face_down", () => HandleInput("pacman.face_down"));
-        KeybindDataManager.UnregisterKeyAction("pacman.face_left", () => HandleInput("pacman.face_left"));
-        KeybindDataManager.UnregisterKeyAction("pacman.face_right", () => HandleInput("pacman.face_right"));
+        UpdatePacmanAnimation();
     }
 }

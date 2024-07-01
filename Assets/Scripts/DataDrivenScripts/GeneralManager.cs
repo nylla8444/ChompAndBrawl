@@ -6,12 +6,17 @@ using UnityEngine.UI;
 
 public class GeneralManager : MonoBehaviour
 {
+    [Header("Default Data")]
     [SerializeField] private DefaultGameData defaultGameData;
     [SerializeField] private DefaultPlayerData defaultPlayerData;
     [SerializeField] private DefaultInputKeybind defaultInputKeybind;
+
+    [Header("General GameObjects")]
     [SerializeField] private GameObject menuPanel;
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private GameObject transitionScreen;
+
+    [Header("Direct Buttons")]
     [SerializeField] private Button directResetButton;
     [SerializeField] private Button directQuitButton;
     

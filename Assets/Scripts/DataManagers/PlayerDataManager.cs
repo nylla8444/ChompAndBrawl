@@ -100,7 +100,7 @@ public static class PlayerDataManager
         }
 
         File.Delete(filePath);
-        Debug.Log("Data file deleted successfully.");
+        Debug.Log("PlayerData file deleted successfully.");
 
         LoadData();
     }

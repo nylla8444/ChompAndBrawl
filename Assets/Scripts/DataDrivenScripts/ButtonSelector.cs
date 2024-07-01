@@ -21,20 +21,24 @@ public enum HighlightType
 [Serializable]
 public class ButtonGroup
 {
+    [Header("Button Type")]
     public ButtonType buttonType;
 
-    // SingleButtonItem properties
+    [Header("Single Button Item Properties")]
     public List<Button> buttons;
 
-    // LabelButtonItem properties
+    [Header("Label Button Item Properties")]
     public Text label;
     public List<Button> labelButtons;
 
-    // NavigableButtonItem properties
+    [Header("Navigable Button Item Properties")]
     public Button navigableButton;
     public List<Button> targetButtons;
 
+    [Header("Highlight Type")]
     public HighlightType highlightType;
+
+    [Header("Highlight Properties")]
     public Color highlightColor;
     public Sprite highlightBackgroundSprite;
 }
@@ -55,7 +59,7 @@ public class ButtonSelector : MonoBehaviour
 
     private void OnDestroy()
     {
-        UnreigsterKeyActions();
+        UnregisterKeyActions();
     }
 
     private void RegisterKeyActions()
@@ -65,7 +69,7 @@ public class ButtonSelector : MonoBehaviour
         KeybindDataManager.RegisterKeyAction("general.go_select", SelectButton);
     }
 
-    private void UnreigsterKeyActions()
+    private void UnregisterKeyActions()
     {
         KeybindDataManager.RegisterKeyAction("general.move_next_selection", MoveToNextSelection);
         KeybindDataManager.RegisterKeyAction("general.move_previous_selection", MoveToPreviousSelection);
@@ -124,10 +128,7 @@ public class ButtonSelector : MonoBehaviour
 
     private void MoveToNextSelection()
     {
-        if (allButtonGroups.Count == 0)
-        {
-            return;
-        }
+        if (allButtonGroups.Count == 0) return;
         
         currentButtonIndex++;
         if (currentButtonIndex >= allButtonGroups[currentGroupIndex].Count)
@@ -140,10 +141,7 @@ public class ButtonSelector : MonoBehaviour
 
     private void MoveToPreviousSelection()
     {
-        if (allButtonGroups.Count == 0)
-        {
-            return;
-        }
+        if (allButtonGroups.Count == 0) return;
         
         currentButtonIndex--;
         if (currentButtonIndex < 0)
@@ -156,25 +154,12 @@ public class ButtonSelector : MonoBehaviour
 
     private void HighlightButton(int groupIndex, int buttonIndex)
     {
-        if (groupIndex < 0 || groupIndex >= allButtonGroups.Count)
-        {
-            return;
-        }
+        if (groupIndex < 0 || groupIndex >= allButtonGroups.Count) return;
 
         for (int i = 0; i < allButtonGroups.Count; i++)
         {
-            if (i >= allButtonGroups.Count)
-            {
-                continue;
-            }
-
             for (int j = 0; j < allButtonGroups[i].Count; j++)
             {
-                if (j >= allButtonGroups[i].Count)
-                {
-                    continue;
-                }
-
                 bool isSelected = (i == groupIndex) && (j == buttonIndex);
                 allButtonGroups[i][j].Highlight(isSelected);
             }
@@ -247,10 +232,7 @@ public abstract class ButtonItem
                 break;
             
             case HighlightType.BackgroundImage:
-                if (highlightImage != null)
-                {
-                    highlightImage.SetActive(isHighlighted);
-                }
+                highlightImage?.SetActive(isHighlighted);
                 if (isHighlighted && backgroundImage != null)
                 {
                     backgroundImage.sprite = highlightBackgroundSprite;
