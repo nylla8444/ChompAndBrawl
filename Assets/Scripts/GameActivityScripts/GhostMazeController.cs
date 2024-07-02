@@ -53,24 +53,19 @@ public class GhostMazeController : MonoBehaviour
     // Variables for AI move control ghost
     private Dictionary<string, bool> onAuto_hasReachedTarget = new Dictionary<string, bool>()
     {
-        { "blinky", false },
-        { "clyde", false },
-        { "inky", false },
-        { "pinky", false }
+        { "blinky", false }, { "clyde", false }, { "inky", false }, { "pinky", false }
+    };
+    private Dictionary<string, Vector2> onAuto_targetPositions = new Dictionary<string, Vector2>()
+    {
+        { "blinky", Vector2.zero }, { "clyde", Vector2.zero }, { "inky", Vector2.zero }, { "pinky", Vector2.zero }
     };
     private Dictionary<string, Vector2> onAuto_directions = new Dictionary<string, Vector2>()
     {
-        { "blinky", Vector2.zero },
-        { "clyde", Vector2.zero },
-        { "inky", Vector2.zero },
-        { "pinky", Vector2.zero }
+        { "blinky", Vector2.zero }, { "clyde", Vector2.zero }, { "inky", Vector2.zero }, { "pinky", Vector2.zero }
     };
     private Dictionary<string, Queue<Vector2>> onAuto_recentTiles = new Dictionary<string, Queue<Vector2>>()
     {
-        { "blinky", new Queue<Vector2>() },
-        { "clyde", new Queue<Vector2>() },
-        { "inky", new Queue<Vector2>() },
-        { "pinky", new Queue<Vector2>() },
+        { "blinky", new Queue<Vector2>() }, { "clyde", new Queue<Vector2>() }, { "inky", new Queue<Vector2>() }, { "pinky", new Queue<Vector2>() },
     };
     private const float TILE_SIZE = 0.16f;
     private const float TILE_OFFSET = 0.08f;
@@ -121,9 +116,9 @@ public class GhostMazeController : MonoBehaviour
     {
         if (!hasMazeStarted) return;
         
-        UpdateCooldownText();
+        UpdateDisplayText();
 
-        if (onCtrl_ghost != null && !isRunning && onCtrl_queuedDirection != Vector2.zero)
+        if (!isRunning && onCtrl_ghost != null && onCtrl_queuedDirection != Vector2.zero)
         {
             onCtrl_direction = onCtrl_queuedDirection;
             onCtrl_targetPosition = (Vector2)onCtrl_ghost.transform.position + onCtrl_direction * TILE_SIZE;
@@ -146,6 +141,14 @@ public class GhostMazeController : MonoBehaviour
 
     private void InitializeGhosts()
     {
+        var ghostData = new Dictionary<string, (GameObject ghost, Transform spawnPoint, Animator animator)>
+        {
+            { "blinky", (blinky, blinkySpawn, blinkyAnimator) },
+            { "clyde", (clyde, clydeSpawn, clydeAnimator) },
+            { "inky", (inky, inkySpawn, inkyAnimator) },
+            { "pinky", (pinky, pinkySpawn, pinkyAnimator) } 
+        };
+        
         GameData gameData = GameDataManager.LoadData();
         aliveGhosts = gameData.ghost_data.list_alive_ghost;
         lastControllingGhost = gameData.ghost_data.current_controlling_ghost;
@@ -154,46 +157,17 @@ public class GhostMazeController : MonoBehaviour
 
         foreach (string ghostName in gameData.ghost_data.list_alive_ghost)
         {
-            GameObject ghostObject = null;
-            Transform spawnPoint = null;
-            Animator animator = null;
-
-            switch (ghostName)
-            {
-                case "blinky":
-                    ghostObject = blinky;
-                    spawnPoint = blinkySpawn;
-                    animator = blinkyAnimator;
-                    break;
-
-                case "clyde":
-                    ghostObject = clyde;
-                    spawnPoint = clydeSpawn;
-                    animator = clydeAnimator;
-                    break;
-
-                case "inky":
-                    ghostObject = inky;
-                    spawnPoint = inkySpawn;
-                    animator = inkyAnimator;
-                    break;
-                    
-                case "pinky":
-                    ghostObject = pinky;
-                    spawnPoint = pinkySpawn;
-                    animator = pinkyAnimator;
-                    break;
-            }
-
-            if (ghostObject == null)
+            if (!ghostData.TryGetValue(ghostName, out var ghostInfo))
             {
                 Debug.LogWarning($"No game object found for {ghostName}");
-                return;
+                continue;
             }
+
+            (GameObject _ghost, Transform _spawnPoint, Animator _animator) = ghostInfo; 
             
-            var ghostPosition = gameData.ghost_data.ghost_positions.Find(pos => pos.ghost_name == ghostName);
-            ghostObject.transform.position = ghostPosition?.coordinate ?? spawnPoint.position;
-            animator?.SetTrigger($"{ghostObject.name}.rest");
+            var ghostPosition = gameData.ghost_data.ghost_positions.Find(pos => pos.ghost_name == _ghost.name);
+            _ghost.transform.position = ghostPosition?.coordinate ?? _spawnPoint.position;
+            _animator?.SetTrigger($"{_ghost.name}.rest");
         }
     }
 
@@ -203,38 +177,30 @@ public class GhostMazeController : MonoBehaviour
 
         bool isControlInverted = GameDataManager.LoadData().ghost_data.is_control_inverted;
         
-        switch (action)
+        Vector2 direction = action switch
         {
-            case "ghost.face_up":
-                onCtrl_queuedDirection = (!isControlInverted) ? Vector2.up : Vector2.down;
-                Debug.Log("Ghost queued up.");
-                break;
-            
-            case "ghost.face_down":
-                onCtrl_queuedDirection = (!isControlInverted) ? Vector2.down : Vector2.up;
-                Debug.Log("Ghost queued down.");
-                break;
-            
-            case "ghost.face_left":
-                onCtrl_queuedDirection = (!isControlInverted) ? Vector2.left : Vector2.right;
-                Debug.Log("Ghost queued left.");
-                break;
-
-            case "ghost.face_right":
-                onCtrl_queuedDirection = (!isControlInverted) ? Vector2.right : Vector2.left;
-                Debug.Log("Ghost queued right.");
-                break;
-
-            case "ghost.change_ghost":
-                if (!isRunning)
-                {
-                    OnPowerup_SwitchGhost();
-                }
-                else
-                {
-                    queuedGhostSwitch = true;
-                }
-                break;
+            "ghost.face_up" => !isControlInverted ? Vector2.up : Vector2.down,
+            "ghost.face_down" => !isControlInverted ? Vector2.down : Vector2.up,
+            "ghost.face_left" => !isControlInverted ? Vector2.left : Vector2.right,
+            "ghost.face_right" => !isControlInverted ? Vector2.right : Vector2.left,
+            _ => Vector2.zero
+        };
+        
+        if (direction != Vector2.zero)
+        {
+            onCtrl_queuedDirection = direction;
+            Debug.Log($"Ghost queued {direction}.");
+        }
+        else if (action == "ghost.change_ghost")
+        {
+            if (!isRunning)
+            {
+                OnPowerup_SwitchGhost();
+            }
+            else
+            {
+                queuedGhostSwitch = true;
+            }
         }
     }
 
@@ -277,8 +243,7 @@ public class GhostMazeController : MonoBehaviour
         if (IsAbleToMoveTo(onCtrl_targetPosition, onCtrl_ghost))
         {
             float speedMutliplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onCtrl_ghost.name).speed_multiplier;
-            Vector2 newPosition = Vector2.MoveTowards(currentPosition, onCtrl_targetPosition, 
-                                                     (onCtrl_defaultSpeed * speedMutliplier) * Time.fixedDeltaTime);
+            Vector2 newPosition = Vector2.MoveTowards(currentPosition, onCtrl_targetPosition, (onCtrl_defaultSpeed * speedMutliplier) * Time.fixedDeltaTime);
             onCtrl_ghost.transform.position = newPosition;
 
             if (newPosition == onCtrl_targetPosition)
@@ -348,69 +313,47 @@ public class GhostMazeController : MonoBehaviour
         animator.ResetTrigger($"{ghostName}.normal_left");
         animator.ResetTrigger($"{ghostName}.normal_right");
 
-        switch (direction)
+        string animatorId = direction switch
         {
-            case Vector2 vector when vector == Vector2.up:
-                animator.SetTrigger($"{ghostName}.normal_up");
-                break;
-            case Vector2 vector when vector == Vector2.down:
-                animator.SetTrigger($"{ghostName}.normal_down");
-                break;
-            case Vector2 vector when vector == Vector2.left:
-                animator.SetTrigger($"{ghostName}.normal_left");
-                break;
-            case Vector2 vector when vector == Vector2.right:
-                animator.SetTrigger($"{ghostName}.normal_right");
-                break;
-        }
+            Vector2 v when v == Vector2.up => $"{ghostName}.normal_up",
+            Vector2 v when v == Vector2.down => $"{ghostName}.normal_down",
+            Vector2 v when v == Vector2.left => $"{ghostName}.normal_left",
+            Vector2 v when v == Vector2.right => $"{ghostName}.normal_right",
+            _ => $"{ghostName}.rest"
+        };
+
+        animator.SetTrigger(animatorId);
     }
 
     private void SwitchGhost(string ghostName)
     {
-        switch (ghostName)
+        var ghostData = new Dictionary<string, (GameObject ghost, Animator animator, float speed)>
         {
-            case "blinky":
-                onCtrl_ghost = blinky;
-                onCtrl_animator = blinkyAnimator;
-                onCtrl_defaultSpeed = blinkyDefaultSpeed;
-                break;
+            { "blinky", (blinky, blinkyAnimator, blinkyDefaultSpeed) },
+            { "clyde", (clyde, clydeAnimator, clydeDefaultSpeed) },
+            { "inky", (inky, inkyAnimator, inkyDefaultSpeed) },
+            { "pinky", (pinky, pinkyAnimator, pinkyDefaultSpeed) }
+        };
 
-            case "clyde":
-                onCtrl_ghost = clyde;
-                onCtrl_animator = clydeAnimator;
-                onCtrl_defaultSpeed = clydeDefaultSpeed;
-                break;
-
-            case "inky":
-                onCtrl_ghost = inky;
-                onCtrl_animator = inkyAnimator;
-                onCtrl_defaultSpeed = inkyDefaultSpeed;;
-                break;
-
-            case "pinky":
-                onCtrl_ghost = pinky;
-                onCtrl_animator = pinkyAnimator;
-                onCtrl_defaultSpeed = pinkyDefaultSpeed;
-                break;
-
-            default:
-                onCtrl_ghost = null;
-                return;
+        if (!ghostData.TryGetValue(ghostName, out var ghostInfo))
+        {
+            onCtrl_ghost = null;
         }
+
+        (onCtrl_ghost, onCtrl_animator, onCtrl_defaultSpeed) = ghostInfo;
 
         if (onCtrl_ghost != null)
         {
             GameData gameData = GameDataManager.LoadData();
             gameData.ghost_data.current_controlling_ghost = ghostName;
-            
-            var ghostPosition = gameData.ghost_data.ghost_positions.Find(pos => pos.ghost_name == ghostName);
-            onCtrl_ghost.transform.position = GetTileCenter((ghostPosition != null) 
-                                                            ? ghostPosition.coordinate 
-                                                            : onCtrl_ghost.transform.position);
+
+            var ghostPosition = gameData.ghost_data.ghost_positions
+                .Find(pos => pos.ghost_name == ghostName);
+            onCtrl_ghost.transform.position = GetTileCenter(ghostPosition?.coordinate ?? onCtrl_ghost.transform.position);
 
             onCtrl_direction = Vector2.zero;
             onCtrl_queuedDirection = Vector2.zero;
-            
+
             onCtrl_animator.SetTrigger($"{onCtrl_ghost.name}.rest");
 
             GameDataManager.SaveData(gameData);
@@ -443,7 +386,7 @@ public class GhostMazeController : MonoBehaviour
         }
     }
 
-    private void UpdateCooldownText()
+    private void UpdateDisplayText()
     {
         float cooldownRemaining = Mathf.Max(0f, switchCooldown - (Time.time - lastSwitchTime));
         cooldownText.text = cooldownRemaining > 0 ? $"{cooldownRemaining:F1}s" : "";
@@ -453,111 +396,230 @@ public class GhostMazeController : MonoBehaviour
     {
         foreach (string ghostName in aliveGhosts)
         {
-            if (ghostName != GameDataManager.LoadData().ghost_data.current_controlling_ghost)
+            if (ghostName != onCtrl_ghost.name)
             {
                 switch (ghostName)
                 {
                     case "blinky":
-                        AutoMoveGhost(blinky, blinkyAnimator, blinkyDefaultSpeed, GetBlinkyAutoTargetPosition());
+                        AutoMoveBlinky();
                         break;
-                        
+                    
                     case "clyde":
-                        AutoMoveGhost(clyde, clydeAnimator, clydeDefaultSpeed, GetClydeAutoTargetPosition());
+                        AutoMoveClyde();
                         break;
-                        
+                    
                     case "inky":
-                        AutoMoveGhost(inky, inkyAnimator, inkyDefaultSpeed, GetInkyAutoTargetPosition());
+                        AutoMoveInky();
                         break;
-                        
+                    
                     case "pinky":
-                        AutoMoveGhost(pinky, pinkyAnimator, pinkyDefaultSpeed, GetPinkyAutoTargetPosition());
+                        AutoMovePinky();
                         break;
                 }
             }
         }
     }
 
-    private void AutoMoveGhost(GameObject ghost, Animator animator, float defaultSpeed, Vector2 targetPosition)
+    private void AutoMoveBlinky()
     {
-        Vector2 onAuto_direction = onAuto_directions[ghost.name];
+        GameObject onAuto_ghost = blinky;
         
-        if ((Vector2)ghost.transform.position == GetTileCenter((Vector2)ghost.transform.position))
+        if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
         {
-            if (onAuto_hasReachedTarget[ghost.name])
+            if (onAuto_hasReachedTarget[onAuto_ghost.name])
             {
-                onAuto_hasReachedTarget[ghost.name] = false;
-                onAuto_direction = GetValidDirection(ghost.transform.position, onAuto_direction, ghost, targetPosition, true);
-                onAuto_directions[ghost.name] = onAuto_direction;
-                UpdateGhostAnimation(animator, onAuto_direction, ghost.name);
+                onAuto_hasReachedTarget[onAuto_ghost.name] = false;
+                GameData gameData = GameDataManager.LoadData();
+                
+                Animator onAuto_animator = blinkyAnimator;
+                Vector2 pacmanPosition = gameData.pacman_data.coordinate;
+                
+                onAuto_directions[onAuto_ghost.name] = GetValidDirection(onAuto_ghost.transform.position, onAuto_directions[onAuto_ghost.name], onAuto_ghost, pacmanPosition, true);   
+                onAuto_targetPositions[onAuto_ghost.name] = (Vector2)onAuto_ghost.transform.position + onAuto_directions[onAuto_ghost.name] * 0.16f;             
 
-                Queue<Vector2> recentTiles = onAuto_recentTiles[ghost.name];
+                UpdateGhostAnimation(onAuto_animator, onAuto_directions[onAuto_ghost.name], onAuto_ghost.name);
+                
+                Queue<Vector2> recentTiles = onAuto_recentTiles[onAuto_ghost.name];
                 if (recentTiles.Count >= MAX_RECENT_TILES)
                 {
                     recentTiles.Dequeue();
                 }
-                recentTiles.Enqueue(GetTileCenter((Vector2)ghost.transform.position));
+                recentTiles.Enqueue(GetTileCenter((Vector2)onAuto_ghost.transform.position));
             }
         }
 
-        float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers
-                                .Find(mul => mul.ghost_name == ghost.name).speed_multiplier;
-        Vector2 newPosition = Vector2.MoveTowards(ghost.transform.position, 
-                                                (Vector2)ghost.transform.position + onAuto_direction * TILE_SIZE, 
-                                                (defaultSpeed * speedMultiplier) * Time.deltaTime);
-
-        if (IsAbleToMoveTo(newPosition, ghost))
+        if (!onAuto_hasReachedTarget[onAuto_ghost.name] && IsAbleToMoveTo(onAuto_targetPositions[onAuto_ghost.name], onAuto_ghost))
         {
-            ghost.transform.position = newPosition;
-
-            if ((Vector2)ghost.transform.position == GetTileCenter((Vector2)ghost.transform.position))
+            if (!onAuto_hasReachedTarget[onAuto_ghost.name])
             {
-                UpdateGhostPosition(ghost.name, newPosition);
-                onAuto_hasReachedTarget[ghost.name] = true;
+                float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onAuto_ghost.name).speed_multiplier;
+                Vector2 newPosition = Vector2.MoveTowards(onAuto_ghost.transform.position, onAuto_targetPositions[onAuto_ghost.name], (blinkyDefaultSpeed * speedMultiplier) * Time.deltaTime);
+                onAuto_ghost.transform.position = newPosition;
+
+                if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
+                {
+                    UpdateGhostPosition(onAuto_ghost.name, newPosition);
+                    onAuto_hasReachedTarget[onAuto_ghost.name] = true;
+                }
             }
         }
         else
         {
-            ghost.transform.position = GetTileCenter((Vector2)ghost.transform.position);
-            onAuto_hasReachedTarget[ghost.name] = true;
+            onAuto_ghost.transform.position = GetTileCenter((Vector2)onAuto_ghost.transform.position);
+            onAuto_hasReachedTarget[onAuto_ghost.name] = true;
         }
     }
 
-    private Vector2 GetBlinkyAutoTargetPosition()
+    private void AutoMoveClyde()
     {
-        GameData gameData = GameDataManager.LoadData();
-        return gameData.pacman_data.coordinate;
-    }
-
-    private Vector2 GetClydeAutoTargetPosition()
-    {
-        GameData gameData = GameDataManager.LoadData();
-        Vector2 clydePosition = clyde.transform.position;
-        Vector2 pacmanPosition = gameData.pacman_data.coordinate;
-        float distanceToPacman = Vector2.Distance(clydePosition, pacmanPosition);
+        GameObject onAuto_ghost = clyde;
         
-        return (distanceToPacman > FEIGNING_IGNORANCE_DISTANCE * TILE_SIZE) ? pacmanPosition : clydeSpawn.position;
+        if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
+        {
+            if (onAuto_hasReachedTarget[onAuto_ghost.name])
+            {
+                onAuto_hasReachedTarget[onAuto_ghost.name] = false;
+                GameData gameData = GameDataManager.LoadData();
+                
+                Animator onAuto_animator = clydeAnimator;
+                Vector2 pacmanPosition = gameData.pacman_data.coordinate;
+                float distanceToPacman = Vector2.Distance(onAuto_ghost.transform.position, pacmanPosition);
+                
+                onAuto_directions[onAuto_ghost.name] = GetValidDirection(onAuto_ghost.transform.position, onAuto_directions[onAuto_ghost.name], onAuto_ghost, pacmanPosition, (distanceToPacman > FEIGNING_IGNORANCE_DISTANCE * 0.16f));
+                onAuto_targetPositions[onAuto_ghost.name] = (Vector2)onAuto_ghost.transform.position + onAuto_directions[onAuto_ghost.name] * 0.16f;
+                
+                UpdateGhostAnimation(onAuto_animator, onAuto_directions[onAuto_ghost.name], onAuto_ghost.name);
+
+                Queue<Vector2> recentTiles = onAuto_recentTiles[onAuto_ghost.name];
+                if (recentTiles.Count >= MAX_RECENT_TILES)
+                {
+                    recentTiles.Dequeue();
+                }
+                recentTiles.Enqueue(GetTileCenter((Vector2)onAuto_ghost.transform.position));
+            }
+        }
+
+        if (!onAuto_hasReachedTarget[onAuto_ghost.name] && IsAbleToMoveTo(onAuto_targetPositions[onAuto_ghost.name], onAuto_ghost))
+        {
+            float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onAuto_ghost.name).speed_multiplier;
+            Vector2 newPosition = Vector2.MoveTowards(onAuto_ghost.transform.position, onAuto_targetPositions[onAuto_ghost.name], (clydeDefaultSpeed * speedMultiplier) * Time.deltaTime);
+            onAuto_ghost.transform.position = newPosition;
+
+            if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
+            {
+                UpdateGhostPosition(onAuto_ghost.name, newPosition);
+                onAuto_hasReachedTarget[onAuto_ghost.name] = true;
+            }
+        }
+        else
+        {
+            onAuto_ghost.transform.position = GetTileCenter((Vector2)onAuto_ghost.transform.position);
+            onAuto_hasReachedTarget[onAuto_ghost.name] = true;
+        }
     }
 
-    private Vector2 GetInkyAutoTargetPosition()
+    private void AutoMoveInky()
     {
-        GameData gameData = GameDataManager.LoadData();
-        Vector2 pacmanPosition = gameData.pacman_data.coordinate;
-        Vector2 pacmanDirection = gameData.pacman_data.direction;
-        Vector2 blinkyPosition = blinky.transform.position;
+        GameObject onAuto_ghost = inky;
 
-        Vector2 offsetFromPacman = pacmanPosition + pacmanDirection * (WHIMSICAL_DISTANCE * TILE_SIZE);
-        Vector2 targetTile = offsetFromPacman + (offsetFromPacman - blinkyPosition);
-        return GetNearestNonCollisionTile(targetTile, inky);
+        if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
+        {
+            if (onAuto_hasReachedTarget[onAuto_ghost.name])
+            {
+                onAuto_hasReachedTarget[onAuto_ghost.name] = false;
+                GameData gameData = GameDataManager.LoadData();
+                
+                Animator onAuto_animator = inkyAnimator;
+                Vector2 pacmanPosition = gameData.pacman_data.coordinate;
+                Vector2 pacmanDirection = gameData.pacman_data.direction;
+                Vector2 inkyPosition = gameData.ghost_data.ghost_positions.Find(pos => pos.ghost_name == onAuto_ghost.name)?.coordinate ?? Vector2.zero;
+
+                Vector2 offsetFromPacman = pacmanPosition + pacmanDirection * (WHIMSICAL_DISTANCE * 0.16f);
+                Vector2 targetTile = offsetFromPacman + (offsetFromPacman - inkyPosition);
+                targetTile = GetNearestNonCollisionTile(targetTile, onAuto_ghost);
+
+                onAuto_directions[onAuto_ghost.name] = GetValidDirection(onAuto_ghost.transform.position, onAuto_directions[onAuto_ghost.name], onAuto_ghost, targetTile, true);
+                onAuto_targetPositions[onAuto_ghost.name] = (Vector2)onAuto_ghost.transform.position + onAuto_directions[onAuto_ghost.name] * 0.16f;
+                
+                UpdateGhostAnimation(onAuto_animator, onAuto_directions[onAuto_ghost.name], onAuto_ghost.name);
+
+                Queue<Vector2> recentTiles = onAuto_recentTiles[onAuto_ghost.name];
+                if (recentTiles.Count >= MAX_RECENT_TILES)
+                {
+                    recentTiles.Dequeue();
+                }
+                recentTiles.Enqueue(GetTileCenter((Vector2)onAuto_ghost.transform.position));
+            }
+        }
+
+        if (!onAuto_hasReachedTarget[onAuto_ghost.name] && IsAbleToMoveTo(onAuto_targetPositions[onAuto_ghost.name], onAuto_ghost))
+        {
+            float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onAuto_ghost.name).speed_multiplier;
+            Vector2 newPosition = Vector2.MoveTowards(onAuto_ghost.transform.position, onAuto_targetPositions[onAuto_ghost.name], (inkyDefaultSpeed * speedMultiplier) * Time.deltaTime);
+            onAuto_ghost.transform.position = newPosition;
+
+            if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
+            {
+                UpdateGhostPosition(onAuto_ghost.name, newPosition);
+                onAuto_hasReachedTarget[onAuto_ghost.name] = true;
+            }
+        }
+        else
+        {
+            onAuto_ghost.transform.position = GetTileCenter((Vector2)onAuto_ghost.transform.position);
+            onAuto_hasReachedTarget[onAuto_ghost.name] = true;
+        }
     }
 
-    private Vector2 GetPinkyAutoTargetPosition()
+    private void AutoMovePinky()
     {
-        GameData gameData = GameDataManager.LoadData();
-        Vector2 pacmanPosition = gameData.pacman_data.coordinate;
-        Vector2 pacmanDirection = gameData.pacman_data.direction;
-        
-        Vector2 targetTile = pacmanPosition + pacmanDirection * (AMBUSHER_DISTANCE * TILE_SIZE);
-        return GetNearestNonCollisionTile(targetTile, pinky);
+        GameObject onAuto_ghost = pinky;
+
+        if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
+        {
+            if (onAuto_hasReachedTarget[onAuto_ghost.name])
+            {
+                onAuto_hasReachedTarget[onAuto_ghost.name] = false;
+                GameData gameData = GameDataManager.LoadData();
+                
+                Animator onAuto_animator = pinkyAnimator;
+                Vector2 pacmanPosition = gameData.pacman_data.coordinate;
+                Vector2 pacmanDirection = gameData.pacman_data.direction;
+
+                Vector2 targetTile = pacmanPosition + pacmanDirection * (AMBUSHER_DISTANCE * 0.16f);
+                targetTile = GetNearestNonCollisionTile(targetTile, onAuto_ghost);
+
+                onAuto_directions[onAuto_ghost.name] = GetValidDirection(onAuto_ghost.transform.position, onAuto_directions[onAuto_ghost.name], onAuto_ghost, targetTile, true);
+                onAuto_targetPositions[onAuto_ghost.name] = (Vector2)onAuto_ghost.transform.position + onAuto_directions[onAuto_ghost.name] * 0.16f;
+                
+                UpdateGhostAnimation(onAuto_animator, onAuto_directions[onAuto_ghost.name], onAuto_ghost.name);
+
+                Queue<Vector2> recentTiles = onAuto_recentTiles[onAuto_ghost.name];
+                if (recentTiles.Count >= MAX_RECENT_TILES)
+                {
+                    recentTiles.Dequeue();
+                }
+                recentTiles.Enqueue(GetTileCenter((Vector2)onAuto_ghost.transform.position));
+            }
+        }
+
+        if (!onAuto_hasReachedTarget[onAuto_ghost.name] && IsAbleToMoveTo(onAuto_targetPositions[onAuto_ghost.name], onAuto_ghost))
+        {
+            float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onAuto_ghost.name).speed_multiplier;
+            Vector2 newPosition = Vector2.MoveTowards(onAuto_ghost.transform.position, onAuto_targetPositions[onAuto_ghost.name], (pinkyDefaultSpeed * speedMultiplier) * Time.deltaTime);
+            onAuto_ghost.transform.position = newPosition;
+
+            if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
+            {
+                UpdateGhostPosition(onAuto_ghost.name, newPosition);
+                onAuto_hasReachedTarget[onAuto_ghost.name] = true;
+            }
+        }
+        else
+        {
+            onAuto_ghost.transform.position = GetTileCenter((Vector2)onAuto_ghost.transform.position);
+            onAuto_hasReachedTarget[onAuto_ghost.name] = true;
+        }
     }
 
     private Vector2 GetTileCenter(Vector2 position)
@@ -567,54 +629,39 @@ public class GhostMazeController : MonoBehaviour
         return new Vector2(x, y);
     }
 
-    private Vector2 GetValidDirection(Vector2 position, Vector2 preferredDirection, GameObject ghostObject, Vector2 targetPosition, bool isDirectTargeting)
+    private Vector2 GetValidDirection(Vector2 currentPosition, Vector2 currentDirection, GameObject ghost, Vector2 targetPosition, bool isDirectTargeting)
     {
-        List<Vector2> directions = new List<Vector2> { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
-        Vector2 oppositeDirection = -preferredDirection;
-        directions.Remove(oppositeDirection);
+        List<Vector2> possibleDirections = new List<Vector2> { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+        possibleDirections.Remove(-currentDirection);
 
-        List<Vector2> validDirections = new List<Vector2>();
-        Vector2 currentTile = GetTileCenter(position);
+        Vector2 bestDirection = Vector2.zero;
+        float bestDistance = float.MaxValue;
 
-        foreach (var direction in directions)
+        foreach (Vector2 direction in possibleDirections)
         {
-            Vector2 nextTile = GetTileCenter(position + direction * TILE_SIZE);
-            if (IsAbleToMoveTo(nextTile, ghostObject) && !onAuto_recentTiles[ghostObject.name].Contains(nextTile))
+            Vector2 newPosition = currentPosition + direction * TILE_SIZE;
+            if (IsAbleToMoveTo(newPosition, ghost))
             {
-                validDirections.Add(direction);
-            }
-        }
-
-        if (validDirections.Count == 1)
-        {
-            return validDirections[0];
-        }
-        else if (validDirections.Count > 1)
-        {
-            if (isDirectTargeting)
-            {
-                validDirections.Sort((dir1, dir2) =>
+                float distanceToTarget = Vector2.Distance(newPosition, targetPosition);
+                if (distanceToTarget < bestDistance)
                 {
-                    float dist1 = Vector2.Distance(position + dir1 * TILE_SIZE, targetPosition);
-                    float dist2 = Vector2.Distance(position + dir2 * TILE_SIZE, targetPosition);
-                    return dist1.CompareTo(dist2);
-                });
-            }
-            else
-            {
-                for (int i = 0; i < validDirections.Count; i++)
-                {
-                    Vector2 validTemp = validDirections[i];
-                    int randomIndex = Random.Range(i, validDirections.Count);
-                    validDirections[i] = validDirections[randomIndex];
-                    validDirections[randomIndex] = validTemp;
+                    bestDistance = distanceToTarget;
+                    bestDirection = direction;
                 }
             }
-
-            return validDirections[0];
         }
 
-        return Vector2.zero;
+        if (bestDirection == Vector2.zero)
+        {
+            bestDirection = -currentDirection;
+        }
+
+        if (!isDirectTargeting && bestDirection == currentDirection && IsAbleToMoveTo(currentPosition + bestDirection * TILE_SIZE, ghost))
+        {
+            return bestDirection;
+        }
+
+        return bestDirection;
     }
 
     private Vector2 GetNearestNonCollisionTile(Vector2 targetTile, GameObject ghost)

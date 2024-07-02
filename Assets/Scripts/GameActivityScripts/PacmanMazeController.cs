@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PacmanMazeController : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class PacmanMazeController : MonoBehaviour
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Animator animator;
     [SerializeField] private LayerMask collisionLayer;
+
+    [Header("Ghost Power-up Info")]
+    [SerializeField] private Text scoresText;
 
     [Space(12)]
     [SerializeField] private bool hasMazeStarted = false;
@@ -62,6 +66,8 @@ public class PacmanMazeController : MonoBehaviour
     private void Update()
     {
         if (!hasMazeStarted) return;
+
+        UpdateDisplayText();
  
         if (!isRunning && queuedDirection != Vector2.zero)
         {
@@ -225,5 +231,11 @@ public class PacmanMazeController : MonoBehaviour
 
         animator.SetTrigger("pacman.rest");
         UpdatePacmanAnimation();
+    }
+
+    private void UpdateDisplayText()
+    {
+        int pacmanScore = GameDataManager.LoadData().pacman_data.score; 
+        scoresText.text = pacmanScore.ToString("0000000");
     }
 }

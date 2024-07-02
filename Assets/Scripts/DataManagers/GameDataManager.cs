@@ -17,6 +17,7 @@ public class GameData
     public class PacmanData
     {
         public int score;
+        public int playtime;
         public int lives;
         public Vector2 coordinate;
         public Vector2 direction;

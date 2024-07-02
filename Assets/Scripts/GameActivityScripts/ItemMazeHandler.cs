@@ -27,12 +27,7 @@ public class ItemMazeHandler : MonoBehaviour
 
     private void Update()
     {
-        GameData gameData = GameDataManager.LoadData();
-        if (gameData.pacman_data.coordinate != lastPacmanPosition)
-        {
-            CheckPacdotCollection();
-            lastPacmanPosition = gameData.pacman_data.coordinate;
-        }
+        CheckPacdotCollection();
     }
 
     private void InitializeItems()

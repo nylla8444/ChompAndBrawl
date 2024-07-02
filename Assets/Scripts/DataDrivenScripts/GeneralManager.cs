@@ -38,6 +38,7 @@ public class GeneralManager : MonoBehaviour
         // Set the application as running in background, and the time scale should be in normal state
         Application.runInBackground = true;
         Time.timeScale = 1.0f;
+        QualitySettings.vSyncCount = 2;
     }
 
     private void PrepareAllData()
