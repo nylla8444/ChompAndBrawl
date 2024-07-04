@@ -32,10 +32,18 @@ public class GhostMazeController : MonoBehaviour
     [Header("Ghost Miscellaneous")]
     [SerializeField] private LayerMask collisionLayer;
     
-    [Header("Ghost Power-up Info")]
-    [SerializeField] private float switchCooldown;
-    [SerializeField] private Text cooldownText;
-    private float lastSwitchTime = -Mathf.Infinity;
+    [Header("Ghost Effect Item Info")]
+    [SerializeField] private float speedMultiplierIncrease;
+    [Space(4)]
+    [SerializeField] private float boostItemUseTime;
+    [SerializeField] private float boostItemCooldown;
+    [SerializeField] private float changeCooldown;
+    [Space(4)]
+    [SerializeField] private Text boostItemCooldownText;
+    [SerializeField] private Text changeCooldownText;
+    
+    private float lastDefaultTime_CD = -Mathf.Infinity;
+    private float lastChangeTime_CD = -Mathf.Infinity;
 
     [Space(12)]
     [SerializeField] private bool hasMazeStarted = false;
@@ -101,6 +109,7 @@ public class GhostMazeController : MonoBehaviour
         KeybindDataManager.RegisterKeyAction("ghost.face_left", () => HandleInput("ghost.face_left"));
         KeybindDataManager.RegisterKeyAction("ghost.face_right", () => HandleInput("ghost.face_right"));
         KeybindDataManager.RegisterKeyAction("ghost.change_ghost", () => HandleInput("ghost.change_ghost"));
+        KeybindDataManager.RegisterKeyAction("ghost.use_boost_item", () => HandleInput("ghost.use_boost_item"));
     }
 
     private void UnregisterKeyActions()
@@ -110,6 +119,7 @@ public class GhostMazeController : MonoBehaviour
         KeybindDataManager.UnregisterKeyAction("ghost.face_left", () => HandleInput("ghost.face_left"));
         KeybindDataManager.UnregisterKeyAction("ghost.face_right", () => HandleInput("ghost.face_right"));
         KeybindDataManager.UnregisterKeyAction("ghost.change_ghost", () => HandleInput("ghost.change_ghost"));
+        KeybindDataManager.UnregisterKeyAction("ghost.use_boost_item", () => HandleInput("ghost.use_boost_item"));
     }
 
     private void Update()
@@ -125,6 +135,13 @@ public class GhostMazeController : MonoBehaviour
             isRunning = true;
             UpdateGhostAnimation(onCtrl_animator, onCtrl_direction, onCtrl_ghost.name);
         }
+
+        // if (isRunning)
+        // {
+        //     MoveTowards();
+        // }
+
+        // MoveNonControlledGhosts();
     }
 
     private void FixedUpdate()
@@ -150,12 +167,12 @@ public class GhostMazeController : MonoBehaviour
         };
         
         GameData gameData = GameDataManager.LoadData();
-        aliveGhosts = gameData.ghost_data.list_alive_ghost;
+        aliveGhosts = gameData.ghost_data.list_alive_ghosts;
         lastControllingGhost = gameData.ghost_data.current_controlling_ghost;
 
-        SwitchGhost(lastControllingGhost);
+        ChangeGhost(lastControllingGhost);
 
-        foreach (string ghostName in gameData.ghost_data.list_alive_ghost)
+        foreach (string ghostName in gameData.ghost_data.list_alive_ghosts)
         {
             if (!ghostData.TryGetValue(ghostName, out var ghostInfo))
             {
@@ -195,25 +212,29 @@ public class GhostMazeController : MonoBehaviour
         {
             if (!isRunning)
             {
-                OnPowerup_SwitchGhost();
+                OnUse_ChangeGhost();
             }
             else
             {
                 queuedGhostSwitch = true;
             }
         }
+        else if (action == "ghost.use_boost_item")
+        {
+            StartCoroutine(OnUse_BoostItem());
+        }
     }
 
     private void MoveTowards()
     {
-        Vector2 currentPosition = onCtrl_ghost.transform.position;
+        Vector2 currentPosition = (Vector2)onCtrl_ghost.transform.position;
 
-        if ((Vector2)onCtrl_ghost.transform.position == onCtrl_targetPosition)
+        if (currentPosition == onCtrl_targetPosition)
         {
             if (queuedGhostSwitch)
             {
                 queuedGhostSwitch = false;
-                OnPowerup_SwitchGhost();
+                OnUse_ChangeGhost();
                 return;
             }
 
@@ -234,7 +255,7 @@ public class GhostMazeController : MonoBehaviour
                 if (queuedGhostSwitch)
                 {
                     queuedGhostSwitch = false;
-                    OnPowerup_SwitchGhost();
+                    OnUse_ChangeGhost();
                 }
                 return;
             }
@@ -257,7 +278,7 @@ public class GhostMazeController : MonoBehaviour
             if (queuedGhostSwitch)
             {
                 queuedGhostSwitch = false;
-                OnPowerup_SwitchGhost();
+                OnUse_ChangeGhost();
             }
         }
     }
@@ -307,25 +328,29 @@ public class GhostMazeController : MonoBehaviour
 
     private void UpdateGhostAnimation(Animator animator, Vector2 direction, string ghostName)
     {
-        animator.ResetTrigger($"{ghostName}.rest");
-        animator.ResetTrigger($"{ghostName}.normal_up");
-        animator.ResetTrigger($"{ghostName}.normal_down");
-        animator.ResetTrigger($"{ghostName}.normal_left");
-        animator.ResetTrigger($"{ghostName}.normal_right");
+        foreach(AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                animator.ResetTrigger(parameter.name);
+            }
+        }
+
+        bool hasPowerPellet = GameDataManager.LoadData().pacman_data.has_power_pellet;
 
         string animatorId = direction switch
         {
-            Vector2 v when v == Vector2.up => $"{ghostName}.normal_up",
-            Vector2 v when v == Vector2.down => $"{ghostName}.normal_down",
-            Vector2 v when v == Vector2.left => $"{ghostName}.normal_left",
-            Vector2 v when v == Vector2.right => $"{ghostName}.normal_right",
+            Vector2 v when v == Vector2.up => (!hasPowerPellet) ? $"{ghostName}.normal_up" : $"{ghostName}.frighten_up",
+            Vector2 v when v == Vector2.down => (!hasPowerPellet) ? $"{ghostName}.normal_down" : $"{ghostName}.frighten_down",
+            Vector2 v when v == Vector2.left => (!hasPowerPellet) ? $"{ghostName}.normal_left" : $"{ghostName}.frighten_left",
+            Vector2 v when v == Vector2.right => (!hasPowerPellet) ? $"{ghostName}.normal_right" : $"{ghostName}.frighten_right",
             _ => $"{ghostName}.rest"
         };
 
         animator.SetTrigger(animatorId);
     }
 
-    private void SwitchGhost(string ghostName)
+    private void ChangeGhost(string ghostName)
     {
         var ghostData = new Dictionary<string, (GameObject ghost, Animator animator, float speed)>
         {
@@ -363,9 +388,13 @@ public class GhostMazeController : MonoBehaviour
         lastControllingGhost = ghostName;
     }
 
-    private void OnPowerup_SwitchGhost()
+    /*********************************************************************/
+    //                            Item Use
+    /*********************************************************************/
+
+    private void OnUse_ChangeGhost()
     {
-        if (aliveGhosts.Count == 0 || Time.time - lastSwitchTime < switchCooldown)
+        if (aliveGhosts.Count == 0 || Time.time - lastChangeTime_CD < changeCooldown)
         {
             Debug.Log("Switch ghost cooldown in progress.");
             return;
@@ -375,22 +404,57 @@ public class GhostMazeController : MonoBehaviour
         currentCharacterIndex = (currentCharacterIndex + 1) % aliveGhosts.Count;
         
         string nextGhostName = aliveGhosts[currentCharacterIndex];
-        SwitchGhost(nextGhostName);
+        ChangeGhost(nextGhostName);
 
-        lastSwitchTime = Time.time;
+        lastChangeTime_CD = Time.time;
         
         if (queuedGhostSwitch)
         {
             queuedGhostSwitch = false;
-            OnPowerup_SwitchGhost();
+            OnUse_ChangeGhost();
         }
+    }
+
+    private IEnumerator OnUse_BoostItem()
+    {
+        if (Time.time - lastDefaultTime_CD < boostItemCooldown)
+        {
+            Debug.Log("Speed boost cooldown in progress.");
+            yield break;
+        }
+        
+        lastDefaultTime_CD = Time.time;
+
+        IncreaseSpeedMultiplier(speedMultiplierIncrease);
+        yield return new WaitForSeconds(boostItemUseTime);
+        IncreaseSpeedMultiplier(-speedMultiplierIncrease);
+    }
+
+    private void IncreaseSpeedMultiplier(float increase)
+    {
+        GameData gameData = GameDataManager.LoadData();
+        var ghostSpeedMultiplier = gameData.ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onCtrl_ghost.name);
+
+        if (ghostSpeedMultiplier != null)
+        {
+            ghostSpeedMultiplier.speed_multiplier += increase;
+        }
+
+        GameDataManager.SaveData(gameData);
     }
 
     private void UpdateDisplayText()
     {
-        float cooldownRemaining = Mathf.Max(0f, switchCooldown - (Time.time - lastSwitchTime));
-        cooldownText.text = cooldownRemaining > 0 ? $"{cooldownRemaining:F1}s" : "";
+        float boostCooldownRemaining = Mathf.Max(0f, boostItemCooldown - (Time.time - lastDefaultTime_CD));
+        boostItemCooldownText.text = boostCooldownRemaining > 0 ? $"{boostCooldownRemaining:F1}s" : "";
+        
+        float changeCooldownRemaining = Mathf.Max(0f, changeCooldown - (Time.time - lastChangeTime_CD));
+        changeCooldownText.text = changeCooldownRemaining > 0 ? $"{changeCooldownRemaining:F1}s" : "";
     }
+
+    /*********************************************************************/
+    //                       Ghost AI Movement
+    /*********************************************************************/
 
     private void MoveNonControlledGhosts()
     {
@@ -400,21 +464,10 @@ public class GhostMazeController : MonoBehaviour
             {
                 switch (ghostName)
                 {
-                    case "blinky":
-                        AutoMoveBlinky();
-                        break;
-                    
-                    case "clyde":
-                        AutoMoveClyde();
-                        break;
-                    
-                    case "inky":
-                        AutoMoveInky();
-                        break;
-                    
-                    case "pinky":
-                        AutoMovePinky();
-                        break;
+                    case "blinky": AutoMoveBlinky(); break;
+                    case "clyde": AutoMoveClyde(); break;
+                    case "inky": AutoMoveInky(); break;
+                    case "pinky": AutoMovePinky(); break;
                 }
             }
         }
@@ -631,19 +684,23 @@ public class GhostMazeController : MonoBehaviour
 
     private Vector2 GetValidDirection(Vector2 currentPosition, Vector2 currentDirection, GameObject ghost, Vector2 targetPosition, bool isDirectTargeting)
     {
-        List<Vector2> possibleDirections = new List<Vector2> { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
-        possibleDirections.Remove(-currentDirection);
+        bool hasPowerPellet = GameDataManager.LoadData().pacman_data.has_power_pellet;
+
+        Vector2[] possibleDirections = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+        Vector2 reverseDirection = -currentDirection;
 
         Vector2 bestDirection = Vector2.zero;
-        float bestDistance = float.MaxValue;
+        float bestDistance = hasPowerPellet ? 0f : float.MaxValue;
 
         foreach (Vector2 direction in possibleDirections)
         {
+            if (direction == reverseDirection) continue;
+
             Vector2 newPosition = currentPosition + direction * TILE_SIZE;
             if (IsAbleToMoveTo(newPosition, ghost))
             {
                 float distanceToTarget = Vector2.Distance(newPosition, targetPosition);
-                if (distanceToTarget < bestDistance)
+                if ((hasPowerPellet && distanceToTarget > bestDistance) || (!hasPowerPellet && distanceToTarget < bestDistance))
                 {
                     bestDistance = distanceToTarget;
                     bestDirection = direction;
@@ -653,7 +710,7 @@ public class GhostMazeController : MonoBehaviour
 
         if (bestDirection == Vector2.zero)
         {
-            bestDirection = -currentDirection;
+            bestDirection = reverseDirection;
         }
 
         if (!isDirectTargeting && bestDirection == currentDirection && IsAbleToMoveTo(currentPosition + bestDirection * TILE_SIZE, ghost))
@@ -666,22 +723,26 @@ public class GhostMazeController : MonoBehaviour
 
     private Vector2 GetNearestNonCollisionTile(Vector2 targetTile, GameObject ghost)
     {
-        if (!IsAbleToMoveTo(targetTile, ghost))
+        if (IsAbleToMoveTo(targetTile, ghost))
         {
-            for (float offset = TILE_SIZE; offset <= TILE_SIZE * 3; offset += TILE_SIZE)
+            return targetTile;
+        }
+
+        Vector2[] directions = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+        float[] offsets = { TILE_SIZE, TILE_SIZE * 2, TILE_SIZE * 3 };
+
+        foreach (float offset in offsets)
+        {
+            foreach (Vector2 direction in directions)
             {
-                Vector2[] directions = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
-                foreach (Vector2 direction in directions)
+                Vector2 checkTile = targetTile + direction * offset;
+                if (IsAbleToMoveTo(checkTile, ghost))
                 {
-                    Vector2 checkTile = targetTile + direction * offset;
-                    if (IsAbleToMoveTo(checkTile, ghost))
-                    {
-                        return checkTile;
-                    }
+                    return checkTile;
                 }
             }
         }
-        
+
         return targetTile;
     }
 }

@@ -38,7 +38,6 @@ public class GeneralManager : MonoBehaviour
         // Set the application as running in background, and the time scale should be in normal state
         Application.runInBackground = true;
         Time.timeScale = 1.0f;
-        QualitySettings.vSyncCount = 2;
     }
 
     private void PrepareAllData()
@@ -94,18 +93,18 @@ public class GeneralManager : MonoBehaviour
         PlayerDataManager.SaveData(playerData);
     }
  
-    private void OnApplicationFocus(bool hasFocus)
-    {
-        PauseOnDeviceOnly();
-    }
+    // private void OnApplicationFocus(bool hasFocus)
+    // {
+    //     if (!hasFocus) PauseOnDeviceOnly();
+    // }
 
-    private void OnApplicationPause(bool hasPause)
-    {
-        PauseOnDeviceOnly();
-    }
+    // private void OnApplicationPause(bool hasPause)
+    // {
+    //     if (!hasPause) PauseOnDeviceOnly();
+    // }
 
-    private void OnApplicationQuit()
-    {
-        PauseOnDeviceOnly();
-    }
+    // private void OnApplicationQuit()
+    // {
+    //     PauseOnDeviceOnly();
+    // }
 }

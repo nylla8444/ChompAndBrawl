@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9370086f594f6904cba9b80347aa2ab7
+guid: aedd62e31bde761489f39d6a5d24d892
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -123,7 +123,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: power_pellet_0
+      name: inky_frighten_down_0
       rect:
         serializedVersion: 2
         x: 0
@@ -137,14 +137,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 81400c4a1bc7a1f46947759b7ccebb5a
-      internalID: -539442752
+      spriteID: cad8029b5650c8a4f9c9b775a17e5545
+      internalID: -234818232
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: power_pellet_1
+      name: inky_frighten_down_1
       rect:
         serializedVersion: 2
         x: 32
@@ -158,14 +158,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 976ad380809b8be46bcf2c57005c863d
-      internalID: 980577907
+      spriteID: b68bc59fe73e01c44b7e54f74a148b7f
+      internalID: 1446899313
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: power_pellet_2
+      name: inky_frighten_down_2
       rect:
         serializedVersion: 2
         x: 64
@@ -179,14 +179,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 772bbe96312cceb419067c0a7f510e31
-      internalID: -57943198
+      spriteID: 721fc4d22d2a5fb4b866614220006579
+      internalID: -1734681596
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: power_pellet_3
+      name: inky_frighten_down_3
       rect:
         serializedVersion: 2
         x: 96
@@ -200,14 +200,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d02514542736a7c41b55416852830c98
-      internalID: 901201139
+      spriteID: 86c06f7c586c2844c94bbd8ec6cbb3fc
+      internalID: 958357789
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: power_pellet_4
+      name: inky_frighten_down_4
       rect:
         serializedVersion: 2
         x: 128
@@ -221,14 +221,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b15288aec152e5148b7faedb8e311aea
-      internalID: 978687035
+      spriteID: 23f69bdd3ee080347bac53060067407b
+      internalID: -1875048454
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: power_pellet_5
+      name: inky_frighten_down_5
       rect:
         serializedVersion: 2
         x: 160
@@ -242,14 +242,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b0a03e1358cf5094b8458cb9457b2c53
-      internalID: 1740548641
+      spriteID: 386a1cfdf31457b458b921ddf42e6b92
+      internalID: -954306218
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: power_pellet_6
+      name: inky_frighten_down_6
       rect:
         serializedVersion: 2
         x: 192
@@ -263,14 +263,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 230a1d9fa8f8f7b438daac053abc34c9
-      internalID: 915668356
+      spriteID: 08e2a2b3b30c8c4479cd845f37edf434
+      internalID: 328638523
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: power_pellet_7
+      name: inky_frighten_down_7
       rect:
         serializedVersion: 2
         x: 224
@@ -284,14 +284,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 132b3bd33e24c324ab6c6111033e600c
-      internalID: 1118737212
+      spriteID: 6ae4eabc9505341429bb78e2d5b66e44
+      internalID: 121885912
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: power_pellet_8
+      name: inky_frighten_down_8
       rect:
         serializedVersion: 2
         x: 256
@@ -305,8 +305,92 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 13e54ae03a763e944b6e5afd91a4593e
-      internalID: 516542419
+      spriteID: 7fb3a9c94931afd4a9c4522973d6c3dd
+      internalID: -1852814910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: inky_frighten_down_9
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6b87ea4bf1f4644f95c33bd706e8489
+      internalID: 992507736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: inky_frighten_down_10
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d18bb25e422b4a24f8359f19ac5f3e27
+      internalID: 1398905716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: inky_frighten_down_11
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 26dca9698249f6f47a564acc65584403
+      internalID: 1380701567
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: inky_frighten_down_12
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 11db5d74d774c194a835993dfd156548
+      internalID: 2038013693
       vertices: []
       indices: 
       edges: []
@@ -322,15 +406,19 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      power_pellet_0: -539442752
-      power_pellet_1: 980577907
-      power_pellet_2: -57943198
-      power_pellet_3: 901201139
-      power_pellet_4: 978687035
-      power_pellet_5: 1740548641
-      power_pellet_6: 915668356
-      power_pellet_7: 1118737212
-      power_pellet_8: 516542419
+      inky_frighten_down_0: -234818232
+      inky_frighten_down_1: 1446899313
+      inky_frighten_down_10: 1398905716
+      inky_frighten_down_11: 1380701567
+      inky_frighten_down_12: 2038013693
+      inky_frighten_down_2: -1734681596
+      inky_frighten_down_3: 958357789
+      inky_frighten_down_4: -1875048454
+      inky_frighten_down_5: -954306218
+      inky_frighten_down_6: 328638523
+      inky_frighten_down_7: 121885912
+      inky_frighten_down_8: -1852814910
+      inky_frighten_down_9: 992507736
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

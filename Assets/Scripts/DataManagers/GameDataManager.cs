@@ -25,7 +25,7 @@ public class GameData
         public float vision_multiplier;
         public bool has_power_pellet;
         public bool has_won_at_fight;
-        public string current_powerup_item;
+        public string current_effect_item;
     }
 
     [Serializable]
@@ -33,7 +33,7 @@ public class GameData
     {
         public string current_controlling_ghost;
         public string current_fighting_ghost;
-        public List<string> list_alive_ghost;
+        public List<string> list_alive_ghosts;
         public List<GhostPositions> ghost_positions;
         public List<GhostSpeedMultipliers> ghost_speed_multipliers;
         public bool is_control_inverted;

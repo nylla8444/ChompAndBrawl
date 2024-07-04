@@ -13,9 +13,9 @@ public class PacmanMazeController : MonoBehaviour
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Animator animator;
     [SerializeField] private LayerMask collisionLayer;
-
-    [Header("Ghost Power-up Info")]
     [SerializeField] private Text scoresText;
+    
+    [Header("Pacman Effect Item Info")]
 
     [Space(12)]
     [SerializeField] private bool hasMazeStarted = false;
@@ -25,7 +25,6 @@ public class PacmanMazeController : MonoBehaviour
     private Vector2 targetPosition;
     private Vector2 queuedDirection;
 
-    private Rigidbody2D rb;
     private BoxCollider2D pacmanCollider;
 
     private const float TILE_SIZE = 0.16f;
@@ -76,6 +75,11 @@ public class PacmanMazeController : MonoBehaviour
             isRunning = true;
             UpdatePacmanAnimation();
         }
+
+        // if (isRunning)
+        // {
+        //     MoveTowards();
+        // }
     }
 
     private void FixedUpdate()
@@ -93,12 +97,11 @@ public class PacmanMazeController : MonoBehaviour
         GameData gameData = GameDataManager.LoadData();
         Vector2 pacmanPosition = gameData.pacman_data.coordinate;
 
-        pacman.transform.position = (pacmanPosition != Vector2.zero)
-            ? pacmanPosition
-            : spawnPoint.position;
+        pacman.transform.position = (pacmanPosition != Vector2.zero) 
+            ? new Vector2(Mathf.Round(pacmanPosition.x * 100.0f) / 100.0f, Mathf.Round(pacmanPosition.y * 100.0f) / 100.0f)
+            : new Vector2(Mathf.Round(spawnPoint.position.x * 100.0f) / 100.0f, Mathf.Round(spawnPoint.position.y * 100.0f) / 100.0f);
         
         pacmanCollider = pacman.GetComponent<BoxCollider2D>();
-        rb = pacman.GetComponent<Rigidbody2D>();
 
         animator?.SetTrigger("pacman.rest");
     }
@@ -107,35 +110,27 @@ public class PacmanMazeController : MonoBehaviour
     {
         if (!hasMazeStarted) return;
         
-        switch (action)
+        Vector2 _direction = action switch
         {
-            case "pacman.face_up":
-                queuedDirection = Vector2.up;
-                Debug.Log("Pac-man queued up.");
-                break;
-            
-            case "pacman.face_down":
-                queuedDirection = Vector2.down;
-                Debug.Log("Pac-man queued down.");
-                break;
-            
-            case "pacman.face_left":
-                queuedDirection = Vector2.left;
-                Debug.Log("Pac-man queued left.");
-                break;
-
-            case "pacman.face_right":
-                queuedDirection = Vector2.right;
-                Debug.Log("Pac-man queued right.");
-                break;
+            "pacman.face_up" => Vector2.up,
+            "pacman.face_down" => Vector2.down,
+            "pacman.face_left" => Vector2.left,
+            "pacman.face_right" => Vector2.right,
+            _ => Vector2.zero
+        };
+        
+        if (_direction != Vector2.zero)
+        {
+            queuedDirection = _direction;
+            Debug.Log($"Ghost queued {_direction}.");
         }
     }
 
     private void MoveTowards()
     {
-        Vector2 currentPosition = pacman.transform.position;
+        Vector2 currentPosition = (Vector2)pacman.transform.position;
 
-        if ((Vector2)pacman.transform.position == targetPosition)
+        if (currentPosition == targetPosition)
         {
             if (IsAbleToMoveTo(currentPosition + queuedDirection * TILE_SIZE))
             {
@@ -198,30 +193,26 @@ public class PacmanMazeController : MonoBehaviour
 
     private void UpdatePacmanAnimation()
     {
-        animator.ResetTrigger("pacman.rest");
-        animator.ResetTrigger("pacman.normal_up");
-        animator.ResetTrigger("pacman.normal_down");
-        animator.ResetTrigger("pacman.normal_left");
-        animator.ResetTrigger("pacman.normal_right");
-        
-        switch (direction)
+        foreach(AnimatorControllerParameter parameter in animator.parameters)
         {
-            case Vector2 vector when vector == Vector2.up:
-                animator.SetTrigger("pacman.normal_up");
-                break;
-
-            case Vector2 vector when vector == Vector2.down:
-                animator.SetTrigger("pacman.normal_down");
-                break;
-
-            case Vector2 vector when vector == Vector2.left:
-                animator.SetTrigger("pacman.normal_left");
-                break;
-
-            case Vector2 vector when vector == Vector2.right:
-                animator.SetTrigger("pacman.normal_right");
-                break;
+            if (parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                animator.ResetTrigger(parameter.name);
+            }
         }
+
+        bool hasPowerPellet = GameDataManager.LoadData().pacman_data.has_power_pellet;
+        
+        string animatorId = direction switch
+        {
+            Vector2 v when v == Vector2.up => (!hasPowerPellet) ? "pacman.normal_up" : "pacman.scary_up",
+            Vector2 v when v == Vector2.down => (!hasPowerPellet) ? "pacman.normal_down" : "pacman.scary_down",
+            Vector2 v when v == Vector2.left => (!hasPowerPellet) ? "pacman.normal_left" : "pacman.scary_left",
+            Vector2 v when v == Vector2.right => (!hasPowerPellet) ? "pacman.normal_right" : "pacman.scary_right",
+            _ => "pacman.rest"
+        };
+
+        animator.SetTrigger(animatorId);
     }
 
     public void Respawn()
@@ -236,6 +227,10 @@ public class PacmanMazeController : MonoBehaviour
     private void UpdateDisplayText()
     {
         int pacmanScore = GameDataManager.LoadData().pacman_data.score; 
-        scoresText.text = pacmanScore.ToString("0000000");
+        scoresText.text = pacmanScore.ToString("00000000");
     }
+
+    /*********************************************************************/
+    //                            Item Use
+    /*********************************************************************/
 }

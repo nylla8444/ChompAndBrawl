@@ -41,8 +41,8 @@ MonoBehaviour:
     - translated_action_name: Face Right
       action_name: pacman.face_right
       key_code: 100
-    - translated_action_name: Power Up
-      action_name: pacman.power_up
+    - translated_action_name: Use Item
+      action_name: pacman.use_item
       key_code: 101
   - category_name: Ghost
     input_keybinds:
@@ -61,9 +61,9 @@ MonoBehaviour:
     - translated_action_name: Change Ghost
       action_name: ghost.change_ghost
       key_code: 13
-    - translated_action_name: Default Power Up
-      action_name: ghost.default_power_up
+    - translated_action_name: Use Boost Item
+      action_name: ghost.use_boost_item
       key_code: 303
-    - translated_action_name: Unique Power Up
-      action_name: ghost.unique_power_up
+    - translated_action_name: Use Unique Item
+      action_name: ghost.use_unique_item
       key_code: 305
