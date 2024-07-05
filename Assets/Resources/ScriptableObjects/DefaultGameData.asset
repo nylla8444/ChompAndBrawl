@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameData:
     pacman_data:
-      score: 0
+      points: 0
       playtime: 0
       lives: 3
       coordinate: {x: 0, y: 0}
@@ -23,24 +23,24 @@ MonoBehaviour:
       vision_multiplier: 1
       has_power_pellet: 0
       has_won_at_fight: 0
-      current_powerup_item: 
+      current_effect_item: 
     ghost_data:
-      current_controlling_ghost: blinky
-      current_fighting_ghost: 
-      list_alive_ghosts:
+      current_controlling: blinky
+      current_fighting: 
+      list_alive:
       - blinky
       - clyde
       - inky
       - pinky
       ghost_positions: []
       ghost_speed_multipliers:
-      - ghost_name: blinky
+      - name: blinky
         speed_multiplier: 1
-      - ghost_name: clyde
+      - name: clyde
         speed_multiplier: 1
-      - ghost_name: inky
+      - name: inky
         speed_multiplier: 1
-      - ghost_name: pinky
+      - name: pinky
         speed_multiplier: 1
       is_control_inverted: 0
     item_data:

@@ -12,7 +12,10 @@ public class EffectItemList : ScriptableObject
 [Serializable]
 public class EffectItem
 {
-    public string effectItemName;
-    public Sprite effectItemSprite;
-    public int effectItemSpawnChance;
+    public string name;
+    public Sprite asItemSprite;
+    public Sprite inEffectSprite;
+    public Sprite startParticleSprite;
+    public float useTime;
+    public int spawnChance;
 }

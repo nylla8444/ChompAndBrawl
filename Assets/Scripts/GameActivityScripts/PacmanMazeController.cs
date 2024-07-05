@@ -13,7 +13,7 @@ public class PacmanMazeController : MonoBehaviour
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Animator animator;
     [SerializeField] private LayerMask collisionLayer;
-    [SerializeField] private Text scoresText;
+    [SerializeField] private Text pointsText;
     
     [Header("Pacman Effect Item Info")]
 
@@ -226,8 +226,8 @@ public class PacmanMazeController : MonoBehaviour
 
     private void UpdateDisplayText()
     {
-        int pacmanScore = GameDataManager.LoadData().pacman_data.score; 
-        scoresText.text = pacmanScore.ToString("00000000");
+        int pacmanScore = GameDataManager.LoadData().pacman_data.points; 
+        pointsText.text = pacmanScore.ToString("00000000");
     }
 
     /*********************************************************************/

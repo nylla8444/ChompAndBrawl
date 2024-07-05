@@ -16,10 +16,10 @@ public class ItemMazeHandler : MonoBehaviour
     [SerializeField] private GameObject effectItemPrefab;
 
     [Header("Scores")]
-    [SerializeField] private int pacdotScore;
-    [SerializeField] private int powerPelletScore;
-    [SerializeField] private int powerPelletFailScore;
-    [SerializeField] private int effectItemScore;
+    [SerializeField] private int pacdotPoints;
+    [SerializeField] private int powerPelletPoints;
+    [SerializeField] private int powerPelletFailPoints;
+    [SerializeField] private int effectItemPoints;
     
     [Header("Item Info")]
     [SerializeField] private float powerPelletDuration;
@@ -43,7 +43,7 @@ public class ItemMazeHandler : MonoBehaviour
 
     private const float TILE_SIZE = 0.16f;
     private const float TILE_OFFSET = 0.08f;
-    private const int MAX_COUNT_POWER_PELLETS = 3;
+    private const int MAX_COUNT_POWER_PELLETS = 2;
     private const int MAX_COUNT_FRUITS = 4;
     private const int MAX_COUNT_EFFECT_ITEMS = 4;
     private const float MIN_DISTANCE_POWER_PELLETS_FROM_ORIGIN = 12f;
@@ -110,7 +110,6 @@ public class ItemMazeHandler : MonoBehaviour
                 }
             }
         }
-        Debug.Log(System.String.Join(", ", gameData.item_data.pacdot_positions));
         GameDataManager.SaveData(gameData);
     }
 
@@ -174,7 +173,7 @@ public class ItemMazeHandler : MonoBehaviour
     private void PacdotCollected(Vector2 position)
     {
         GameData gameData = GameDataManager.LoadData();
-        gameData.pacman_data.score += pacdotScore;
+        gameData.pacman_data.points += pacdotPoints;
         gameData.item_data.pacdot_positions.Remove(position);
         GameDataManager.SaveData(gameData);
     }
@@ -255,7 +254,7 @@ public class ItemMazeHandler : MonoBehaviour
             }
         }
 
-        if (!System.String.IsNullOrEmpty(gameData.ghost_data.current_fighting_ghost))
+        if (!System.String.IsNullOrEmpty(gameData.ghost_data.current_fighting))
         {
             StopCoroutine(PowerPelletEffect());
         }
@@ -265,7 +264,7 @@ public class ItemMazeHandler : MonoBehaviour
     {
         GameData gameData = GameDataManager.LoadData();
         gameData.pacman_data.has_power_pellet = true;
-        gameData.pacman_data.score += powerPelletScore;
+        gameData.pacman_data.points += powerPelletPoints;
         GameDataManager.SaveData(gameData);
     }
 
@@ -275,7 +274,7 @@ public class ItemMazeHandler : MonoBehaviour
         
         GameData gameData = GameDataManager.LoadData();
         gameData.pacman_data.has_power_pellet = false;
-        gameData.pacman_data.score -= powerPelletFailScore;
+        gameData.pacman_data.points -= powerPelletFailPoints;
         GameDataManager.SaveData(gameData);
 
         SpawnAllPowerPellets();
@@ -306,11 +305,11 @@ public class ItemMazeHandler : MonoBehaviour
     {
         GameData gameData = GameDataManager.LoadData();
         List<Fruit> possibleFruits = new List<Fruit>();
-        int aliveGhostCount = gameData.ghost_data.list_alive_ghosts.Count;
+        int aliveGhostCount = gameData.ghost_data.list_alive.Count;
 
         foreach (Fruit fruit in fruitList.fruits)
         {
-            if (fruit.fruitGhostRequirement <= aliveGhostCount - 4)
+            if (fruit.ghostRequirement <= aliveGhostCount - 4)
             {
                 possibleFruits.Add(fruit);
             }
@@ -346,12 +345,12 @@ public class ItemMazeHandler : MonoBehaviour
         GameObject fruitObject = Instantiate(fruitPrefab, position, Quaternion.identity);
         
         RemovePacdot(position);
-        fruitObject.GetComponent<SpriteRenderer>().sprite = selectedFruit.fruitSprite;
-        fruitObject.name = selectedFruit.fruitName;
+        fruitObject.GetComponent<SpriteRenderer>().sprite = selectedFruit.asItemSprite;
+        fruitObject.name = selectedFruit.name;
         fruitsOnPath.Add(fruitObject);
         fruitDictionary[fruitObject] = selectedFruit;
         
-        Debug.Log($"Fruit spawned: {selectedFruit.fruitName} at ({position.x}, {position.y})");
+        Debug.Log($"Fruit spawned: {selectedFruit.name} at ({position.x}, {position.y})");
     }
 
     private Fruit SelectFruitBasedOnChance(List<Fruit> possibleFruits)
@@ -361,7 +360,7 @@ public class ItemMazeHandler : MonoBehaviour
 
         foreach (Fruit fruit in possibleFruits)
         {
-            if (randomChance <= fruit.fruitSpawnChance)
+            if (randomChance <= fruit.spawnChance)
             {
                 possibleItems.Add(fruit);
             }
@@ -395,7 +394,7 @@ public class ItemMazeHandler : MonoBehaviour
         GameData gameData = GameDataManager.LoadData();
         if (fruitDictionary.TryGetValue(fruitObject, out Fruit fruitData))
         {
-            gameData.pacman_data.score += fruitData.fruitScore;
+            gameData.pacman_data.points += fruitData.points;
             fruitDictionary.Remove(fruitObject);
             GameDataManager.SaveData(gameData);
         }
@@ -455,12 +454,12 @@ public class ItemMazeHandler : MonoBehaviour
         GameObject effectItemObject = Instantiate(effectItemPrefab, position, Quaternion.identity);
         
         RemovePacdot(position);
-        effectItemObject.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = selectedEffectItem.effectItemSprite;
-        effectItemObject.name = selectedEffectItem.effectItemName;
+        effectItemObject.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = selectedEffectItem.asItemSprite;
+        effectItemObject.name = selectedEffectItem.name;
         effectItemsOnPath.Add(effectItemObject);
         effectItemDictionary[effectItemObject] = selectedEffectItem;
         
-        Debug.Log($"Effect Item spawned: {selectedEffectItem.effectItemName} at ({position.x}, {position.y})");
+        Debug.Log($"Effect Item spawned: {selectedEffectItem.name} at ({position.x}, {position.y})");
     }
 
     private EffectItem SelectEffectItemBasedOnChance(List<EffectItem> possibleEffectItems)
@@ -470,7 +469,7 @@ public class ItemMazeHandler : MonoBehaviour
 
         foreach (EffectItem effectItem in possibleEffectItems)
         {
-            if (randomChance <= effectItem.effectItemSpawnChance)
+            if (randomChance <= effectItem.spawnChance)
             {
                 possibleItems.Add(effectItem);
             }
@@ -508,8 +507,8 @@ public class ItemMazeHandler : MonoBehaviour
         GameData gameData = GameDataManager.LoadData();
         if (effectItemDictionary.TryGetValue(effectItemObject, out EffectItem effectItemData))
         {
-            gameData.pacman_data.score += effectItemScore;
-            gameData.pacman_data.current_effect_item = effectItemData.effectItemName;
+            gameData.pacman_data.points += effectItemPoints;
+            gameData.pacman_data.current_effect_item = effectItemData.name;
             effectItemDictionary.Remove(effectItemObject);
             GameDataManager.SaveData(gameData);
         }

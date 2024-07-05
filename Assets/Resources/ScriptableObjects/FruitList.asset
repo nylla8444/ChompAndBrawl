@@ -13,38 +13,38 @@ MonoBehaviour:
   m_Name: FruitList
   m_EditorClassIdentifier: 
   fruits:
-  - fruitName: cherry
-    fruitSprite: {fileID: -1790056757, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
-    fruitScore: 100
-    fruitGhostRequirement: 0
-    fruitSpawnChance: 100
-  - fruitName: strawberry
-    fruitSprite: {fileID: 1785883142, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
-    fruitScore: 250
-    fruitGhostRequirement: 0
-    fruitSpawnChance: 80
-  - fruitName: orange
-    fruitSprite: {fileID: 1280049722, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
-    fruitScore: 500
-    fruitGhostRequirement: 1
-    fruitSpawnChance: 60
-  - fruitName: green_apple
-    fruitSprite: {fileID: 1579115496, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
-    fruitScore: 750
-    fruitGhostRequirement: 1
-    fruitSpawnChance: 40
-  - fruitName: grapes
-    fruitSprite: {fileID: 70093511, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
-    fruitScore: 1000
-    fruitGhostRequirement: 2
-    fruitSpawnChance: 30
-  - fruitName: banana
-    fruitSprite: {fileID: -1326892743, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
-    fruitScore: 2500
-    fruitGhostRequirement: 2
-    fruitSpawnChance: 20
-  - fruitName: golden_cherry
-    fruitSprite: {fileID: 1878980519, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
-    fruitScore: 5000
-    fruitGhostRequirement: 3
-    fruitSpawnChance: 10
+  - name: cherry
+    asItemSprite: {fileID: -1790056757, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
+    points: 100
+    ghostRequirement: 0
+    spawnChance: 100
+  - name: strawberry
+    asItemSprite: {fileID: 1785883142, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
+    points: 250
+    ghostRequirement: 0
+    spawnChance: 80
+  - name: orange
+    asItemSprite: {fileID: 1280049722, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
+    points: 500
+    ghostRequirement: 1
+    spawnChance: 60
+  - name: green_apple
+    asItemSprite: {fileID: 1579115496, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
+    points: 750
+    ghostRequirement: 1
+    spawnChance: 45
+  - name: grapes
+    asItemSprite: {fileID: 70093511, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
+    points: 1000
+    ghostRequirement: 2
+    spawnChance: 30
+  - name: banana
+    asItemSprite: {fileID: -1326892743, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
+    points: 2500
+    ghostRequirement: 2
+    spawnChance: 20
+  - name: golden_cherry
+    asItemSprite: {fileID: 1878980519, guid: 0f9b8d0ab9834854e822d695c357a4a5, type: 3}
+    points: 5000
+    ghostRequirement: 3
+    spawnChance: 10

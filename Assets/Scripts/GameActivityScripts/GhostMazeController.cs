@@ -167,12 +167,12 @@ public class GhostMazeController : MonoBehaviour
         };
         
         GameData gameData = GameDataManager.LoadData();
-        aliveGhosts = gameData.ghost_data.list_alive_ghosts;
-        lastControllingGhost = gameData.ghost_data.current_controlling_ghost;
+        aliveGhosts = gameData.ghost_data.list_alive;
+        lastControllingGhost = gameData.ghost_data.current_controlling;
 
         ChangeGhost(lastControllingGhost);
 
-        foreach (string ghostName in gameData.ghost_data.list_alive_ghosts)
+        foreach (string ghostName in gameData.ghost_data.list_alive)
         {
             if (!ghostData.TryGetValue(ghostName, out var ghostInfo))
             {
@@ -182,7 +182,7 @@ public class GhostMazeController : MonoBehaviour
 
             (GameObject _ghost, Transform _spawnPoint, Animator _animator) = ghostInfo; 
             
-            var ghostPosition = gameData.ghost_data.ghost_positions.Find(pos => pos.ghost_name == _ghost.name);
+            var ghostPosition = gameData.ghost_data.ghost_positions.Find(pos => pos.name == _ghost.name);
             _ghost.transform.position = ghostPosition?.coordinate ?? _spawnPoint.position;
             _animator?.SetTrigger($"{_ghost.name}.rest");
         }
@@ -263,7 +263,7 @@ public class GhostMazeController : MonoBehaviour
 
         if (IsAbleToMoveTo(onCtrl_targetPosition, onCtrl_ghost))
         {
-            float speedMutliplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onCtrl_ghost.name).speed_multiplier;
+            float speedMutliplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.name == onCtrl_ghost.name).speed_multiplier;
             Vector2 newPosition = Vector2.MoveTowards(currentPosition, onCtrl_targetPosition, (onCtrl_defaultSpeed * speedMutliplier) * Time.fixedDeltaTime);
             onCtrl_ghost.transform.position = newPosition;
 
@@ -307,12 +307,12 @@ public class GhostMazeController : MonoBehaviour
     {
         GameData gameData = GameDataManager.LoadData();
 
-        var ghostPosition = gameData.ghost_data.ghost_positions.Find(pos => pos.ghost_name == ghostName);
+        var ghostPosition = gameData.ghost_data.ghost_positions.Find(pos => pos.name == ghostName);
         if (ghostPosition == null)
         {
             ghostPosition = new GameData.GhostData.GhostPositions
             {
-                ghost_name = ghostName,
+                name = ghostName,
                 coordinate = position
             };
             
@@ -370,10 +370,10 @@ public class GhostMazeController : MonoBehaviour
         if (onCtrl_ghost != null)
         {
             GameData gameData = GameDataManager.LoadData();
-            gameData.ghost_data.current_controlling_ghost = ghostName;
+            gameData.ghost_data.current_controlling = ghostName;
 
             var ghostPosition = gameData.ghost_data.ghost_positions
-                .Find(pos => pos.ghost_name == ghostName);
+                .Find(pos => pos.name == ghostName);
             onCtrl_ghost.transform.position = GetTileCenter(ghostPosition?.coordinate ?? onCtrl_ghost.transform.position);
 
             onCtrl_direction = Vector2.zero;
@@ -425,15 +425,15 @@ public class GhostMazeController : MonoBehaviour
         
         lastDefaultTime_CD = Time.time;
 
-        IncreaseSpeedMultiplier(speedMultiplierIncrease);
+        InEffect_Boost(speedMultiplierIncrease);
         yield return new WaitForSeconds(boostItemUseTime);
-        IncreaseSpeedMultiplier(-speedMultiplierIncrease);
+        InEffect_Boost(-speedMultiplierIncrease);
     }
 
-    private void IncreaseSpeedMultiplier(float increase)
+    private void InEffect_Boost(float increase)
     {
         GameData gameData = GameDataManager.LoadData();
-        var ghostSpeedMultiplier = gameData.ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onCtrl_ghost.name);
+        var ghostSpeedMultiplier = gameData.ghost_data.ghost_speed_multipliers.Find(mul => mul.name == onCtrl_ghost.name);
 
         if (ghostSpeedMultiplier != null)
         {
@@ -505,7 +505,7 @@ public class GhostMazeController : MonoBehaviour
         {
             if (!onAuto_hasReachedTarget[onAuto_ghost.name])
             {
-                float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onAuto_ghost.name).speed_multiplier;
+                float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.name == onAuto_ghost.name).speed_multiplier;
                 Vector2 newPosition = Vector2.MoveTowards(onAuto_ghost.transform.position, onAuto_targetPositions[onAuto_ghost.name], (blinkyDefaultSpeed * speedMultiplier) * Time.deltaTime);
                 onAuto_ghost.transform.position = newPosition;
 
@@ -554,7 +554,7 @@ public class GhostMazeController : MonoBehaviour
 
         if (!onAuto_hasReachedTarget[onAuto_ghost.name] && IsAbleToMoveTo(onAuto_targetPositions[onAuto_ghost.name], onAuto_ghost))
         {
-            float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onAuto_ghost.name).speed_multiplier;
+            float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.name == onAuto_ghost.name).speed_multiplier;
             Vector2 newPosition = Vector2.MoveTowards(onAuto_ghost.transform.position, onAuto_targetPositions[onAuto_ghost.name], (clydeDefaultSpeed * speedMultiplier) * Time.deltaTime);
             onAuto_ghost.transform.position = newPosition;
 
@@ -585,7 +585,7 @@ public class GhostMazeController : MonoBehaviour
                 Animator onAuto_animator = inkyAnimator;
                 Vector2 pacmanPosition = gameData.pacman_data.coordinate;
                 Vector2 pacmanDirection = gameData.pacman_data.direction;
-                Vector2 inkyPosition = gameData.ghost_data.ghost_positions.Find(pos => pos.ghost_name == onAuto_ghost.name)?.coordinate ?? Vector2.zero;
+                Vector2 inkyPosition = gameData.ghost_data.ghost_positions.Find(pos => pos.name == onAuto_ghost.name)?.coordinate ?? Vector2.zero;
 
                 Vector2 offsetFromPacman = pacmanPosition + pacmanDirection * (WHIMSICAL_DISTANCE * 0.16f);
                 Vector2 targetTile = offsetFromPacman + (offsetFromPacman - inkyPosition);
@@ -607,7 +607,7 @@ public class GhostMazeController : MonoBehaviour
 
         if (!onAuto_hasReachedTarget[onAuto_ghost.name] && IsAbleToMoveTo(onAuto_targetPositions[onAuto_ghost.name], onAuto_ghost))
         {
-            float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onAuto_ghost.name).speed_multiplier;
+            float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.name == onAuto_ghost.name).speed_multiplier;
             Vector2 newPosition = Vector2.MoveTowards(onAuto_ghost.transform.position, onAuto_targetPositions[onAuto_ghost.name], (inkyDefaultSpeed * speedMultiplier) * Time.deltaTime);
             onAuto_ghost.transform.position = newPosition;
 
@@ -658,7 +658,7 @@ public class GhostMazeController : MonoBehaviour
 
         if (!onAuto_hasReachedTarget[onAuto_ghost.name] && IsAbleToMoveTo(onAuto_targetPositions[onAuto_ghost.name], onAuto_ghost))
         {
-            float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.ghost_name == onAuto_ghost.name).speed_multiplier;
+            float speedMultiplier = GameDataManager.LoadData().ghost_data.ghost_speed_multipliers.Find(mul => mul.name == onAuto_ghost.name).speed_multiplier;
             Vector2 newPosition = Vector2.MoveTowards(onAuto_ghost.transform.position, onAuto_targetPositions[onAuto_ghost.name], (pinkyDefaultSpeed * speedMultiplier) * Time.deltaTime);
             onAuto_ghost.transform.position = newPosition;
 

@@ -12,9 +12,9 @@ public class FruitList : ScriptableObject
 [Serializable]
 public class Fruit
 {
-    public string fruitName;
-    public Sprite fruitSprite;
-    public int fruitScore;
-    public int fruitGhostRequirement;
-    public int fruitSpawnChance;
+    public string name;
+    public Sprite asItemSprite;
+    public int points;
+    public int ghostRequirement;
+    public int spawnChance;
 }

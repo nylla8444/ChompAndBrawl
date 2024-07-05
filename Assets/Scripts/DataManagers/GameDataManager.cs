@@ -16,7 +16,7 @@ public class GameData
     [Serializable]
     public class PacmanData
     {
-        public int score;
+        public int points;
         public int playtime;
         public int lives;
         public Vector2 coordinate;
@@ -31,9 +31,9 @@ public class GameData
     [Serializable]
     public class GhostData
     {
-        public string current_controlling_ghost;
-        public string current_fighting_ghost;
-        public List<string> list_alive_ghosts;
+        public string current_controlling;
+        public string current_fighting;
+        public List<string> list_alive;
         public List<GhostPositions> ghost_positions;
         public List<GhostSpeedMultipliers> ghost_speed_multipliers;
         public bool is_control_inverted;
@@ -41,14 +41,14 @@ public class GameData
         [Serializable]
         public class GhostPositions
         {
-            public string ghost_name;
+            public string name;
             public Vector2 coordinate;
         }
 
         [Serializable]
         public class GhostSpeedMultipliers
         {
-            public string ghost_name;
+            public string name;
             public float speed_multiplier;
         }
 

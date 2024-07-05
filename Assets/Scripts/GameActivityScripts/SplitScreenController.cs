@@ -62,7 +62,7 @@ public class SplitScreenController : MonoBehaviour
         {
             foreach (Transform ghost in allGhosts)
             {
-                if (ghost.name == gameData.ghost_data.current_controlling_ghost)
+                if (ghost.name == gameData.ghost_data.current_controlling)
                 {
                     currentGhost = ghost;
                     StartCoroutine(SmoothTransition(player2Camera.transform, new Vector3(ghost.position.x, ghost.position.y, player2Camera.transform.position.z)));
@@ -79,7 +79,7 @@ public class SplitScreenController : MonoBehaviour
         {
             foreach (Transform ghost in allGhosts)
             {
-                if (ghost.name == gameData.ghost_data.current_controlling_ghost)
+                if (ghost.name == gameData.ghost_data.current_controlling)
                 {
                     if (currentGhost != ghost)
                     {
