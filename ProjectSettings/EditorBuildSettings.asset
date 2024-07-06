@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/PacmanMaze/TheGhostIslandMaze.unity
+    path: Assets/Scenes/Labyrinth/TheGhostIsland.unity
     guid: 695be937f6402c64ebcd0fdec2415b5d
   - enabled: 1
     path: Assets/Scenes/MainMenuScene.unity

@@ -14,7 +14,7 @@ public class EffectItem
 {
     public string name;
     public Sprite asItemSprite;
-    public Sprite inEffectSprite;
+    public Sprite inEffectIconSprite;
     public Sprite startParticleSprite;
     public float useTime;
     public int spawnChance;

@@ -19066,16 +19066,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 243776805}
   m_CullTransparentMesh: 1
---- !u!1 &267224961 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6053070551972510259, guid: 7d1a731601b2b3b429b3d727f41dce09, type: 3}
-  m_PrefabInstance: {fileID: 5066349387520260612}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &267224962 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1048993054694160367, guid: 7d1a731601b2b3b429b3d727f41dce09, type: 3}
-  m_PrefabInstance: {fileID: 5066349387520260612}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &311632595
 GameObject:
   m_ObjectHideFlags: 0
@@ -32848,7 +32838,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 267224962}
+  - {fileID: 5242625702566301163}
   - {fileID: 56474009}
   - {fileID: 1647793505}
   - {fileID: 998042564}
@@ -35442,7 +35432,7 @@ MonoBehaviour:
   pathLayer:
     serializedVersion: 2
     m_Bits: 128
-  pacdotPrefab: {fileID: 267224961}
+  pacdotPrefab: {fileID: 1319443040688619575}
   powerPelletPrefab: {fileID: 56474008}
   fruitPrefab: {fileID: 1647793504}
   effectItemPrefab: {fileID: 998042563}
@@ -35669,6 +35659,11 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.16, y: 0.16}
   m_EdgeRadius: 0
+--- !u!1 &1319443040688619575 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6053070551972510259, guid: 7d1a731601b2b3b429b3d727f41dce09, type: 3}
+  m_PrefabInstance: {fileID: 5066349387520260612}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1629859443757188409
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35925,6 +35920,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7d1a731601b2b3b429b3d727f41dce09, type: 3}
+--- !u!4 &5242625702566301163 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1048993054694160367, guid: 7d1a731601b2b3b429b3d727f41dce09, type: 3}
+  m_PrefabInstance: {fileID: 5066349387520260612}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5257486531157323143
 PrefabInstance:
   m_ObjectHideFlags: 0
