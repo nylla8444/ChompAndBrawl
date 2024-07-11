@@ -17,6 +17,10 @@ public class SplitScreenMazeHandler : MonoBehaviour
     [SerializeField] private float cameraSmoothSpeed = 0.125f;
     [SerializeField] private float offsetDistance = 1.0f;
 
+    [Header("Arrow Indicator")]
+    [SerializeField] private GameObject arrowPrefab;
+    [SerializeField] private float arrowDistanceFromPlayer = 1.0f;
+
     [Header("Effect Objects")]
     [SerializeField] private GameObject pacman_effectDisplayPrefab;
     [SerializeField] private GameObject ghost_effectDisplayPrefab;
@@ -29,17 +33,22 @@ public class SplitScreenMazeHandler : MonoBehaviour
     private Vector3 player1Velocity = Vector3.zero;
     private Vector3 player2Velocity = Vector3.zero;
     private float DEFAULT_ORTHOGRAPHIC_SIZE = 1.25f;
+    private GameObject arrowInstance;
 
     private void Start()
     {
         UpdateCurrentControllingGhost();
         StartCoroutine(UpdatePacmanEffectDisplay());
         StartCoroutine(UpdateGhostEffectDisplay());
+
+        arrowInstance = Instantiate(arrowPrefab);
+        arrowInstance.SetActive(false);
     }
 
     private void Update()
     {
         CameraFollow();
+        UpdateArrowVisibilityAndPosition();
     }
 
     private void CameraFollow()
@@ -121,6 +130,30 @@ public class SplitScreenMazeHandler : MonoBehaviour
             yield return null;
         }
         cameraTransform.position = new Vector3(targetPosition.x, targetPosition.y, -10f);
+    }
+
+    private void UpdateArrowVisibilityAndPosition()
+    {
+        Vector3 player1ViewportPosition = player2Camera.WorldToViewportPoint(player1.position);
+
+        bool isPlayer1Visible = player1ViewportPosition.x >= 0 && player1ViewportPosition.x <= 1 &&
+                                player1ViewportPosition.y >= 0 && player1ViewportPosition.y <= 1 &&
+                                player1ViewportPosition.z > 0;
+
+        if (!isPlayer1Visible)
+        {
+            arrowInstance.SetActive(true);
+            Vector3 direction = (player1.position - currentGhost.position).normalized;
+
+            arrowInstance.transform.position = currentGhost.position + direction * arrowDistanceFromPlayer;
+
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            arrowInstance.transform.rotation = Quaternion.Euler(0, 0, angle - 90);
+        }
+        else
+        {
+            arrowInstance.SetActive(false);
+        }
     }
 
     private IEnumerator UpdatePacmanEffectDisplay()
