@@ -18,7 +18,7 @@ MonoBehaviour:
     asItemSprite: {fileID: -724520673, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
     startParticleSprite: {fileID: 0}
     useTime: 2.5
-    cooldown: 1.25
+    cooldown: 1.5
     spawnChance: 100
     inEffect:
       id: speed_boost
@@ -29,7 +29,7 @@ MonoBehaviour:
     asItemSprite: {fileID: 1686728571, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
     startParticleSprite: {fileID: 0}
     useTime: 5
-    cooldown: 1.25
+    cooldown: 1.5
     spawnChance: 80
     inEffect:
       id: zoom_out
@@ -40,7 +40,7 @@ MonoBehaviour:
     asItemSprite: {fileID: -674732789, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
     startParticleSprite: {fileID: 0}
     useTime: 3
-    cooldown: 1.25
+    cooldown: 1.5
     spawnChance: 45
     inEffect:
       id: retreating
@@ -51,7 +51,7 @@ MonoBehaviour:
     asItemSprite: {fileID: -2053906448, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
     startParticleSprite: {fileID: 0}
     useTime: 5
-    cooldown: 5
+    cooldown: 1.5
     spawnChance: 30
     inEffect:
       id: immune
@@ -62,7 +62,7 @@ MonoBehaviour:
     asItemSprite: {fileID: 1525094629, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
     startParticleSprite: {fileID: 0}
     useTime: 2.5
-    cooldown: 1.25
+    cooldown: 1.5
     spawnChance: 90
     inEffect:
       id: slowness
@@ -73,7 +73,7 @@ MonoBehaviour:
     asItemSprite: {fileID: 1049722366, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
     startParticleSprite: {fileID: 0}
     useTime: 6
-    cooldown: 1.25
+    cooldown: 1.5
     spawnChance: 70
     inEffect:
       id: paralyzed
@@ -84,7 +84,7 @@ MonoBehaviour:
     asItemSprite: {fileID: -858369387, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
     startParticleSprite: {fileID: 0}
     useTime: 5
-    cooldown: 1.25
+    cooldown: 1.5
     spawnChance: 50
     inEffect:
       id: darkness
@@ -95,7 +95,7 @@ MonoBehaviour:
     asItemSprite: {fileID: -1968986577, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
     startParticleSprite: {fileID: 0}
     useTime: 7
-    cooldown: 1.25
+    cooldown: 1.5
     spawnChance: 35
     inEffect:
       id: inverted

@@ -319,17 +319,18 @@ public class PacmanMazeController : MonoBehaviour
         var item_rocketBoost = effectItemList.effectItems.Find(item => item.name == "rocket_boost");
         const float SPEED_MULTIPLIER_INCREASE = 0.5f;
         
-        InEffect_RocketBoost(SPEED_MULTIPLIER_INCREASE);
+        InEffect_RocketBoost("add", SPEED_MULTIPLIER_INCREASE);
         yield return new WaitForSeconds(item_rocketBoost.useTime);
-        InEffect_RocketBoost(-SPEED_MULTIPLIER_INCREASE);
+        InEffect_RocketBoost("remove", -SPEED_MULTIPLIER_INCREASE);
     }
 
-    private void InEffect_RocketBoost(float increase)
-    {
+    private void InEffect_RocketBoost(string listMode, float increase)
+    {        
         float _pacman_speedMultiplier = IngameDataManager.LoadSpecificData<float>("pacman_data.speed_multiplier");
         _pacman_speedMultiplier += increase;
 
         IngameDataManager.SaveSpecificData("pacman_data.speed_multiplier", _pacman_speedMultiplier);
+        InOutAffectedItems(listMode, "rocket_boost", "pacman");
     }
 
     // Zoom Out
@@ -340,13 +341,15 @@ public class PacmanMazeController : MonoBehaviour
         const float VISION_MULTIPLIER_INCREASE = 0.4f;
         const float VISION_DURATION = 1.0f;
 
-        yield return StartCoroutine(InEffect_ZoomOut(VISION_MULTIPLIER_INCREASE, VISION_DURATION));
+        yield return StartCoroutine(InEffect_ZoomOut("add", VISION_MULTIPLIER_INCREASE, VISION_DURATION));
         yield return new WaitForSeconds(item_zoomOut.useTime);
-        yield return StartCoroutine(InEffect_ZoomOut(-VISION_MULTIPLIER_INCREASE, VISION_DURATION));
+        yield return StartCoroutine(InEffect_ZoomOut("remove", -VISION_MULTIPLIER_INCREASE, VISION_DURATION));
     }
 
-    private IEnumerator InEffect_ZoomOut(float increase, float duration)
+    private IEnumerator InEffect_ZoomOut(string listMode, float increase, float duration)
     {
+        InOutAffectedItems(listMode, "zoom_out", "pacman");
+        
         float _pacman_visionMultiplier = IngameDataManager.LoadSpecificData<float>("pacman_data.vision_multiplier");
         float startValue = _pacman_visionMultiplier;
         float targetValue = _pacman_visionMultiplier + increase;
@@ -372,19 +375,19 @@ public class PacmanMazeController : MonoBehaviour
         var item_retreat = effectItemList.effectItems.Find(item => item.name == "retreat");
         const float SPEED_MULTIPLIER_INCREASE = 0.75f;
 
-        InEffect_Retreat(-SPEED_MULTIPLIER_INCREASE);
+        InEffect_Retreat("add", -SPEED_MULTIPLIER_INCREASE);
         yield return new WaitForSeconds(item_retreat.useTime);
-        
-        InEffect_Retreat(SPEED_MULTIPLIER_INCREASE);
+        InEffect_Retreat("remove", SPEED_MULTIPLIER_INCREASE);
         Respawn();
     }
 
-    private void InEffect_Retreat(float increase)
+    private void InEffect_Retreat(string listMode, float increase)
     {
         float _pacman_speedMultiplier = IngameDataManager.LoadSpecificData<float>("pacman_data.speed_multiplier");
         _pacman_speedMultiplier += increase;
 
         IngameDataManager.SaveSpecificData("pacman_data.speed_multiplier", _pacman_speedMultiplier);
+        InOutAffectedItems(listMode, "retreat", "pacman");
     }
 
     // Immunity
@@ -393,13 +396,13 @@ public class PacmanMazeController : MonoBehaviour
     {
         var item_immunity = effectItemList.effectItems.Find(item => item.name == "immunity");
 
-        InEffect_Immunity(true);
+        InEffect_Immunity("add", true);
         yield return new WaitForSeconds(item_immunity.useTime);
-        InEffect_Immunity(false);
+        InEffect_Immunity("remove", false);
     }
 
-    private void InEffect_Immunity(bool isImmune)
-    {
+    private void InEffect_Immunity(string listMode, bool isImmune)
+    {    
         pacman.GetComponent<SpriteRenderer>().color = isImmune 
             ? new Color(1.0f, 1.0f, 1.0f, 0.5f) 
             : new Color(1.0f, 1.0f, 1.0f, 1.0f);
@@ -408,6 +411,7 @@ public class PacmanMazeController : MonoBehaviour
         _pacman_isImmuneToGhost = isImmune;
         
         IngameDataManager.SaveSpecificData("pacman_data.is_immune_to_ghost", _pacman_isImmuneToGhost);
+        InOutAffectedItems(listMode, "immunity", "pacman");
     }
 
     // Slow Move
@@ -417,21 +421,22 @@ public class PacmanMazeController : MonoBehaviour
         var item_slowMove = effectItemList.effectItems.Find(item => item.name == "slow_move");
         const float SPEED_MULTIPLIER_INCREASE = 0.25f;
 
-        InEffect_SlowMove(-SPEED_MULTIPLIER_INCREASE);
+        InEffect_SlowMove("add", -SPEED_MULTIPLIER_INCREASE);
         yield return new WaitForSeconds(item_slowMove.useTime);
-        InEffect_SlowMove(SPEED_MULTIPLIER_INCREASE);
+        InEffect_SlowMove("remove", SPEED_MULTIPLIER_INCREASE);
     }
 
-    private void InEffect_SlowMove(float increase)
+    private void InEffect_SlowMove(string listMode, float increase)
     {
         List<string> _ghost_listAlive = IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive");
                 
         foreach (string ghostName in _ghost_listAlive)
-        {
+        {    
             float _speedMultiplier = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", ghostName, "speed_multiplier");
             _speedMultiplier += increase;
 
             IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "speed_multiplier", _speedMultiplier);
+            InOutAffectedItems(listMode, "slow_move", "ghost", ghostName);
         }
     }
 
@@ -450,6 +455,9 @@ public class PacmanMazeController : MonoBehaviour
         
         foreach (string ghostName in _ghost_listAlive)
         {
+            bool _ghost_isParalyzed = IngameDataManager.LoadSpecificListData<bool>("ghost_data.ghost_single_info", ghostName, "is_paralyzed");
+            if (_ghost_isParalyzed) continue;
+            
             Vector2 _coordinate = IngameDataManager.LoadSpecificListData<Vector2>("ghost_data.ghost_single_info", ghostName, "coordinate");
             float distance = Vector2.Distance(_coordinate, pacman.transform.position);
             if (distance < nearestDistance)
@@ -460,7 +468,9 @@ public class PacmanMazeController : MonoBehaviour
         }
 
         if (nearestGhost == null || nearestDistance == Mathf.Infinity) yield break;
-        Debug.Log($"Nearest Ghost: {nearestGhost}");
+        
+        IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", nearestGhost, "is_paralyzed", true);
+        InOutAffectedItems("add", "paralyze", "ghost", nearestGhost);
 
         int paralyzeCount = 0;
         while (paralyzeCount < MAX_PARALYZE_COUNT)
@@ -472,6 +482,9 @@ public class PacmanMazeController : MonoBehaviour
             yield return new WaitForSeconds((item_paralyze.useTime / 4.0f) - PARALYZE_DURATION);
             paralyzeCount++;
         }
+
+        IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", nearestGhost, "is_paralyzed", false);
+        InOutAffectedItems("remove", "paralyze", "ghost", nearestGhost);
     }
 
     private void InEffect_Paralyze(float increase, string ghostName)
@@ -495,13 +508,19 @@ public class PacmanMazeController : MonoBehaviour
         };
         const float DARKNESS_DURATION = 1.0f;
 
-        yield return StartCoroutine(InEffect_Darkness(AMBIENT_COLORS[0], -VISION_MULTIPLIER_INCREASE, DARKNESS_DURATION));
+        yield return StartCoroutine(InEffect_Darkness("add", AMBIENT_COLORS[0], -VISION_MULTIPLIER_INCREASE, DARKNESS_DURATION));
         yield return new WaitForSeconds(item_darkness.useTime);
-        yield return StartCoroutine(InEffect_Darkness(AMBIENT_COLORS[1], VISION_MULTIPLIER_INCREASE, DARKNESS_DURATION));
+        yield return StartCoroutine(InEffect_Darkness("remove", AMBIENT_COLORS[1], VISION_MULTIPLIER_INCREASE, DARKNESS_DURATION));
     }
 
-    private IEnumerator InEffect_Darkness(Color changeColor, float increase, float duration)
+    private IEnumerator InEffect_Darkness(string listMode, Color changeColor, float increase, float duration)
     {
+        List<string> _ghost_listAlive = IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive");
+        foreach (string ghostName in _ghost_listAlive)
+        {
+            InOutAffectedItems(listMode, "darkness", "ghost", ghostName);
+        }
+        
         float _ghost_visionMultiplier = IngameDataManager.LoadSpecificData<float>("ghost_data.vision_multiplier");
         float startValue = _ghost_visionMultiplier;
         float targetValue = _ghost_visionMultiplier + increase;
@@ -528,17 +547,43 @@ public class PacmanMazeController : MonoBehaviour
     {
         var item_invertControl = effectItemList.effectItems.Find(item => item.name == "invert_control");
 
-        InEffect_InvertControl(true);
+        InEffect_InvertControl("add", true);
         yield return new WaitForSeconds(item_invertControl.useTime);
-        InEffect_InvertControl(false);
+        InEffect_InvertControl("remove", false);
     }
 
-    private void InEffect_InvertControl(bool isInvert)
+    private void InEffect_InvertControl(string listMode, bool isInvert)
     {
+        List<string> _ghost_listAlive = IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive");
+        foreach (string ghostName in _ghost_listAlive)
+        {
+            InOutAffectedItems(listMode, "invert_control", "ghost", ghostName);
+        }
+        
         bool _ghost_isControlInverted = IngameDataManager.LoadSpecificData<bool>("ghost_data.is_control_inverted");
         _ghost_isControlInverted = isInvert;
 
         IngameDataManager.SaveSpecificData("ghost_data.is_control_inverted", _ghost_isControlInverted);
+    }
+
+    private void InOutAffectedItems(string listMode, string effectItem, string character, string ghostName = null)
+    {
+        List<string> _affectedItems = new List<string>();
+        
+        if (character == "pacman") 
+            _affectedItems = IngameDataManager.LoadSpecificData<List<string>>("pacman_data.affected_items");
+        else if (character == "ghost" && ghostName != null) 
+            _affectedItems = IngameDataManager.LoadSpecificListData<List<string>>("ghost_data.ghost_single_info", ghostName, "affected_items");
+
+        if (listMode == "add") 
+            _affectedItems.Add(effectItem);
+        else if (listMode == "remove") 
+            _affectedItems.Remove(effectItem);
+
+        if (character == "pacman") 
+            IngameDataManager.SaveSpecificData("pacman_data.affected_items", _affectedItems);
+        else if (character == "ghost" && ghostName != null) 
+            IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "affected_items", _affectedItems);
     }
 
     private void UpdateTextDisplay()

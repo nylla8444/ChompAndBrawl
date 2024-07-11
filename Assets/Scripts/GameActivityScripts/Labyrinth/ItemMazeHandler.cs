@@ -49,7 +49,7 @@ public class ItemMazeHandler : MonoBehaviour
     private const float TILE_OFFSET = 0.08f;
     private const int MAX_COUNT_POWER_PELLETS = 2;
     private const int MAX_COUNT_FRUITS = 4;
-    private const int MAX_COUNT_EFFECT_ITEMS = 4;
+    private const int MAX_COUNT_EFFECT_ITEMS = 32;  // change back after test
     private const float MIN_DISTANCE_POWER_PELLETS_FROM_ORIGIN = 12f;
     private const float MIN_DISTANCE_BETWEEN_POWER_PELLETS = 16f;
     private const float MIN_DISTANCE_FRUITS_FROM_ORIGIN = 4f;

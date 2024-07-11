@@ -20,7 +20,6 @@ public class IngameData
         public int points;
         public int playtime;
         public int lives;
-        public string current_effect_item;
         public float speed_multiplier;
         public float vision_multiplier;
         public float wind_burst_speed_affect;
@@ -29,6 +28,8 @@ public class IngameData
         public bool has_power_pellet;
         public bool has_won_at_fight;
         public bool is_immune_to_ghost;
+        public string current_effect_item;
+        public List<string> affected_items;
     }
 
     [Serializable]
@@ -50,6 +51,8 @@ public class IngameData
             public float wind_burst_speed_affect;
             public Vector2 coordinate;
             public Vector2 direction;
+            public bool is_paralyzed;
+            public List<string> affected_items;
         }
 
         public GhostData()
