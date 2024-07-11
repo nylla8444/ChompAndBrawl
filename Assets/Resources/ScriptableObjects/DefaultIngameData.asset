@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3499920959ac2544897fd70a466da54b, type: 3}
+  m_Name: DefaultIngameData
+  m_EditorClassIdentifier: 
+  ingameData:
+    pacman_data:
+      points: 0
+      playtime: 0
+      lives: 3
+      current_effect_item: 
+      speed_multiplier: 1
+      vision_multiplier: 1
+      wind_burst_speed_affect: 1
+      coordinate: {x: 0, y: 0}
+      direction: {x: 0, y: 0}
+      has_power_pellet: 0
+      has_won_at_fight: 0
+      is_immune_to_ghost: 0
+    ghost_data:
+      current_controlling: blinky
+      current_fighting: 
+      vision_multiplier: 1
+      is_control_inverted: 0
+      list_alive:
+      - blinky
+      - clyde
+      - inky
+      - pinky
+      ghost_single_info:
+      - name: blinky
+        effect_item: imitate_speed
+        speed_multiplier: 1
+        wind_burst_speed_affect: 1
+        coordinate: {x: 0, y: 0}
+        direction: {x: 0, y: 0}
+      - name: clyde
+        effect_item: electroshock
+        speed_multiplier: 1
+        wind_burst_speed_affect: 1
+        coordinate: {x: 0, y: 0}
+        direction: {x: 0, y: 0}
+      - name: inky
+        effect_item: wind_burst
+        speed_multiplier: 1
+        wind_burst_speed_affect: 1
+        coordinate: {x: 0, y: 0}
+        direction: {x: 0, y: 0}
+      - name: pinky
+        effect_item: sticky_goo
+        speed_multiplier: 1
+        wind_burst_speed_affect: 1
+        coordinate: {x: 0, y: 0}
+        direction: {x: 0, y: 0}
+    item_data:
+      pacdot_positions: []

@@ -12,4 +12,70 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a46e595c9a266448849c0019423be03, type: 3}
   m_Name: EffectItemList_Ghost
   m_EditorClassIdentifier: 
-  effectItems: []
+  effectItems:
+  - name: change_ghost
+    description: Change to another ghost
+    asItemSprite: {fileID: 0}
+    startParticleSprite: {fileID: 0}
+    useTime: 0
+    cooldown: 5
+    spawnChance: 0
+    inEffect:
+      id: 
+      description: 
+      iconSprite: {fileID: 0}
+  - name: boost
+    description: Increase movement speed
+    asItemSprite: {fileID: 0}
+    startParticleSprite: {fileID: 0}
+    useTime: 0.5
+    cooldown: 8
+    spawnChance: 0
+    inEffect:
+      id: dash_boost
+      description: Increase movement speed
+      iconSprite: {fileID: 884256959, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
+  - name: imitate_speed
+    description: Copy pacman's movement speed
+    asItemSprite: {fileID: -10174900, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
+    startParticleSprite: {fileID: 0}
+    useTime: 4
+    cooldown: 35
+    spawnChance: 0
+    inEffect:
+      id: speed_imitating
+      description: Currently at pacman's movement speed
+      iconSprite: {fileID: 1131077144, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
+  - name: electroshock
+    description: Summon electric shocks to all
+    asItemSprite: {fileID: -1042628093, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
+    startParticleSprite: {fileID: 0}
+    useTime: 3.5
+    cooldown: 45
+    spawnChance: 0
+    inEffect:
+      id: shocked
+      description: In shock from electric
+      iconSprite: {fileID: 616606579, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
+  - name: wind_burst
+    description: Summons wind affecting movement speed
+    asItemSprite: {fileID: 1379981790, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
+    startParticleSprite: {fileID: 0}
+    useTime: 7.5
+    cooldown: 60
+    spawnChance: 0
+    inEffect:
+      id: wind_bursted
+      description: Bursting from wind affecting speed
+      iconSprite: {fileID: -1367715175, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
+  - name: sticky_goo
+    description: Summons goo beneath feet
+    asItemSprite: {fileID: -1366512609, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
+    startParticleSprite: {fileID: 0}
+    useTime: 3
+    cooldown: 30
+    spawnChance: 0
+    inEffect:
+      id: sticking
+      description: Getting sticky from goo
+      iconSprite: {fileID: 984381382, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
