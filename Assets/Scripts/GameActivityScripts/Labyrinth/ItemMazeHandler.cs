@@ -5,6 +5,8 @@ using UnityEngine.Tilemaps;
 
 public class ItemMazeHandler : MonoBehaviour
 {
+    [SerializeField] private bool isMazeStarted = false;
+    
     [Header("Miscellaneous")]
     [SerializeField] private Tilemap pathTilemap;
     [SerializeField] private LayerMask pathLayer;
@@ -31,9 +33,6 @@ public class ItemMazeHandler : MonoBehaviour
     [SerializeField] private FruitList fruitList;
     [SerializeField] private EffectItemList effectItemList;
 
-    [Space(12)]
-    [SerializeField] private bool isMazeStarted = false;
-
     private List<GameObject> pacdotsOnPath = new List<GameObject>();
     private List<GameObject> powerPelletsOnPath = new List<GameObject>();
     private List<GameObject> fruitsOnPath = new List<GameObject>();
@@ -49,7 +48,7 @@ public class ItemMazeHandler : MonoBehaviour
     private const float TILE_OFFSET = 0.08f;
     private const int MAX_COUNT_POWER_PELLETS = 2;
     private const int MAX_COUNT_FRUITS = 4;
-    private const int MAX_COUNT_EFFECT_ITEMS = 4;  // change back after test
+    private const int MAX_COUNT_EFFECT_ITEMS = 4;
     private const float MIN_DISTANCE_POWER_PELLETS_FROM_ORIGIN = 12f;
     private const float MIN_DISTANCE_BETWEEN_POWER_PELLETS = 16f;
     private const float MIN_DISTANCE_FRUITS_FROM_ORIGIN = 4f;
@@ -63,12 +62,16 @@ public class ItemMazeHandler : MonoBehaviour
 
     private void Update()
     {
-        if (!IngameDataManager.LoadSpecificData<bool>("pacman_data.is_immune_to_ghost"))
+        if (isMazeStarted && !IngameDataManager.LoadSpecificData<bool>("pacman_data.is_immune_to_ghost"))
         {
-            CheckPacdotCollection();
-            CheckPowerPelletCollection();
-            CheckFruitCollection();
-            CheckEffectItemCollection();
+            Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
+            if (_pacman_coordinate == lastPacmanPosition) return;
+            
+            CheckPacdotCollection(_pacman_coordinate);
+            CheckPowerPelletCollection(_pacman_coordinate);
+            CheckFruitCollection(_pacman_coordinate);
+            CheckEffectItemCollection(_pacman_coordinate);
+            lastPacmanPosition = _pacman_coordinate;
         }
     }
 
@@ -172,12 +175,11 @@ public class ItemMazeHandler : MonoBehaviour
         }
     }
 
-    private void CheckPacdotCollection()
+    private void CheckPacdotCollection(Vector2 position)
     {
-        Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
         foreach (GameObject pacdot in new List<GameObject>(pacdotsOnPath))
         {
-            if (_pacman_coordinate == (Vector2)pacdot.transform.position)
+            if (position == (Vector2)pacdot.transform.position)
             {
                 PacdotCollected(pacdot.transform.position);
                 pacdotsOnPath.Remove(pacdot);
@@ -253,15 +255,13 @@ public class ItemMazeHandler : MonoBehaviour
         }
     }
 
-    private void CheckPowerPelletCollection()
+    private void CheckPowerPelletCollection(Vector2 position)
     {
-        Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
-
         if (!IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet"))
         {
             foreach (GameObject powerPellet in new List<GameObject>(powerPelletsOnPath))
             {
-                if (_pacman_coordinate == (Vector2)powerPellet.transform.position)
+                if (position == (Vector2)powerPellet.transform.position)
                 {
                     PowerPelletCollected(powerPellet.transform.position);
                     powerPelletsOnPath.Remove(powerPellet);
@@ -429,12 +429,11 @@ public class ItemMazeHandler : MonoBehaviour
         return null;
     }
 
-    private void CheckFruitCollection()
+    private void CheckFruitCollection(Vector2 position)
     {
-        Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
         foreach (GameObject fruit in new List<GameObject>(fruitsOnPath))
         {
-            if (_pacman_coordinate == (Vector2)fruit.transform.position)
+            if (position == (Vector2)fruit.transform.position)
             {
                 FruitCollected(fruit);
                 fruitsOnPath.Remove(fruit);
@@ -537,15 +536,13 @@ public class ItemMazeHandler : MonoBehaviour
         return null;
     }
 
-    private void CheckEffectItemCollection()
+    private void CheckEffectItemCollection(Vector2 position)
     {
-        Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
-
         if (!System.String.IsNullOrEmpty(IngameDataManager.LoadSpecificData<string>("pacman_data.current_effect_item"))) return;
 
         foreach (GameObject effectItem in new List<GameObject>(effectItemsOnPath))
         {
-            if (_pacman_coordinate == (Vector2)effectItem.transform.position)
+            if (position == (Vector2)effectItem.transform.position)
             {
                 EffectItemCollected(effectItem);
                 effectItemsOnPath.Remove(effectItem);

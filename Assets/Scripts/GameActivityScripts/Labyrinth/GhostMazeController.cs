@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class GhostMazeController : MonoBehaviour
 {
+    [SerializeField] private bool isMazeStarted = false;
+
     [Header("Ghost Objects")]
     [SerializeField] private GameObject blinky;
     [SerializeField] private GameObject clyde;
@@ -39,10 +41,14 @@ public class GhostMazeController : MonoBehaviour
     [SerializeField] private Text cdText_changeGhost;
     [SerializeField] private Text cdText_effectItem;
     [Space(4)]
-    [SerializeField] private Image changeGhostIcon;
     [SerializeField] private List<Sprite> changeGhostSprites;
+    [SerializeField] private Image changeGhostIcon;
     [SerializeField] private Image effectItemIcon;
+    [Space(4)]
     [SerializeField] private GameObject stickyGooPrefab;
+    [Space(4)]
+    [SerializeField] private GameObject startParticlePrefab;
+    [SerializeField] private ParticleEffectMazeHandler particleEffectMazeHandler;
     
     private float lastCd_changeGhost = -Mathf.Infinity;
     private float lastCd_boost = -Mathf.Infinity;
@@ -51,8 +57,6 @@ public class GhostMazeController : MonoBehaviour
     private float lastCd_inkyEffectItem = -Mathf.Infinity;
     private float lastCd_pinkyEffectItem = -Mathf.Infinity;
 
-    [Space(12)]
-    [SerializeField] private bool isMazeStarted = false;
     private bool isRunning = false;
 
     // Variables for player controlling ghost
@@ -66,7 +70,7 @@ public class GhostMazeController : MonoBehaviour
     // Variables for AI move control ghost
     private Dictionary<string, bool> onAuto_hasReachedTarget = new Dictionary<string, bool>()
     {
-        { "blinky", false }, { "clyde", false }, { "inky", false }, { "pinky", false }
+        { "blinky", true }, { "clyde", true }, { "inky", true }, { "pinky", true }
     };
     private Dictionary<string, Vector2> onAuto_targetPositions = new Dictionary<string, Vector2>()
     {
@@ -134,6 +138,7 @@ public class GhostMazeController : MonoBehaviour
         if (!isMazeStarted) return;
         
         UpdateTextDisplay();
+        MoveNonControlledGhosts();
 
         if (!isRunning && onCtrl_ghost != null && onCtrl_queuedDirection != Vector2.zero)
         {
@@ -152,8 +157,6 @@ public class GhostMazeController : MonoBehaviour
         {
             MoveTowards();
         }
-
-        MoveNonControlledGhosts();
     }
 
     private void InitializeGhosts()
@@ -740,7 +743,7 @@ public class GhostMazeController : MonoBehaviour
         IngameDataManager.SaveSpecificData("pacman_data.vision_multiplier", _pacman_visionMultiplier);
     }
 
-    private void InOutAffectedItems(string listMode, string effectItem, string character, string ghostName = null)
+    private void InOutAffectedItems(string listMode, string effectItemName, string character, string ghostName = null)
     {
         List<string> _affectedItems = new List<string>();
         
@@ -749,10 +752,16 @@ public class GhostMazeController : MonoBehaviour
         else if (character == "ghost" && ghostName != null) 
             _affectedItems = IngameDataManager.LoadSpecificListData<List<string>>("ghost_data.ghost_single_info", ghostName, "affected_items");
 
-        if (listMode == "add") 
-            _affectedItems.Add(effectItem);
-        else if (listMode == "remove") 
-            _affectedItems.Remove(effectItem);
+        if (listMode == "add")
+        {
+            _affectedItems.Add(effectItemName);
+            EffectItem effectItem = effectItemList.effectItems.Find(item => item.name == effectItemName);
+            particleEffectMazeHandler.SpawnStartParticle(startParticlePrefab, effectItem.startParticleSprite, effectItem.inEffect.id, ((character == "pacman") ? "pacman" : ghostName));
+        }
+        else if (listMode == "remove")
+        { 
+            _affectedItems.Remove(effectItemName);
+        }
 
         if (character == "pacman") 
             IngameDataManager.SaveSpecificData("pacman_data.affected_items", _affectedItems);
@@ -818,7 +827,8 @@ public class GhostMazeController : MonoBehaviour
         if (!ghostData.TryGetValue(ghostName, out var ghostInfo)) return;
 
         (onAuto_ghost, onAuto_animator, onAuto_defaultSpeed) = ghostInfo;
-        
+
+        Vector2 currentPosition = onAuto_ghost.transform.position;
 
         if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
         {
@@ -829,10 +839,10 @@ public class GhostMazeController : MonoBehaviour
                 IngameData.GhostData _ghostData = IngameDataManager.LoadSpecificData<IngameData.GhostData>("ghost_data");
 
                 Vector2 pacmanPosition = _pacmanData.coordinate;
-                Vector2 targetPosition = GetGhostTargetPosition(ghostName, onAuto_ghost.transform.position, pacmanPosition, _pacmanData, _ghostData);
+                Vector2 targetPosition = GetGhostTargetPosition(ghostName, currentPosition, pacmanPosition, _pacmanData, _ghostData);
 
-                onAuto_directions[ghostName] = GetValidDirection(onAuto_ghost.transform.position, onAuto_directions[ghostName], onAuto_ghost, targetPosition, _pacmanData);
-                onAuto_targetPositions[ghostName] = (Vector2)onAuto_ghost.transform.position + onAuto_directions[ghostName] * 0.16f;
+                onAuto_directions[ghostName] = GetValidDirection(currentPosition, onAuto_directions[ghostName], onAuto_ghost, targetPosition, _pacmanData);
+                onAuto_targetPositions[ghostName] = currentPosition + onAuto_directions[ghostName] * 0.16f;
 
                 UpdateGhostAnimation(onAuto_animator, onAuto_directions[ghostName], ghostName);
                 UpdateGhostDirection(ghostName, onAuto_directions[ghostName]);
@@ -842,7 +852,7 @@ public class GhostMazeController : MonoBehaviour
                 {
                     recentTiles.Dequeue();
                 }
-                recentTiles.Enqueue(GetTileCenter((Vector2)onAuto_ghost.transform.position));
+                recentTiles.Enqueue(GetTileCenter(currentPosition));
             }
         }
 
@@ -850,11 +860,11 @@ public class GhostMazeController : MonoBehaviour
         {
             float _speedMultiplier = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", onAuto_ghost.name, "speed_multiplier");
             float _windBurstSpeedAffect = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", onAuto_ghost.name, "wind_burst_speed_affect");
-            
-            Vector2 newPosition = Vector2.MoveTowards(onAuto_ghost.transform.position, onAuto_targetPositions[ghostName], (onAuto_defaultSpeed * _speedMultiplier * _windBurstSpeedAffect) * Time.deltaTime);
+
+            Vector2 newPosition = Vector2.MoveTowards(currentPosition, onAuto_targetPositions[ghostName], (onAuto_defaultSpeed * _speedMultiplier * _windBurstSpeedAffect) * Time.deltaTime);
             onAuto_ghost.transform.position = newPosition;
 
-            if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
+            if (newPosition == GetTileCenter(newPosition))
             {
                 UpdateGhostPosition(ghostName, newPosition);
                 onAuto_hasReachedTarget[ghostName] = true;
@@ -862,7 +872,7 @@ public class GhostMazeController : MonoBehaviour
         }
         else
         {
-            onAuto_ghost.transform.position = GetTileCenter((Vector2)onAuto_ghost.transform.position);
+            onAuto_ghost.transform.position = GetTileCenter(currentPosition);
             onAuto_hasReachedTarget[ghostName] = true;
         }
     }

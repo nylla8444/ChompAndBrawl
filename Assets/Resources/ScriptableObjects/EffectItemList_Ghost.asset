@@ -16,7 +16,7 @@ MonoBehaviour:
   - name: change_ghost
     description: Change to another ghost
     asItemSprite: {fileID: 0}
-    startParticleSprite: {fileID: 0}
+    startParticleSprite: {fileID: 1541491438, guid: 0bfbb7a22b850144da0c194c4fa8d4ae, type: 3}
     useTime: 0
     cooldown: 5
     spawnChance: 0
@@ -27,7 +27,7 @@ MonoBehaviour:
   - name: boost
     description: Increase movement speed
     asItemSprite: {fileID: 0}
-    startParticleSprite: {fileID: 0}
+    startParticleSprite: {fileID: -1641276229, guid: 0bfbb7a22b850144da0c194c4fa8d4ae, type: 3}
     useTime: 0.5
     cooldown: 8
     spawnChance: 0
@@ -38,7 +38,7 @@ MonoBehaviour:
   - name: imitate_speed
     description: Copy pacman's movement speed
     asItemSprite: {fileID: -10174900, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
-    startParticleSprite: {fileID: 0}
+    startParticleSprite: {fileID: 85575944, guid: 0bfbb7a22b850144da0c194c4fa8d4ae, type: 3}
     useTime: 4
     cooldown: 35
     spawnChance: 0
@@ -49,7 +49,7 @@ MonoBehaviour:
   - name: electroshock
     description: Summon electric shocks to all
     asItemSprite: {fileID: -1042628093, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
-    startParticleSprite: {fileID: 0}
+    startParticleSprite: {fileID: 97392235, guid: 0bfbb7a22b850144da0c194c4fa8d4ae, type: 3}
     useTime: 3.5
     cooldown: 45
     spawnChance: 0
@@ -60,7 +60,7 @@ MonoBehaviour:
   - name: wind_burst
     description: Summons wind affecting movement speed
     asItemSprite: {fileID: 1379981790, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
-    startParticleSprite: {fileID: 0}
+    startParticleSprite: {fileID: -834369022, guid: 0bfbb7a22b850144da0c194c4fa8d4ae, type: 3}
     useTime: 7.5
     cooldown: 60
     spawnChance: 0
@@ -71,7 +71,7 @@ MonoBehaviour:
   - name: sticky_goo
     description: Summons goo beneath feet
     asItemSprite: {fileID: -1366512609, guid: 07e92148e2a823343b0e48ec4fc57493, type: 3}
-    startParticleSprite: {fileID: 0}
+    startParticleSprite: {fileID: -106520791, guid: 0bfbb7a22b850144da0c194c4fa8d4ae, type: 3}
     useTime: 3
     cooldown: 30
     spawnChance: 0

@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class PacmanMazeController : MonoBehaviour
 {
+    [SerializeField] private bool isMazeStarted = false;
+    
     [Header("Pacman Properties")]
     [SerializeField] private GameObject pacman;
     [SerializeField] private float defaultSpeed;
@@ -14,6 +16,7 @@ public class PacmanMazeController : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private LayerMask collisionLayer;
     [SerializeField] private Text pointsText;
+    [SerializeField] private Text playtimeText;
     
     [Header("Pacman Effect Item Info")]
     [SerializeField] private EffectItemList effectItemList;
@@ -22,13 +25,14 @@ public class PacmanMazeController : MonoBehaviour
     [SerializeField] private Text cdText_effectItem;
     [Space(4)]
     [SerializeField] private Image ghostAmbient_darkness;
+    [Space(4)]
+    [SerializeField] private GameObject startParticlePrefab;
+    [SerializeField] private ParticleEffectMazeHandler particleEffectMazeHandler;
     
     private bool hasEffectItem = false;
     private float cd_effectItem = 0f;
     private float lastCd_effectItem = -Mathf.Infinity;
 
-    [Space(12)]
-    [SerializeField] private bool isMazeStarted = false;
     private bool isRunning = false;
     
     private Vector2 direction;
@@ -111,6 +115,7 @@ public class PacmanMazeController : MonoBehaviour
         pacmanCollider = pacman.GetComponent<BoxCollider2D>();
 
         animator?.SetTrigger("pacman.rest");
+        StartCoroutine(IncreasePlaytime());
     }
 
     private void HandleInput(string action)
@@ -318,7 +323,7 @@ public class PacmanMazeController : MonoBehaviour
     {
         var item_rocketBoost = effectItemList.effectItems.Find(item => item.name == "rocket_boost");
         const float SPEED_MULTIPLIER_INCREASE = 0.5f;
-        
+
         InEffect_RocketBoost("add", SPEED_MULTIPLIER_INCREASE);
         yield return new WaitForSeconds(item_rocketBoost.useTime);
         InEffect_RocketBoost("remove", -SPEED_MULTIPLIER_INCREASE);
@@ -566,7 +571,7 @@ public class PacmanMazeController : MonoBehaviour
         IngameDataManager.SaveSpecificData("ghost_data.is_control_inverted", _ghost_isControlInverted);
     }
 
-    private void InOutAffectedItems(string listMode, string effectItem, string character, string ghostName = null)
+    private void InOutAffectedItems(string listMode, string effectItemName, string character, string ghostName = null)
     {
         List<string> _affectedItems = new List<string>();
         
@@ -575,10 +580,19 @@ public class PacmanMazeController : MonoBehaviour
         else if (character == "ghost" && ghostName != null) 
             _affectedItems = IngameDataManager.LoadSpecificListData<List<string>>("ghost_data.ghost_single_info", ghostName, "affected_items");
 
-        if (listMode == "add") 
-            _affectedItems.Add(effectItem);
+        if (listMode == "add")
+        {
+            _affectedItems.Add(effectItemName);
+            EffectItem effectItem = effectItemList.effectItems.Find(item => item.name == effectItemName);
+            particleEffectMazeHandler.SpawnStartParticle(startParticlePrefab, 
+                                                        effectItem.startParticleSprite, 
+                                                        effectItem.inEffect.id, 
+                                                        (character == "pacman") ? "pacman" : ghostName);
+        }
         else if (listMode == "remove") 
-            _affectedItems.Remove(effectItem);
+        {
+            _affectedItems.Remove(effectItemName);
+        }
 
         if (character == "pacman") 
             IngameDataManager.SaveSpecificData("pacman_data.affected_items", _affectedItems);
@@ -593,5 +607,19 @@ public class PacmanMazeController : MonoBehaviour
 
         float remainCd_effectItem = Mathf.Max(0f, cd_effectItem - (Time.time - lastCd_effectItem));
         cdText_effectItem.text = remainCd_effectItem > 0 ? $"{remainCd_effectItem:F1}s" : "";
+    }
+
+    private IEnumerator IncreasePlaytime()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1.0f);
+            
+            int playtime = IngameDataManager.LoadSpecificData<int>("pacman_data.playtime");
+            IngameDataManager.SaveSpecificData("pacman_data.playtime", playtime + 1);
+
+            System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(playtime);
+            playtimeText.text = string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
+        }
     }
 }
