@@ -10,7 +10,6 @@ public class ItemMazeHandler : MonoBehaviour
     [Header("Miscellaneous")]
     [SerializeField] private Tilemap pathTilemap;
     [SerializeField] private LayerMask pathLayer;
-    [SerializeField] private GameObject environmentAmbient;
 
     [Header("Item Prefabs")]
     [SerializeField] private GameObject pacdotPrefab;
@@ -28,6 +27,11 @@ public class ItemMazeHandler : MonoBehaviour
     [SerializeField] private float powerPelletDuration;
     [SerializeField] private float fruitSpawnInterval;
     [SerializeField] private float effectItemSpawnInterval;
+    [Space(4)]
+    [SerializeField] private ParticleEffectMazeHandler particleEffectMazeHandler;
+    [SerializeField] private GameObject monsterAmbient;
+    [SerializeField] private GameObject monsterTransformOverlayPrefab;
+
 
     [Header("Item List")]
     [SerializeField] private FruitList fruitList;
@@ -47,7 +51,7 @@ public class ItemMazeHandler : MonoBehaviour
     private const float TILE_SIZE = 0.16f;
     private const float TILE_OFFSET = 0.08f;
     private const int MAX_COUNT_POWER_PELLETS = 2;
-    private const int MAX_COUNT_FRUITS = 4;
+    private const int MAX_COUNT_FRUITS = 6;
     private const int MAX_COUNT_EFFECT_ITEMS = 4;
     private const float MIN_DISTANCE_POWER_PELLETS_FROM_ORIGIN = 12f;
     private const float MIN_DISTANCE_BETWEEN_POWER_PELLETS = 16f;
@@ -58,20 +62,26 @@ public class ItemMazeHandler : MonoBehaviour
     {
         isMazeStarted = true;   // remove after test
         InitializeItems();
+        StartCoroutine(CheckCollection());
     }
 
-    private void Update()
+    private IEnumerator CheckCollection()
     {
-        if (isMazeStarted && !IngameDataManager.LoadSpecificData<bool>("pacman_data.is_immune_to_ghost"))
+        while (true)
         {
-            Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
-            if (_pacman_coordinate == lastPacmanPosition) return;
-            
-            CheckPacdotCollection(_pacman_coordinate);
-            CheckPowerPelletCollection(_pacman_coordinate);
-            CheckFruitCollection(_pacman_coordinate);
-            CheckEffectItemCollection(_pacman_coordinate);
-            lastPacmanPosition = _pacman_coordinate;
+            yield return new WaitForSeconds(0.1f);
+            if (isMazeStarted && !IngameDataManager.LoadSpecificData<bool>("pacman_data.is_immune_to_ghost"))
+            {
+                Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
+                if (_pacman_coordinate != lastPacmanPosition)
+                {
+                    CheckPacdotCollection(_pacman_coordinate);
+                    CheckPowerPelletCollection(_pacman_coordinate);
+                    CheckFruitCollection(_pacman_coordinate);
+                    CheckEffectItemCollection(_pacman_coordinate);
+                    lastPacmanPosition = _pacman_coordinate;
+                }
+            }
         }
     }
 
@@ -101,6 +111,13 @@ public class ItemMazeHandler : MonoBehaviour
         SpawnAllPowerPellets();
         StartSpawnFruits();
         StartSpawnEffectItems();
+    }
+
+    private void IncreasePoints(int points)
+    {
+        int _pacman_points = IngameDataManager.LoadSpecificData<int>("pacman_data.points");
+        _pacman_points += points;
+        IngameDataManager.SaveSpecificData("pacman_data.points", _pacman_points);
     }
 
     /*********************************************************************/
@@ -190,13 +207,10 @@ public class ItemMazeHandler : MonoBehaviour
 
     private void PacdotCollected(Vector2 position)
     {
-        int _pacman_points = IngameDataManager.LoadSpecificData<int>("pacman_data.points");
-        List<Vector2> _item_pacdotPositions = IngameDataManager.LoadSpecificData<List<Vector2>>("item_data.pacdot_positions");
+        IncreasePoints(pacdotPoints);
 
-        _pacman_points += pacdotPoints;
+        List<Vector2> _item_pacdotPositions = IngameDataManager.LoadSpecificData<List<Vector2>>("item_data.pacdot_positions");
         _item_pacdotPositions.Remove(position);
-        
-        IngameDataManager.SaveSpecificData("pacman_data.points", _pacman_points);
         IngameDataManager.SaveSpecificData("item_data.pacdot_positions", _item_pacdotPositions);
     }
 
@@ -263,7 +277,7 @@ public class ItemMazeHandler : MonoBehaviour
             {
                 if (position == (Vector2)powerPellet.transform.position)
                 {
-                    PowerPelletCollected(powerPellet.transform.position);
+                    IncreasePoints(powerPelletPoints);
                     powerPelletsOnPath.Remove(powerPellet);
                     Destroy(powerPellet);
                     
@@ -279,18 +293,6 @@ public class ItemMazeHandler : MonoBehaviour
         }
     }
 
-    private void PowerPelletCollected(Vector2 position)
-    {
-        int _pacman_points = IngameDataManager.LoadSpecificData<int>("pacman_data.points");
-        bool _pacman_hasPowerPellet = IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet");
-
-        _pacman_points += pacdotPoints;
-        _pacman_hasPowerPellet = true;
-        
-        IngameDataManager.SaveSpecificData("pacman_data.points", _pacman_points);
-        IngameDataManager.SaveSpecificData("pacman_data.has_power_pellet", _pacman_hasPowerPellet);
-    }
-
     private IEnumerator PowerPelletEffect()
     {
         const float AMBIENT_TRANSITION_SPEED = 2.5f;
@@ -300,7 +302,12 @@ public class ItemMazeHandler : MonoBehaviour
             new Color(1.0f, 1.0f, 1.0f, 0.0f)
         };
 
-        StartCoroutine(UpdateObjectColor(environmentAmbient, AMBIENT_COLORS[0], AMBIENT_TRANSITION_SPEED));
+        particleEffectMazeHandler.SpawnEffectOverlay(monsterTransformOverlayPrefab, "pacman", 2.0f, "effect.monster_transform");
+        yield return new WaitForSeconds(1.0f);
+        StartCoroutine(UpdateObjectColor(monsterAmbient, AMBIENT_COLORS[0], AMBIENT_TRANSITION_SPEED));
+
+        IngameDataManager.SaveSpecificData("pacman_data.has_power_pellet", true);
+
         float elapsedTime = 0f;
 
         while (elapsedTime < powerPelletDuration)
@@ -312,18 +319,15 @@ public class ItemMazeHandler : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        
-        int _pacman_points = IngameDataManager.LoadSpecificData<int>("pacman_data.points");
-        bool _pacman_hasPowerPellet = IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet");
 
-        _pacman_points -= powerPelletFailPoints;
-        _pacman_hasPowerPellet = false;
+        particleEffectMazeHandler.SpawnEffectOverlay(monsterTransformOverlayPrefab, "pacman", 2.0f, "effect.monster_transform");
+        yield return new WaitForSeconds(1.0f);
+        StartCoroutine(UpdateObjectColor(monsterAmbient, AMBIENT_COLORS[1], AMBIENT_TRANSITION_SPEED));
         
-        IngameDataManager.SaveSpecificData("pacman_data.points", _pacman_points);
-        IngameDataManager.SaveSpecificData("pacman_data.has_power_pellet", _pacman_hasPowerPellet);
+        IncreasePoints(powerPelletFailPoints);
+        IngameDataManager.SaveSpecificData("pacman_data.has_power_pellet", false);
 
         SpawnAllPowerPellets();
-        StartCoroutine(UpdateObjectColor(environmentAmbient, AMBIENT_COLORS[1], AMBIENT_TRANSITION_SPEED));
     }
 
     private IEnumerator UpdateObjectColor(GameObject _object, Color _color, float _transitionSpeed)
@@ -333,6 +337,8 @@ public class ItemMazeHandler : MonoBehaviour
             _object.GetComponent<SpriteRenderer>().color = Color.Lerp(_object.GetComponent<SpriteRenderer>().color, _color, _transitionSpeed * Time.deltaTime);
             yield return null;
         }
+
+        _object.GetComponent<SpriteRenderer>().color = _color;
     }
 
     /*********************************************************************/
@@ -444,12 +450,10 @@ public class ItemMazeHandler : MonoBehaviour
 
     private void FruitCollected(GameObject fruitObject)
     {
-        int _pacman_points = IngameDataManager.LoadSpecificData<int>("pacman_data.points");
         if (fruitDictionary.TryGetValue(fruitObject, out Fruit fruitData))
         {
-            _pacman_points += fruitData.points;
+            IncreasePoints(fruitData.points);
             fruitDictionary.Remove(fruitObject);
-            IngameDataManager.SaveSpecificData("pacman_data.points", _pacman_points);
         }
     }
 
@@ -553,16 +557,14 @@ public class ItemMazeHandler : MonoBehaviour
 
     private void EffectItemCollected(GameObject effectItemObject)
     {
-        int _pacman_points = IngameDataManager.LoadSpecificData<int>("pacman_data.points");
         string _pacman_currentEffectItem = IngameDataManager.LoadSpecificData<string>("pacman_data.current_effect_item");
 
         if (effectItemDictionary.TryGetValue(effectItemObject, out EffectItem effectItemData))
         {
-            _pacman_points += effectItemPoints;
+            IncreasePoints(effectItemPoints);
+
             _pacman_currentEffectItem = effectItemData.name;
             effectItemDictionary.Remove(effectItemObject);
-            
-            IngameDataManager.SaveSpecificData("pacman_data.points", _pacman_points);
             IngameDataManager.SaveSpecificData("pacman_data.current_effect_item", _pacman_currentEffectItem);
         }
     }

@@ -35,16 +35,16 @@ public class SplitScreenMazeHandler : MonoBehaviour
         arrowInstance.SetActive(false);
     }
 
-    private void Update()
+    private void LateUpdate()
     {
-        CameraFollow();
+        CameraFollowPacman();
+        CameraFollowGhost();
         UpdateArrowVisibilityAndPosition();
     }
 
-    private void CameraFollow()
+    private void CameraFollowPacman()
     {
         float _pacman_visionMultiplier = IngameDataManager.LoadSpecificData<float>("pacman_data.vision_multiplier");
-        float _ghost_visionMultiplier = IngameDataManager.LoadSpecificData<float>("ghost_data.vision_multiplier");
 
         // Player 1 camera follows Pacman with offset
         Vector3 player1TargetPosition = GetTargetPosition(player1, player1Camera);
@@ -53,6 +53,13 @@ public class SplitScreenMazeHandler : MonoBehaviour
         player1Camera.transform.position = new Vector3(player1Camera.transform.position.x, player1Camera.transform.position.y, -10f);
         player1Camera.orthographicSize = DEFAULT_ORTHOGRAPHIC_SIZE * _pacman_visionMultiplier;
 
+       
+    }
+
+    private void CameraFollowGhost()
+    {
+        float _ghost_visionMultiplier = IngameDataManager.LoadSpecificData<float>("ghost_data.vision_multiplier");
+        
         // Player 2 camera follows the current ghost
         Transform currentCharacter = GetCurrentControllingGhost();
         if (currentCharacter != null)

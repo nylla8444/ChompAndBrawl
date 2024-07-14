@@ -45,7 +45,11 @@ public class GhostMazeController : MonoBehaviour
     [SerializeField] private Image changeGhostIcon;
     [SerializeField] private Image effectItemIcon;
     [Space(4)]
+    [SerializeField] private GameObject sparkElectricParticlePrefab;
+    [SerializeField] private GameObject ghostElectrifiedOverlayPrefab;
+    [SerializeField] private GameObject windBurstParticlePrefab;
     [SerializeField] private GameObject stickyGooPrefab;
+    [SerializeField] private GameObject gooOverlayPrefab;
     [Space(4)]
     [SerializeField] private GameObject startParticlePrefab;
     [SerializeField] private ParticleEffectMazeHandler particleEffectMazeHandler;
@@ -136,10 +140,14 @@ public class GhostMazeController : MonoBehaviour
     private void Update()
     {
         if (!isMazeStarted) return;
-        
-        UpdateTextDisplay();
+
         MoveNonControlledGhosts();
 
+        if (isRunning)
+        {
+            MoveTowards();
+        }
+        
         if (!isRunning && onCtrl_ghost != null && onCtrl_queuedDirection != Vector2.zero)
         {
             onCtrl_direction = onCtrl_queuedDirection;
@@ -152,11 +160,8 @@ public class GhostMazeController : MonoBehaviour
     private void FixedUpdate()
     {
         if (!isMazeStarted) return;
-        
-        if (isRunning)
-        {
-            MoveTowards();
-        }
+
+        UpdateTextDisplay();
     }
 
     private void InitializeGhosts()
@@ -550,23 +555,25 @@ public class GhostMazeController : MonoBehaviour
         var item_electroshock = effectItemList.effectItems.Find(item => item.name == "electroshock");
         const float PACMAN_SPEED_MULTIPLIER_INCREASE = 0.4f;
         const float GHOST_SPEED_MULTIPLIER_INCREASE = 0.8f;
+        float duration = item_electroshock.useTime;
 
         bool _pacman_hasPowerPellet = IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet");
         _pacman_hasPowerPellet = false;
         IngameDataManager.SaveSpecificData<bool>("pacman_data.has_power_pellet", _pacman_hasPowerPellet);
 
-        InEffect_Electroshock("add", -PACMAN_SPEED_MULTIPLIER_INCREASE, -GHOST_SPEED_MULTIPLIER_INCREASE);
-        yield return new WaitForSeconds(item_electroshock.useTime);
+        InEffect_Electroshock("add", -PACMAN_SPEED_MULTIPLIER_INCREASE, -GHOST_SPEED_MULTIPLIER_INCREASE, duration);
+        yield return new WaitForSeconds(duration);
         InEffect_Electroshock("remove", PACMAN_SPEED_MULTIPLIER_INCREASE, GHOST_SPEED_MULTIPLIER_INCREASE);
     }
 
-    private void InEffect_Electroshock(string listMode, float pacmanIncrease, float ghostIncrease)
+    private void InEffect_Electroshock(string listMode, float pacmanIncrease, float ghostIncrease, float duration = 0)
     {
         float _pacman_speedMultiplier = IngameDataManager.LoadSpecificData<float>("pacman_data.speed_multiplier");
         _pacman_speedMultiplier += pacmanIncrease;
 
         IngameDataManager.SaveSpecificData("pacman_data.speed_multiplier", _pacman_speedMultiplier);
         InOutAffectedItems(listMode, "electroshock", "pacman");
+        particleEffectMazeHandler.SpawnEffectParticle(sparkElectricParticlePrefab, "pacman");
 
         
         string onControlled = onCtrl_ghost.name;
@@ -581,6 +588,12 @@ public class GhostMazeController : MonoBehaviour
             
             IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "speed_multiplier", _ghost_speedMultiplier);
             InOutAffectedItems(listMode, "electroshock", "ghost", ghostName);
+
+            if (listMode == "add")
+            {
+                particleEffectMazeHandler.SpawnEffectParticle(sparkElectricParticlePrefab, ghostName);
+                particleEffectMazeHandler.SpawnEffectOverlay(ghostElectrifiedOverlayPrefab, ghostName, duration);
+            }
         }
     }
     
@@ -599,6 +612,7 @@ public class GhostMazeController : MonoBehaviour
 
     private IEnumerator InEffect_WindBurst(float increaseLeft, float increaseRight, float duration)
     {
+        particleEffectMazeHandler.SpawnAmbientParticle(windBurstParticlePrefab, new Vector2(-4.0f, 4.0f));
         List<string> _ghost_listAlive = IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive");
         
         InOutAffectedItems("add", "wind_burst", "pacman");
@@ -711,15 +725,17 @@ public class GhostMazeController : MonoBehaviour
         const float SPEED_MULTIPLIER_INCREASE = 0.8f;
         const float VISION_MULTIPLIER_INCREASE = 0.25f;
         const float STICKY_DURATION = 1.0f;
+        float USE_TIME_DURATION = item_stickyGoo.useTime;
 
-        yield return StartCoroutine(InEffect_StickyGoo("add", -SPEED_MULTIPLIER_INCREASE, -VISION_MULTIPLIER_INCREASE, STICKY_DURATION));
-        yield return new WaitForSeconds(item_stickyGoo.useTime);
+        yield return StartCoroutine(InEffect_StickyGoo("add", -SPEED_MULTIPLIER_INCREASE, -VISION_MULTIPLIER_INCREASE, STICKY_DURATION, USE_TIME_DURATION));
+        yield return new WaitForSeconds(USE_TIME_DURATION);
         yield return StartCoroutine(InEffect_StickyGoo("remove", SPEED_MULTIPLIER_INCREASE, VISION_MULTIPLIER_INCREASE, STICKY_DURATION));
     }
 
-    private IEnumerator InEffect_StickyGoo(string listMode, float speedIncrease, float visionIncrease, float duration)
+    private IEnumerator InEffect_StickyGoo(string listMode, float speedIncrease, float visionIncrease, float stickyDuration, float useTimeDuration = 0f)
     {
         InOutAffectedItems(listMode, "sticky_goo", "pacman");
+        particleEffectMazeHandler.SpawnEffectOverlay(gooOverlayPrefab, "pacman", useTimeDuration);
 
         float _pacman_speedMultiplier = IngameDataManager.LoadSpecificData<float>("pacman_data.speed_multiplier");
         _pacman_speedMultiplier += speedIncrease;
@@ -730,9 +746,9 @@ public class GhostMazeController : MonoBehaviour
         float targetValue = _pacman_visionMultiplier + visionIncrease;
         float elapsedTime = 0f;
         
-        while (elapsedTime < duration)
+        while (elapsedTime < stickyDuration)
         {
-            _pacman_visionMultiplier = Mathf.Lerp(startValue, targetValue, elapsedTime / duration);
+            _pacman_visionMultiplier = Mathf.Lerp(startValue, targetValue, elapsedTime / stickyDuration);
             IngameDataManager.SaveSpecificData("pacman_data.vision_multiplier", _pacman_visionMultiplier);
 
             elapsedTime += Time.deltaTime;

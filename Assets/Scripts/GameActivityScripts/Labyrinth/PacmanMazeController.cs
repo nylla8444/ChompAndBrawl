@@ -24,10 +24,11 @@ public class PacmanMazeController : MonoBehaviour
     [SerializeField] private Image effectItemIcon;
     [SerializeField] private Text cdText_effectItem;
     [Space(4)]
-    [SerializeField] private Image ghostAmbient_darkness;
+    [SerializeField] private Image darknessAmbient;
     [Space(4)]
-    [SerializeField] private GameObject startParticlePrefab;
     [SerializeField] private ParticleEffectMazeHandler particleEffectMazeHandler;
+    [SerializeField] private GameObject startParticlePrefab;
+    [SerializeField] private GameObject sparkParalyzeParticlePrefab;
     
     private bool hasEffectItem = false;
     private float cd_effectItem = 0f;
@@ -81,10 +82,12 @@ public class PacmanMazeController : MonoBehaviour
     private void Update()
     {
         if (!isMazeStarted) return;
+        
+        if (isRunning)
+        {
+            MoveTowards();
+        }
 
-        UpdateEffectItemDisplay();
-        UpdateTextDisplay();
- 
         if (!isRunning && queuedDirection != Vector2.zero)
         {
             direction = queuedDirection;
@@ -97,11 +100,9 @@ public class PacmanMazeController : MonoBehaviour
     private void FixedUpdate()
     {
         if (!isMazeStarted) return;
-        
-        if (isRunning)
-        {
-            MoveTowards();
-        }
+
+        UpdateEffectItemDisplay();
+        UpdateTextDisplay();
     }
 
     private void InitializePacman()
@@ -481,6 +482,8 @@ public class PacmanMazeController : MonoBehaviour
         while (paralyzeCount < MAX_PARALYZE_COUNT)
         {
             InEffect_Paralyze(-SPEED_MULTIPLIER_INCREASE, nearestGhost);
+            particleEffectMazeHandler.SpawnEffectParticle(sparkParalyzeParticlePrefab, nearestGhost);
+
             yield return new WaitForSeconds(PARALYZE_DURATION);
             InEffect_Paralyze(SPEED_MULTIPLIER_INCREASE, nearestGhost);
 
@@ -508,7 +511,7 @@ public class PacmanMazeController : MonoBehaviour
         const float VISION_MULTIPLIER_INCREASE = 0.1f;
         List<Color> AMBIENT_COLORS = new List<Color>
         {
-            new Color(0.0f, 0.0f, 0.0f, 0.8f),
+            new Color(0.0f, 0.0f, 0.0f, 1.0f),
             new Color(0.0f, 0.0f, 0.0f, 0.0f)
         };
         const float DARKNESS_DURATION = 1.0f;
@@ -533,7 +536,7 @@ public class PacmanMazeController : MonoBehaviour
         
         while (elapsedTime < duration)
         {
-            ghostAmbient_darkness.color = Color.Lerp(ghostAmbient_darkness.color, changeColor, elapsedTime / duration);
+            darknessAmbient.color = Color.Lerp(darknessAmbient.color, changeColor, elapsedTime / duration);
             
             _ghost_visionMultiplier = Mathf.Lerp(startValue, targetValue, elapsedTime / duration);
             IngameDataManager.SaveSpecificData("ghost_data.vision_multiplier", _ghost_visionMultiplier);
