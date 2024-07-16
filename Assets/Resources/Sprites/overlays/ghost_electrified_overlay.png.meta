@@ -110,7 +110,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: overlay_ghost_electrified_0
+      name: ghost_electrified_overlay_0
       rect:
         serializedVersion: 2
         x: 0
@@ -118,7 +118,7 @@ TextureImporter:
         width: 32
         height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -131,7 +131,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: overlay_ghost_electrified_1
+      name: ghost_electrified_overlay_1
       rect:
         serializedVersion: 2
         x: 32
@@ -139,7 +139,7 @@ TextureImporter:
         width: 32
         height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -152,7 +152,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: overlay_ghost_electrified_2
+      name: ghost_electrified_overlay_2
       rect:
         serializedVersion: 2
         x: 64
@@ -160,7 +160,7 @@ TextureImporter:
         width: 32
         height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -173,7 +173,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: overlay_ghost_electrified_3
+      name: ghost_electrified_overlay_3
       rect:
         serializedVersion: 2
         x: 96
@@ -181,7 +181,7 @@ TextureImporter:
         width: 32
         height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -204,10 +204,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      overlay_ghost_electrified_0: 1630259416
-      overlay_ghost_electrified_1: 1125745085
-      overlay_ghost_electrified_2: 536132782
-      overlay_ghost_electrified_3: -518278259
+      ghost_electrified_overlay_0: 1630259416
+      ghost_electrified_overlay_1: 1125745085
+      ghost_electrified_overlay_2: 536132782
+      ghost_electrified_overlay_3: -518278259
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

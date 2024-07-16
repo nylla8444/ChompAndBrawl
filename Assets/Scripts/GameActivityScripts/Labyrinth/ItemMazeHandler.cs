@@ -17,11 +17,15 @@ public class ItemMazeHandler : MonoBehaviour
     [SerializeField] private GameObject fruitPrefab;
     [SerializeField] private GameObject effectItemPrefab;
 
-    [Header("Scores")]
+    [Header("Points Providers")]
     [SerializeField] private int pacdotPoints;
     [SerializeField] private int powerPelletPoints;
     [SerializeField] private int powerPelletFailPoints;
     [SerializeField] private int effectItemPoints;
+    [Space(4)]
+    [SerializeField] private Sprite pointsDisplay80;
+    [SerializeField] private Sprite pointsDisplayM200;
+    [SerializeField] private Sprite pointsDisplay120;
     
     [Header("Item Info")]
     [SerializeField] private float powerPelletDuration;
@@ -31,7 +35,7 @@ public class ItemMazeHandler : MonoBehaviour
     [SerializeField] private ParticleEffectMazeHandler particleEffectMazeHandler;
     [SerializeField] private GameObject monsterAmbient;
     [SerializeField] private GameObject monsterTransformOverlayPrefab;
-
+    [SerializeField] private GameObject pointsDisplayPrefab;
 
     [Header("Item List")]
     [SerializeField] private FruitList fruitList;
@@ -53,10 +57,11 @@ public class ItemMazeHandler : MonoBehaviour
     private const int MAX_COUNT_POWER_PELLETS = 2;
     private const int MAX_COUNT_FRUITS = 6;
     private const int MAX_COUNT_EFFECT_ITEMS = 4;
-    private const float MIN_DISTANCE_POWER_PELLETS_FROM_ORIGIN = 12f;
-    private const float MIN_DISTANCE_BETWEEN_POWER_PELLETS = 16f;
-    private const float MIN_DISTANCE_FRUITS_FROM_ORIGIN = 4f;
-    private const float MIN_DISTANCE_EFFECT_ITEMS_FROM_ORIGIN = 8f;
+    private const float MIN_DISTANCE_POWER_PELLETS_FROM_ORIGIN = 12.0f;
+    private const float MIN_DISTANCE_BETWEEN_POWER_PELLETS = 16.0f;
+    private const float MIN_DISTANCE_FRUITS_FROM_ORIGIN = 4.0f;
+    private const float MIN_DISTANCE_EFFECT_ITEMS_FROM_ORIGIN = 8.0f;
+    private const float POINTS_DISPLAY_DURATION = 3.0f;
 
     private void Start()
     {
@@ -303,7 +308,8 @@ public class ItemMazeHandler : MonoBehaviour
         };
 
         particleEffectMazeHandler.SpawnEffectOverlay(monsterTransformOverlayPrefab, "pacman", 2.0f, "effect.monster_transform");
-        yield return new WaitForSeconds(1.0f);
+        particleEffectMazeHandler.SpawnTextEffect(pointsDisplayPrefab, pointsDisplay80, IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate"), POINTS_DISPLAY_DURATION);
+        yield return new WaitForSeconds(0.8f);
         StartCoroutine(UpdateObjectColor(monsterAmbient, AMBIENT_COLORS[0], AMBIENT_TRANSITION_SPEED));
 
         IngameDataManager.SaveSpecificData("pacman_data.has_power_pellet", true);
@@ -321,10 +327,11 @@ public class ItemMazeHandler : MonoBehaviour
         }
 
         particleEffectMazeHandler.SpawnEffectOverlay(monsterTransformOverlayPrefab, "pacman", 2.0f, "effect.monster_transform");
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(0.8f);
         StartCoroutine(UpdateObjectColor(monsterAmbient, AMBIENT_COLORS[1], AMBIENT_TRANSITION_SPEED));
         
         IncreasePoints(powerPelletFailPoints);
+        particleEffectMazeHandler.SpawnTextEffect(pointsDisplayPrefab, pointsDisplayM200, IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate"), POINTS_DISPLAY_DURATION);
         IngameDataManager.SaveSpecificData("pacman_data.has_power_pellet", false);
 
         SpawnAllPowerPellets();
@@ -453,6 +460,8 @@ public class ItemMazeHandler : MonoBehaviour
         if (fruitDictionary.TryGetValue(fruitObject, out Fruit fruitData))
         {
             IncreasePoints(fruitData.points);
+            particleEffectMazeHandler.SpawnTextEffect(pointsDisplayPrefab, fruitData.pointsSprite, fruitObject.transform.position, POINTS_DISPLAY_DURATION);
+
             fruitDictionary.Remove(fruitObject);
         }
     }
@@ -562,6 +571,7 @@ public class ItemMazeHandler : MonoBehaviour
         if (effectItemDictionary.TryGetValue(effectItemObject, out EffectItem effectItemData))
         {
             IncreasePoints(effectItemPoints);
+            particleEffectMazeHandler.SpawnTextEffect(pointsDisplayPrefab, pointsDisplay120, effectItemObject.transform.position, POINTS_DISPLAY_DURATION);
 
             _pacman_currentEffectItem = effectItemData.name;
             effectItemDictionary.Remove(effectItemObject);

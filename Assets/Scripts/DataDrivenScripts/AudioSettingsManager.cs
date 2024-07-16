@@ -16,6 +16,9 @@ public class AudioSettingsManager : MonoBehaviour
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private List<Sprite> sfxIcons; // 0: mute, 1: unmute
 
+    [Header("Scripts")]
+    [SerializeField] private AudioManager audioManager;
+
     private PlayerData playerData;
 
     private void Start()
@@ -63,6 +66,7 @@ public class AudioSettingsManager : MonoBehaviour
         playerData.audio.music_volume = newVolume;
         musicSlider.value = newVolume;
         UpdateMusicIcon(newVolume);
+        audioManager.MusicVolume = newVolume;
         
         PlayerDataManager.SaveData(playerData);
     }
@@ -75,6 +79,7 @@ public class AudioSettingsManager : MonoBehaviour
         playerData.audio.sfx_volume = newVolume;
         sfxSlider.value = newVolume;
         UpdateSfxIcon(newVolume);
+        audioManager.SfxVolume = newVolume;
         
         PlayerDataManager.SaveData(playerData);
     }
@@ -86,6 +91,7 @@ public class AudioSettingsManager : MonoBehaviour
         float volume = musicSlider.value;
         playerData.audio.music_volume = volume;
         UpdateMusicIcon(volume);
+        audioManager.MusicVolume = volume;
         
         PlayerDataManager.SaveData(playerData);
     }
@@ -97,6 +103,7 @@ public class AudioSettingsManager : MonoBehaviour
         float volume = sfxSlider.value;
         playerData.audio.sfx_volume = volume;
         UpdateSfxIcon(volume);
+        audioManager.SfxVolume = volume;
         
         PlayerDataManager.SaveData(playerData);
     }

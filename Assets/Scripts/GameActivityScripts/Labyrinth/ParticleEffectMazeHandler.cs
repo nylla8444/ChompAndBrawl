@@ -74,7 +74,13 @@ public class ParticleEffectMazeHandler : MonoBehaviour
         particleSystem.Play();
 
         Destroy(particleInstance, particleSystem.main.duration + particleSystem.main.startLifetime.constantMax);
+    }
 
+    public void SpawnTextEffect(GameObject textPrefab, Sprite textSprite, Vector2 position, float duration)
+    {
+        GameObject textInstance = Instantiate(textPrefab, position, Quaternion.identity);
+        textInstance.GetComponent<SpriteRenderer>().sprite = textSprite;
+        Destroy(textInstance, duration);
     }
 
     private IEnumerator FollowTarget(GameObject particleInstance, Transform followTransform, float duration)

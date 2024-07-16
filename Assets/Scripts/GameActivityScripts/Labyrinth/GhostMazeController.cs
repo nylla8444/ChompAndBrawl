@@ -137,7 +137,7 @@ public class GhostMazeController : MonoBehaviour
         KeybindDataManager.UnregisterKeyAction("ghost.use_unique_item", () => HandleInput("ghost.use_unique_item"));
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (!isMazeStarted) return;
 
@@ -155,11 +155,6 @@ public class GhostMazeController : MonoBehaviour
             isRunning = true;
             UpdateGhostAnimation(onCtrl_animator, onCtrl_direction, onCtrl_ghost.name);
         }
-    }
-
-    private void FixedUpdate()
-    {
-        if (!isMazeStarted) return;
 
         UpdateTextDisplay();
     }
@@ -214,18 +209,22 @@ public class GhostMazeController : MonoBehaviour
         if (direction != Vector2.zero)
         {
             onCtrl_queuedDirection = direction;
+            return;
         }
-        else if (action == "ghost.change_ghost")
+        
+        switch (action)
         {
-            OnUse_ChangeGhostItem();
-        }
-        else if (action == "ghost.use_boost_item")
-        {
-            StartCoroutine(OnUse_BoostItem());
-        }
-        else if (action == "ghost.use_unique_item")
-        {
-            OnUse_EffectItem();
+            case "ghost.change_ghost":
+                OnUse_ChangeGhostItem();
+                break;
+
+            case "ghost.use_boost_item": 
+                StartCoroutine(OnUse_BoostItem()); 
+                break;
+
+            case "ghost.use_unique_item": 
+                OnUse_EffectItem(); 
+                break;
         }
     }
 
@@ -279,16 +278,11 @@ public class GhostMazeController : MonoBehaviour
         BoxCollider2D ghostCollider = ghost.GetComponent<BoxCollider2D>();
         if (ghostCollider == null) return false;
 
-        Bounds ghostBounds = ghostCollider.bounds;
-        ghostBounds.center = targetPosition;
-        Collider2D[] hits = Physics2D.OverlapBoxAll(ghostBounds.center, ghostBounds.size, 0f, collisionLayer);
+        RaycastHit2D hit = Physics2D.BoxCast(targetPosition, ghostCollider.bounds.size, 0f, Vector2.zero, 0f, collisionLayer);
 
-        foreach (Collider2D hit in hits)
+        if (hit.collider != null && hit.collider.gameObject != ghost && !hit.collider.isTrigger)
         {
-            if (hit != null && hit.gameObject != ghost && !hit.isTrigger)
-            {
-                return false;
-            }
+            return false;
         }
 
         return true;

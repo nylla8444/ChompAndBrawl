@@ -52,8 +52,6 @@ public class SplitScreenMazeHandler : MonoBehaviour
                                                               ref player1Velocity, cameraSmoothSpeed);
         player1Camera.transform.position = new Vector3(player1Camera.transform.position.x, player1Camera.transform.position.y, -10f);
         player1Camera.orthographicSize = DEFAULT_ORTHOGRAPHIC_SIZE * _pacman_visionMultiplier;
-
-       
     }
 
     private void CameraFollowGhost()

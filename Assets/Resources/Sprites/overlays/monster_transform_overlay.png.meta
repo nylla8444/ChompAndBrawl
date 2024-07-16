@@ -110,7 +110,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: monster_transform_effect_0
+      name: monster_transform_overlay_0
       rect:
         serializedVersion: 2
         x: 0
@@ -118,7 +118,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -131,7 +131,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_1
+      name: monster_transform_overlay_1
       rect:
         serializedVersion: 2
         x: 16
@@ -139,7 +139,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -152,7 +152,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_2
+      name: monster_transform_overlay_2
       rect:
         serializedVersion: 2
         x: 32
@@ -160,7 +160,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -173,7 +173,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_3
+      name: monster_transform_overlay_3
       rect:
         serializedVersion: 2
         x: 48
@@ -181,7 +181,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -194,7 +194,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_4
+      name: monster_transform_overlay_4
       rect:
         serializedVersion: 2
         x: 64
@@ -202,7 +202,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -215,7 +215,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_5
+      name: monster_transform_overlay_5
       rect:
         serializedVersion: 2
         x: 80
@@ -223,7 +223,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -236,7 +236,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_6
+      name: monster_transform_overlay_6
       rect:
         serializedVersion: 2
         x: 96
@@ -244,7 +244,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -257,7 +257,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_7
+      name: monster_transform_overlay_7
       rect:
         serializedVersion: 2
         x: 0
@@ -265,7 +265,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -278,7 +278,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_8
+      name: monster_transform_overlay_8
       rect:
         serializedVersion: 2
         x: 16
@@ -286,7 +286,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -299,7 +299,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_9
+      name: monster_transform_overlay_9
       rect:
         serializedVersion: 2
         x: 32
@@ -307,7 +307,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -320,7 +320,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_10
+      name: monster_transform_overlay_10
       rect:
         serializedVersion: 2
         x: 48
@@ -328,7 +328,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -341,7 +341,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_11
+      name: monster_transform_overlay_11
       rect:
         serializedVersion: 2
         x: 64
@@ -349,7 +349,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -362,7 +362,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_12
+      name: monster_transform_overlay_12
       rect:
         serializedVersion: 2
         x: 80
@@ -370,7 +370,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -383,7 +383,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_13
+      name: monster_transform_overlay_13
       rect:
         serializedVersion: 2
         x: 96
@@ -391,7 +391,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -404,7 +404,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_14
+      name: monster_transform_overlay_14
       rect:
         serializedVersion: 2
         x: 0
@@ -412,7 +412,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -425,7 +425,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_15
+      name: monster_transform_overlay_15
       rect:
         serializedVersion: 2
         x: 16
@@ -433,7 +433,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -446,7 +446,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_16
+      name: monster_transform_overlay_16
       rect:
         serializedVersion: 2
         x: 32
@@ -454,7 +454,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -467,7 +467,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_17
+      name: monster_transform_overlay_17
       rect:
         serializedVersion: 2
         x: 48
@@ -475,7 +475,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -488,7 +488,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_18
+      name: monster_transform_overlay_18
       rect:
         serializedVersion: 2
         x: 64
@@ -496,7 +496,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -509,7 +509,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_19
+      name: monster_transform_overlay_19
       rect:
         serializedVersion: 2
         x: 80
@@ -517,7 +517,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -530,7 +530,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: monster_transform_effect_20
+      name: monster_transform_overlay_20
       rect:
         serializedVersion: 2
         x: 96
@@ -538,7 +538,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -561,27 +561,27 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      monster_transform_effect_0: 1621380594
-      monster_transform_effect_1: 2037580450
-      monster_transform_effect_10: 570463382
-      monster_transform_effect_11: -1277978268
-      monster_transform_effect_12: 757073385
-      monster_transform_effect_13: 1058152913
-      monster_transform_effect_14: -920264401
-      monster_transform_effect_15: 1961534496
-      monster_transform_effect_16: 1014741364
-      monster_transform_effect_17: -650232010
-      monster_transform_effect_18: 580553762
-      monster_transform_effect_19: 235326525
-      monster_transform_effect_2: -875238321
-      monster_transform_effect_20: 490464142
-      monster_transform_effect_3: 526709265
-      monster_transform_effect_4: 935546267
-      monster_transform_effect_5: -1964749179
-      monster_transform_effect_6: 1965494670
-      monster_transform_effect_7: -2099445244
-      monster_transform_effect_8: 990170149
-      monster_transform_effect_9: -1285488724
+      monster_transform_overlay_0: 1621380594
+      monster_transform_overlay_1: 2037580450
+      monster_transform_overlay_10: 570463382
+      monster_transform_overlay_11: -1277978268
+      monster_transform_overlay_12: 757073385
+      monster_transform_overlay_13: 1058152913
+      monster_transform_overlay_14: -920264401
+      monster_transform_overlay_15: 1961534496
+      monster_transform_overlay_16: 1014741364
+      monster_transform_overlay_17: -650232010
+      monster_transform_overlay_18: 580553762
+      monster_transform_overlay_19: 235326525
+      monster_transform_overlay_2: -875238321
+      monster_transform_overlay_20: 490464142
+      monster_transform_overlay_3: 526709265
+      monster_transform_overlay_4: 935546267
+      monster_transform_overlay_5: -1964749179
+      monster_transform_overlay_6: 1965494670
+      monster_transform_overlay_7: -2099445244
+      monster_transform_overlay_8: 990170149
+      monster_transform_overlay_9: -1285488724
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

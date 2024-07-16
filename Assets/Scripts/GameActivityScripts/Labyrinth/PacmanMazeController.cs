@@ -79,10 +79,10 @@ public class PacmanMazeController : MonoBehaviour
         KeybindDataManager.UnregisterKeyAction("pacman.use_item", () => HandleInput("pacman.use_item"));
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (!isMazeStarted) return;
-        
+
         if (isRunning)
         {
             MoveTowards();
@@ -95,11 +95,6 @@ public class PacmanMazeController : MonoBehaviour
             isRunning = true;
             UpdatePacmanAnimation();
         }
-    }
-
-    private void FixedUpdate()
-    {
-        if (!isMazeStarted) return;
 
         UpdateEffectItemDisplay();
         UpdateTextDisplay();
@@ -135,10 +130,13 @@ public class PacmanMazeController : MonoBehaviour
         if (_direction != Vector2.zero)
         {
             queuedDirection = _direction;
+            return;
         }
-        else if (action == "pacman.use_item")
+        
+        if (action == "pacman.use_item")
         {
             OnUse_EffectItem();
+            return;
         }
     }
 
@@ -188,16 +186,13 @@ public class PacmanMazeController : MonoBehaviour
 
     private bool IsAbleToMoveTo(Vector2 targetPosition)
     {
-        Bounds pacmanBounds = pacmanCollider.bounds;
-        pacmanBounds.center = targetPosition;
-        Collider2D[] hits = Physics2D.OverlapBoxAll(pacmanBounds.center, pacmanBounds.size, 0f, collisionLayer);
+        float tolerance = 0.1f;
 
-        foreach (Collider2D hit in hits)
+        RaycastHit2D hit = Physics2D.BoxCast(targetPosition, pacmanCollider.bounds.size, 0f, Vector2.zero, tolerance, collisionLayer);
+
+        if (hit.collider != null && hit.collider.gameObject != pacman)
         {
-            if (hit != null && hit.gameObject != pacman)
-            {
-                return false;
-            }
+            return false;
         }
 
         return true;
