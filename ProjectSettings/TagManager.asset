@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Pacman
   - Ghost
+  - BrawlScript
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - Collision
   - Pacman Safezone
   - Ghost Safezone
-  - 
+  - Fighters
   - 
   - 
   - 
