@@ -1,19 +1,25 @@
 using UnityEngine;
 
-public class BrawlManager : MonoBehaviour {
+public enum AttackCategory {
+    punch,
+    basic,
+    special
+}
 
+public class BrawlManager : MonoBehaviour {
+    public CameraHandler cameraHandler;
     [SerializeField] private GameObject arenaFloor;
     [SerializeField] private float characterSpeed;
     [SerializeField] private float jumpStrength;
     [SerializeField] private float smoothTime; // for character movement
     [SerializeField] private GameObject[] fighters;
-    public float blockMoveSpeed;
 
     private PlayerBehavior[] fighterScript = new PlayerBehavior[2];
     private Rigidbody2D[] fighterRb = new Rigidbody2D[2];
     private BoxCollider2D[] fighterColliders = new BoxCollider2D[2];
     private GameObject pacman;
     private GameObject ghost;
+    public float blockMoveReduction;
 
     public GameObject getArenaFloor() { return arenaFloor; }
     public float getCharacterSpeed() { return characterSpeed; }

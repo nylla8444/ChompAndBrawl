@@ -253,13 +253,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 261c3968aa1f4334289568f06d1e6fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 0
+  punchAttack: {fileID: 11400000, guid: bb78f12ad7f1a4046b7fe0a96bdf3df7, type: 2}
   inputHandler:
     jumpKey: 273
     leftKey: 276
     crouchKey: 274
     rightKey: 275
-    punchKey: 92
-  punchAttack: {fileID: 11400000, guid: 2faa7bdf80514b14eaf4ec66f669a796, type: 2}
+    punchKey: 47
+  facingRight: 0
+  isBlocking: 0
+  isCrouching: 0
+  queuedAttack: {fileID: 0}
+  chargeAttack: 0
+  stunTime: 0
+  attackCooldown: 0
 --- !u!50 &305738993
 Rigidbody2D:
   serializedVersion: 4
@@ -448,9 +456,10 @@ MonoBehaviour:
   characterSpeed: 3
   jumpStrength: 20
   smoothTime: 0.1
-  playerHitboxes:
-  - {fileID: 1024155349}
-  - {fileID: 305738994}
+  fighters:
+  - {fileID: 1024155347}
+  - {fileID: 305738991}
+  blockMoveReduction: 0.66
 --- !u!1 &722577194
 GameObject:
   m_ObjectHideFlags: 0
@@ -590,7 +599,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 762475657}
-  - component: {fileID: 762475658}
   m_Layer: 11
   m_Name: AttackBox
   m_TagString: Untagged
@@ -608,56 +616,11 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 305738996}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &762475658
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 762475656}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0.625, y: 0.425}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.25, y: 0.75}
-  m_EdgeRadius: 0
 --- !u!1 &1024155347
 GameObject:
   m_ObjectHideFlags: 0
@@ -830,13 +793,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 261c3968aa1f4334289568f06d1e6fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 0
+  punchAttack: {fileID: 11400000, guid: bb78f12ad7f1a4046b7fe0a96bdf3df7, type: 2}
   inputHandler:
     jumpKey: 119
     leftKey: 97
     crouchKey: 115
     rightKey: 100
     punchKey: 101
-  punchAttack: {fileID: 11400000, guid: bb78f12ad7f1a4046b7fe0a96bdf3df7, type: 2}
+  facingRight: 0
+  isBlocking: 0
+  isCrouching: 0
+  queuedAttack: {fileID: 0}
+  chargeAttack: 0
+  stunTime: 0
+  attackCooldown: 0
 --- !u!1 &1267714207
 GameObject:
   m_ObjectHideFlags: 0

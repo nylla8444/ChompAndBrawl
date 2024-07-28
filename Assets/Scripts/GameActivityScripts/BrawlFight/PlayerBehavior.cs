@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 // public class PlayerBehavior : PacmanMazeController
 // {
@@ -17,29 +18,31 @@ using UnityEngine;
 
 
 [System.Serializable] public class PlayerBehavior : MonoBehaviour {
-    enum state {
-        none,
-        attack_charge,
-        attack_cooldown,
-        jumping,
-        crouching,
-    }
     private const float COLLIDER_MARGIN = 0.02f;
 
-    [SerializeField] private InputHandler inputHandler;
-    private BrawlManager brawlManager;
-    private Rigidbody2D rigidBody;
-    private BoxCollider2D boxCollider;
-    private float horizontalValue;
-    private float horizontalVelocity;
-    private bool crouched;
-    private float stunTime;
-    private float attackCooldown;
-    private GameObject attackBox;
-    private int attackDirection;
-    public bool facingRight;
-    public bool isBlocking;
+    [Header("Fighter Stats")]
+    [SerializeField] private float health;
     [SerializeField] private Attack punchAttack;
+    [SerializeField] private InputHandler inputHandler;
+
+    private BrawlManager brawlManager;
+    private BoxCollider2D boxCollider;
+    private Rigidbody2D rigidBody;
+    private GameObject attackBox;
+    private float horizontalValue;
+    private float horizontalVelocity; // used for smooth damp
+    private BoxCollider2D opponentCollider;
+    private PlayerBehavior opponentBehavior;
+    private Rigidbody2D opponentRigidBody;
+    private Attack lastAttack;
+
+    [HideInInspector] public bool facingRight;
+    [HideInInspector] public bool isBlocking;
+    [HideInInspector] public bool isCrouching;
+    [HideInInspector] public Attack queuedAttack;
+    [HideInInspector] public float chargeAttack;
+    [HideInInspector] public float stunTime;
+    [HideInInspector] public float attackCooldown;
 
     [System.Serializable] public class InputHandler {
         [SerializeField] private KeyCode jumpKey;
@@ -49,36 +52,36 @@ using UnityEngine;
         [SerializeField] private KeyCode punchKey;
         private PlayerBehavior playerBehavior;
 
-        public void initialize(PlayerBehavior behavior) {
+        public void Initialize(PlayerBehavior behavior) {
             playerBehavior = behavior;
         }
-        public float GetHorizontal() {
+
+        public float getHorizontalValue() {
+            if (IsWalkingLeft() && IsWalkingRight()) {
+                playerBehavior.isBlocking = true;
+                return 0;
+            }
             playerBehavior.isBlocking = false;
-            if (!(Input.GetKey(leftKey) ^ Input.GetKey(rightKey))) { return 0; }
 
-            if (Input.GetKey(leftKey)) {
-                if (playerBehavior.facingRight) {
-                    playerBehavior.isBlocking = true;
-                    return -1 * playerBehavior.brawlManager.blockMoveSpeed;
-                } else {
-                    return -1;
-                }
-            }
-            if (Input.GetKey(rightKey)) {
-                if (playerBehavior.facingRight)  {
-                    return 1;
-                } else {
-                    playerBehavior.isBlocking = true;
-                    return 1 * playerBehavior.brawlManager.blockMoveSpeed;
-                }
+            if (IsWalkingLeft()) {
+                if (!playerBehavior.facingRight) { return -1; }
+                playerBehavior.isBlocking = true;
+                return -playerBehavior.brawlManager.blockMoveReduction;
             }
 
-            Debug.LogWarning("Input working improperly");
+            if (IsWalkingRight()) {
+                if (playerBehavior.facingRight) { return 1; }
+                playerBehavior.isBlocking = true;
+                return playerBehavior.brawlManager.blockMoveReduction;
+            }
+
             return 0;
         }
 
+        public bool IsWalkingLeft() { return Input.GetKey(leftKey); }
+        public bool IsWalkingRight() { return Input.GetKey(rightKey); }
         public bool IsJumping() { return Input.GetKey(jumpKey); }
-        public bool IsCrouching() { return Input.GetKey(crouchKey); }
+        public bool Crouching() { return Input.GetKey(crouchKey); }
         public bool IsPunching() { return Input.GetKeyDown(punchKey); }
     }
 
@@ -89,94 +92,88 @@ using UnityEngine;
         attackBox = gameObject.transform.GetChild(0).gameObject;
 
         horizontalValue = 0;
-        stunTime = 0;
-        attackCooldown = 0;
-        attackDirection = 1;
-
-        crouched = false;
+        chargeAttack = 0;
         facingRight = false;
 
         // for smoothdamp
         horizontalVelocity = 0;
 
-        inputHandler.initialize(this);
+        GameObject[] fighters = brawlManager.getFighters();
+        for (int i = 0; i < 2; i++ ) {
+            if (fighters[i] == gameObject) { continue; }
+            
+            GameObject opponent = fighters[i];
+            opponentBehavior = opponent.GetComponent<PlayerBehavior>();
+            opponentCollider = opponent.GetComponent<BoxCollider2D>();
+            opponentRigidBody = opponent.GetComponent<Rigidbody2D>();
+            break;
+        }
+
+        inputHandler.Initialize(this);
     }
 
     private void Update() {
-        // Handle Stunning
-        if (stunTime > 0) { stunTime -= Time.deltaTime; return; }
-        
-        // Handle Attacks
-        // Attack Direction
-        attackDirection = facingRight ? 1 : -1;
+        // Stun Logic
+        if (stunTime > 0) {
+            stunTime -= Time.deltaTime;
+            if (stunTime > 0) { return; }
+        }
 
-        // Attack Cooldown
-        if (attackCooldown > 0) { attackCooldown -= Time.deltaTime; return; }
-
-        // Basic Punch
+        // ATTACKING
+        // punch attack sequence
         if (inputHandler.IsPunching()) {
-            BoxCollider2D attackHitbox = setAttackBox(punchAttack);
-            GameObject[] fighters = brawlManager.getFighters();
-
-            for (int i = 0; i < 2; i++) {
-                if (gameObject == fighters[i]) { continue; }
-                if (isAttackHit(attackHitbox, brawlManager.getFighterCollider()[i])) {
-                    PlayerBehavior otherBehavior = brawlManager.getFighterScript()[i];
-                    Rigidbody2D otherRigidBody = brawlManager.getFighterRb()[i];
-
-                    rigidBody.velocity = new Vector2(punchAttack.rootVelocity * attackDirection, rigidBody.velocity.y);
-                    otherRigidBody.velocity = new Vector2(punchAttack.otherVelocity * attackDirection, otherRigidBody.velocity.y);
-
-                    otherBehavior.stun(punchAttack.stunDuration * (otherBehavior.isBlocking ? .33f : 1f));
-                    attackCooldown = punchAttack.hitDuration;
-
-                } else {
-                    attackCooldown = punchAttack.missDuration;
-                }
-            }
-
-            Destroy(attackHitbox);
-        }
-
-        // Handle Movements
-        if (isStanding()) {
-
-            // Crouch
-            if (inputHandler.IsCrouching()) {
-                if (!crouched) {
-                    boxCollider.size = new Vector2(1f, 0.5f);
-                    boxCollider.offset = new Vector2(0f, -0.25f);
-                    horizontalValue = 0;
-                    crouched = true;
-                    // Debug.Log("Crouching");
-                }
-                return;
+            if (queuedAttack && lastAttack && lastAttack.attackCategory == AttackCategory.punch) {
+                queuedAttack = lastAttack.nextAttack;
             } else {
-                if (crouched) {
-                    boxCollider.size = new Vector2(1f, 1f);
-                    boxCollider.offset = new Vector2(0f, 0f);
-                    crouched = false;
-                    // Debug.Log("Uncrouched");
-                }
-            }
-
-            // Horizontal Movement
-            horizontalValue = Mathf.SmoothDamp(horizontalValue, inputHandler.GetHorizontal(), ref horizontalVelocity, brawlManager.getSmoothTime());
-            
-            // Jump
-            if (inputHandler.IsJumping()) {
-                rigidBody.velocity = new Vector2(rigidBody.velocity.x, brawlManager.getJumpStrength());
+                queuedAttack = punchAttack;
             }
         }
+
+        // Post attack cd
+        if (attackCooldown > 0) {
+            attackCooldown -= Time.deltaTime;
+            if (attackCooldown > 0) { return; }
+        }
+
+        // Pre attack cd
+        if (queuedAttack && chargeAttack <= 0) { chargeAttack = queuedAttack.chargeDuration; }
+        if (chargeAttack > 0) {
+            chargeAttack -= Time.deltaTime;
+            if (chargeAttack > 0) { return; }
+            registerAttack(queuedAttack);
+        }
+
+        // MOVEMENT
+        // crouching
+        if (inputHandler.Crouching()) {
+            Debug.Log("Reduce Hitbox");
+            horizontalValue = 0;
+            isCrouching = true;
+            return;
+        }
+        isCrouching = false;
+
+        // horizontal movement
+        if (!IsGrounded()) { return; }
+        horizontalValue = Mathf.SmoothDamp(
+            horizontalValue,
+            inputHandler.getHorizontalValue(),
+            ref horizontalVelocity,
+            brawlManager.getSmoothTime()
+        );
+        
+        // jumping 
+        if (!inputHandler.IsJumping()) { return; }
+        rigidBody.velocity = new Vector2(rigidBody.velocity.x, brawlManager.getJumpStrength());
     }
 
     private void FixedUpdate() {
-        if (stunTime <= 0 && attackCooldown <= 0) {
+        if (!isCrouching && stunTime <= 0 && chargeAttack <= 0 && attackCooldown <= 0) {
             rigidBody.velocity = new Vector2(horizontalValue * brawlManager.getCharacterSpeed(), rigidBody.velocity.y);
         }
     }
 
-    private bool isStanding() {
+    private bool IsGrounded() {
         GameObject arenaFloor = brawlManager.getArenaFloor();
         float floorValue = arenaFloor.transform.position.y + arenaFloor.transform.localScale.y / 2;
         float feetValue = gameObject.transform.position.y - gameObject.transform.localScale.y / 2;
@@ -184,20 +181,52 @@ using UnityEngine;
         return feetValue < floorValue + COLLIDER_MARGIN;
     }
 
-    private bool isAttackHit(BoxCollider2D attackHitbox, BoxCollider2D playerHitbox) {
-        return attackHitbox.bounds.Intersects(playerHitbox.bounds);
-    }
-
-    public void stun(float seconds) {
-        stunTime = seconds;
-        attackCooldown = 0;
-    }
-
-    private BoxCollider2D setAttackBox(Attack attackInfo) {
+    private void registerAttack(Attack attack) {
+        // reminder for self: implement last attack then remove the stuff from register attack 
         BoxCollider2D attackHitbox = attackBox.AddComponent<BoxCollider2D>();
-        attackHitbox.offset = punchAttack.attackBoxOffset;
-        attackHitbox.size = punchAttack.attackBoxOffset;
+        if (!attack) {Debug.Log("AttackArgument Missing"); return; }
+        Debug.Log(attack.name);
+        attackHitbox.offset = attack.attackBoxOffset;
+        attackHitbox.size = attack.attackBoxSize;
 
-        return attackHitbox;
+        int attackDirection = facingRight ? 1 : -1;
+
+        if (attackHitbox.bounds.Intersects(opponentCollider.bounds)) {
+            // Attack hit
+            rigidBody.velocity = new Vector2(attack.rootVelocity.x * attackDirection, attack.rootVelocity.y);
+            if (opponentBehavior.isBlocking) {
+                opponentBehavior.stun(attack.stunDuration / 2, new Vector2(attack.otherVelocity.x * attackDirection / 2, attack.otherVelocity.y));
+                attackCooldown = attack.hitDuration;
+                lastAttack = null;
+            } else {
+                opponentBehavior.stun(attack.stunDuration, new Vector2(attack.otherVelocity.x * attackDirection, attack.otherVelocity.y));
+                attackCooldown = attack.hitDuration;
+                lastAttack = attack;
+
+                if (attack.shakeCam) { brawlManager.cameraHandler.Shake(attack.camShakeDuration, attack.camShakeStrength); }
+            }
+
+            Debug.Log("Apply Damage");
+        } else {
+            attackCooldown = attack.missDuration;
+            lastAttack = null;
+        }
+
+        queuedAttack = null;
     }
+
+    public void stun(float seconds, Vector2 knockback) {
+        stunTime = seconds;
+        rigidBody.velocity = knockback;
+        queuedAttack = null;
+        
+    }
+
+    // private BoxCollider2D setAttackBox(Attack attackInfo) {
+    //     BoxCollider2D attackHitbox = attackBox.AddComponent<BoxCollider2D>();
+    //     attackHitbox.offset = punchAttack.attackBoxOffset;
+    //     attackHitbox.size = punchAttack.attackBoxOffset;
+
+    //     return attackHitbox;
+    // }
 }
