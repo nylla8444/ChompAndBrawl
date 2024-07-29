@@ -60,6 +60,7 @@ public class ButtonSelector : MonoBehaviour
     private void OnDestroy()
     {
         UnregisterKeyActions();
+        ClearButtonReferences();
     }
 
     private void RegisterKeyActions()
@@ -172,6 +173,21 @@ public class ButtonSelector : MonoBehaviour
             currentButtonIndex >= 0 && currentButtonIndex < allButtonGroups[currentGroupIndex].Count)
         {
             allButtonGroups[currentGroupIndex][currentButtonIndex].Press();
+        }
+    }
+
+    private void ClearButtonReferences()
+    {
+        foreach (var buttonGroup in buttonGroupList)
+        {
+            buttonGroup.buttons?.Clear();
+            buttonGroup.labelButtons?.Clear();
+            buttonGroup.targetButtons?.Clear();
+        }
+
+        if (allButtonGroups != null)
+        {
+            allButtonGroups.Clear();
         }
     }
 }

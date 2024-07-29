@@ -17,6 +17,7 @@ public class IngameData
     [Serializable]
     public class PacmanData
     {
+        public bool has_read_tutorial;
         public int points;
         public int playtime;
         public int lives;
@@ -35,6 +36,7 @@ public class IngameData
     [Serializable]
     public class GhostData
     {
+        public bool has_read_tutorial;
         public string current_controlling;
         public string current_fighting;
         public float vision_multiplier;
@@ -117,7 +119,7 @@ public static class IngameDataManager
     {
         if (defaultIngameData == null)
         {
-            Debug.LogError("DefaultIngameData is not set. Call Initialize() first.");
+            Debug.LogWarning("DefaultIngameData is not set. Call Initialize() first.");
             return null;
         }
 

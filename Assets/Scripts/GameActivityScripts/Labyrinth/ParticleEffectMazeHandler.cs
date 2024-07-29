@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ParticleEffectMazeHandler : MonoBehaviour
 {
-    [Header("Transforms")]
+    [Header("===Transforms===")]
     [SerializeField] private Transform pacmanTransform;
     [SerializeField] private Transform blinkyTransform;
     [SerializeField] private Transform clydeTransform;

@@ -1,0 +1,434 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &178985306126646656
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2501457125066576366}
+  - component: {fileID: 6755832317137167095}
+  m_Layer: 0
+  m_Name: EffectDisplayMazeHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &2501457125066576366
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 178985306126646656}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8823609240881930095}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6755832317137167095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 178985306126646656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cbf115ae30ee844c97109c0c320e4df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pacman_effectDisplayPrefab: {fileID: 0}
+  ghost_effectDisplayPrefab: {fileID: 0}
+  pacman_effectDisplayAnchor: {fileID: 0}
+  ghost_effectDisplayAnchor: {fileID: 0}
+  pacman_effectItemList: {fileID: 11400000, guid: 8581038b1c3ed954ab54f553375812cb, type: 2}
+  ghost_effectItemList: {fileID: 11400000, guid: 83a13f4b1a7575246960d6af65ee0c76, type: 2}
+--- !u!1 &1207103957363085339
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2800969271466404015}
+  - component: {fileID: 5164592894600792505}
+  m_Layer: 0
+  m_Name: ParticleEffectMazeHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &2800969271466404015
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1207103957363085339}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8823609240881930095}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5164592894600792505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1207103957363085339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d276aad43a4755a48886ae8b012c91e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pacmanTransform: {fileID: 0}
+  blinkyTransform: {fileID: 0}
+  clydeTransform: {fileID: 0}
+  inkyTransform: {fileID: 0}
+  pinkyTransform: {fileID: 0}
+--- !u!1 &4072383773383904158
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5550020678305888462}
+  - component: {fileID: 5366468098498393255}
+  m_Layer: 0
+  m_Name: PacmanMazeController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &5550020678305888462
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4072383773383904158}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8823609240881930095}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5366468098498393255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4072383773383904158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d43e3cf002a3d347b24bae0d27a7f49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMazeStarted: 1
+  pacman: {fileID: 0}
+  defaultSpeed: 0.6
+  collisionLayer:
+    serializedVersion: 2
+    m_Bits: 1280
+  spawnPoint: {fileID: 0}
+  animator: {fileID: 0}
+  pointsText: {fileID: 0}
+  playtimeText: {fileID: 0}
+  heartImages:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  heartSprites:
+  - {fileID: -2097884759, guid: 8ac87f5138efb65499661fb6fc33f4de, type: 3}
+  - {fileID: 752676979, guid: 8ac87f5138efb65499661fb6fc33f4de, type: 3}
+  effectItemList: {fileID: 11400000, guid: 8581038b1c3ed954ab54f553375812cb, type: 2}
+  effectItemIcon: {fileID: 0}
+  effectItemText: {fileID: 0}
+  cdText_effectItem: {fileID: 0}
+  cdImage_effectItem: {fileID: 0}
+  darknessAmbient: {fileID: 0}
+  particleEffectMazeHandler: {fileID: 5164592894600792505}
+  startParticlePrefab: {fileID: 0}
+  sparkParalyzeParticlePrefab: {fileID: 0}
+--- !u!1 &6242337282724736687
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8823609240881930095}
+  m_Layer: 0
+  m_Name: MainActivities
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &8823609240881930095
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6242337282724736687}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5550020678305888462}
+  - {fileID: 4959080754261243610}
+  - {fileID: 3872347666221189896}
+  - {fileID: 7465195059269203353}
+  - {fileID: 2800969271466404015}
+  - {fileID: 2501457125066576366}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7314093173190401099
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4959080754261243610}
+  - component: {fileID: 1212074582422392060}
+  m_Layer: 0
+  m_Name: GhostMazeController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &4959080754261243610
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7314093173190401099}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8823609240881930095}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1212074582422392060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7314093173190401099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2820580b95ab57c489472811443f905a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMazeStarted: 1
+  blinky: {fileID: 0}
+  clyde: {fileID: 0}
+  inky: {fileID: 0}
+  pinky: {fileID: 0}
+  blinkyDefaultSpeed: 0.45
+  clydeDefaultSpeed: 0.45
+  inkyDefaultSpeed: 0.45
+  pinkyDefaultSpeed: 0.45
+  blinkySpawn: {fileID: 0}
+  clydeSpawn: {fileID: 0}
+  inkySpawn: {fileID: 0}
+  pinkySpawn: {fileID: 0}
+  blinkyAnimator: {fileID: 0}
+  clydeAnimator: {fileID: 0}
+  inkyAnimator: {fileID: 0}
+  pinkyAnimator: {fileID: 0}
+  collisionLayer:
+    serializedVersion: 2
+    m_Bits: 768
+  ghostImages:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  ghostEmptySprites:
+  - {fileID: 1716042781, guid: 0057ba42bb7699c469d77eb4d90ff1e8, type: 3}
+  - {fileID: 1239482833, guid: 0057ba42bb7699c469d77eb4d90ff1e8, type: 3}
+  - {fileID: 1287218249, guid: 0057ba42bb7699c469d77eb4d90ff1e8, type: 3}
+  - {fileID: -1427405797, guid: 0057ba42bb7699c469d77eb4d90ff1e8, type: 3}
+  ghostFullSprites:
+  - {fileID: 1971376139, guid: d2dc3e842ff167e40840a6870f7caf1a, type: 3}
+  - {fileID: 1068661461, guid: ace0e7a005e2b484c8cc9bd36751f24c, type: 3}
+  - {fileID: -1311548452, guid: 01ea548859a7a024dba0473578fcfdb2, type: 3}
+  - {fileID: -348098888, guid: bef96989bbeab914b98d4bcbe849f91f, type: 3}
+  effectItemList: {fileID: 11400000, guid: 83a13f4b1a7575246960d6af65ee0c76, type: 2}
+  cdText_boost: {fileID: 0}
+  cdText_changeGhost: {fileID: 0}
+  cdText_effectItem: {fileID: 0}
+  cdImage_boost: {fileID: 0}
+  cdImage_changeGhost: {fileID: 0}
+  cdImage_effectItem: {fileID: 0}
+  changeGhostSprites:
+  - {fileID: 1731197057, guid: 2bb5f959c02637a48a9c5738995457ad, type: 3}
+  - {fileID: -774957811, guid: 2bb5f959c02637a48a9c5738995457ad, type: 3}
+  - {fileID: 1085428045, guid: 2bb5f959c02637a48a9c5738995457ad, type: 3}
+  - {fileID: 1053499429, guid: 2bb5f959c02637a48a9c5738995457ad, type: 3}
+  changeGhostIcon: {fileID: 0}
+  effectItemIcon: {fileID: 0}
+  effectItemText: {fileID: 0}
+  sparkElectricParticlePrefab: {fileID: 0}
+  ghostElectrifiedOverlayPrefab: {fileID: 0}
+  windBurstParticlePrefab: {fileID: 0}
+  stickyGooPrefab: {fileID: 0}
+  gooOverlayPrefab: {fileID: 0}
+  startParticlePrefab: {fileID: 0}
+  particleEffectMazeHandler: {fileID: 5164592894600792505}
+--- !u!1 &8395411075957181815
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7465195059269203353}
+  - component: {fileID: 4735484392978848195}
+  m_Layer: 0
+  m_Name: ItemMazeHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &7465195059269203353
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8395411075957181815}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8823609240881930095}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4735484392978848195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8395411075957181815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c8f8e07c208f5243a5ce90cd8119078, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMazeStarted: 0
+  pathTilemap: {fileID: 0}
+  pathLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  pacdotPrefab: {fileID: 0}
+  powerPelletPrefab: {fileID: 0}
+  fruitPrefab: {fileID: 0}
+  effectItemPrefab: {fileID: 0}
+  pacdotPoints: 10
+  powerPelletPoints: 80
+  powerPelletFailPoints: 200
+  effectItemPoints: 120
+  pointsDisplay80: {fileID: -510106347, guid: 116d6cbde9f90ad47bc85c6c38b9cdb9, type: 3}
+  pointsDisplayM200: {fileID: -1644717277, guid: 116d6cbde9f90ad47bc85c6c38b9cdb9, type: 3}
+  pointsDisplay120: {fileID: -120787559, guid: 116d6cbde9f90ad47bc85c6c38b9cdb9, type: 3}
+  powerPelletDuration: 7.5
+  fruitSpawnInterval: 8
+  effectItemSpawnInterval: 10
+  particleEffectMazeHandler: {fileID: 5164592894600792505}
+  monsterAmbient: {fileID: 0}
+  monsterTransformOverlayPrefab: {fileID: 0}
+  pointsDisplayPrefab: {fileID: 0}
+  fruitList: {fileID: 11400000, guid: a89cfbb750260df41b937ee26cfa68ae, type: 2}
+  effectItemList: {fileID: 11400000, guid: 8581038b1c3ed954ab54f553375812cb, type: 2}
+--- !u!1 &8906782971778160419
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3872347666221189896}
+  - component: {fileID: 3543034137275090703}
+  m_Layer: 0
+  m_Name: SplitScreenMazeHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &3872347666221189896
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8906782971778160419}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8823609240881930095}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3543034137275090703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8906782971778160419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43c7831847cce3145b17146177481225, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player1Camera: {fileID: 0}
+  player2Camera: {fileID: 0}
+  player1: {fileID: 0}
+  allGhosts:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  cameraSmoothSpeed: 0.2
+  offsetDistance: -4
+  arrowPrefab: {fileID: 0}
+  arrowDistanceFromPlayer: 0.4

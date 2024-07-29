@@ -5,19 +5,19 @@ using UnityEngine.UI;
 
 public class SplitScreenMazeHandler : MonoBehaviour
 {
-    [Header("Player Cameras")]
+    [Header("===Player Cameras===")]
     [SerializeField] private Camera player1Camera;
     [SerializeField] private Camera player2Camera;
 
-    [Header("Transform Objects")]
+    [Header("===Transform Objects===")]
     [SerializeField] private Transform player1;
     [SerializeField] private List<Transform> allGhosts;
 
-    [Header("Camera Properties")]
+    [Header("===Camera Properties===")]
     [SerializeField] private float cameraSmoothSpeed = 0.125f;
     [SerializeField] private float offsetDistance = 1.0f;
 
-    [Header("Arrow Indicator")]
+    [Header("===Arrow Indicator===")]
     [SerializeField] private GameObject arrowPrefab;
     [SerializeField] private float arrowDistanceFromPlayer = 1.0f;
 
@@ -29,13 +29,13 @@ public class SplitScreenMazeHandler : MonoBehaviour
 
     private void Start()
     {
-        UpdateCurrentControllingGhost();
+        StartCoroutine(InitiateCurrentControllingGhost());
 
         arrowInstance = Instantiate(arrowPrefab);
         arrowInstance.SetActive(false);
     }
 
-    private void LateUpdate()
+    private void Update()
     {
         CameraFollowPacman();
         CameraFollowGhost();
@@ -81,7 +81,7 @@ public class SplitScreenMazeHandler : MonoBehaviour
         return new Vector3(target.position.x, target.position.y, camera.transform.position.z) + offset;
     }
 
-    private void UpdateCurrentControllingGhost()
+    private IEnumerator InitiateCurrentControllingGhost()
     {
         string _ghost_currentControlling = IngameDataManager.LoadSpecificData<string>("ghost_data.current_controlling");
         foreach (Transform ghost in allGhosts)
@@ -89,7 +89,9 @@ public class SplitScreenMazeHandler : MonoBehaviour
             if (ghost.name == _ghost_currentControlling)
             {
                 currentGhost = ghost;
-                StartCoroutine(SmoothTransition(player2Camera.transform, new Vector3(ghost.position.x, ghost.position.y, player2Camera.transform.position.z)));
+                yield return new WaitForSeconds(0.01f);
+                
+                player2Camera.transform.position = GetTargetPosition(ghost, player2Camera);
                 break;
             }
         }

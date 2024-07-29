@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ingameData:
     pacman_data:
+      has_read_tutorial: 0
       points: 0
       playtime: 0
       lives: 3
-      current_effect_item: 
       speed_multiplier: 1
       vision_multiplier: 1
       wind_burst_speed_affect: 1
@@ -26,7 +26,10 @@ MonoBehaviour:
       has_power_pellet: 0
       has_won_at_fight: 0
       is_immune_to_ghost: 0
+      current_effect_item: 
+      affected_items: []
     ghost_data:
+      has_read_tutorial: 0
       current_controlling: blinky
       current_fighting: 
       vision_multiplier: 1
@@ -43,23 +46,31 @@ MonoBehaviour:
         wind_burst_speed_affect: 1
         coordinate: {x: 0, y: 0}
         direction: {x: 0, y: 0}
+        is_paralyzed: 0
+        affected_items: []
       - name: clyde
         effect_item: electroshock
         speed_multiplier: 1
         wind_burst_speed_affect: 1
         coordinate: {x: 0, y: 0}
         direction: {x: 0, y: 0}
+        is_paralyzed: 0
+        affected_items: []
       - name: inky
         effect_item: wind_burst
         speed_multiplier: 1
         wind_burst_speed_affect: 1
         coordinate: {x: 0, y: 0}
         direction: {x: 0, y: 0}
+        is_paralyzed: 0
+        affected_items: []
       - name: pinky
         effect_item: sticky_goo
         speed_multiplier: 1
         wind_burst_speed_affect: 1
         coordinate: {x: 0, y: 0}
         direction: {x: 0, y: 0}
+        is_paralyzed: 0
+        affected_items: []
     item_data:
       pacdot_positions: []

@@ -95,7 +95,17 @@ public static class KeybindDataManager
         if (keyActionMap.ContainsKey(actionName))
         {
             keyActionMap[actionName] -= action;
+
+            if (keyActionMap[actionName] == null)
+            {
+                keyActionMap.Remove(actionName);
+            }
         }
+    }
+
+    public static void ResetKeyActions()
+    {
+        keyActionMap.Clear();
     }
 
     private static void SaveKeyBindings()

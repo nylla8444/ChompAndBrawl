@@ -7,17 +7,17 @@ public class ItemMazeHandler : MonoBehaviour
 {
     [SerializeField] private bool isMazeStarted = false;
     
-    [Header("Miscellaneous")]
+    [Header("===Miscellaneous===")]
     [SerializeField] private Tilemap pathTilemap;
     [SerializeField] private LayerMask pathLayer;
 
-    [Header("Item Prefabs")]
+    [Header("===Item Prefabs===")]
     [SerializeField] private GameObject pacdotPrefab;
     [SerializeField] private GameObject powerPelletPrefab;
     [SerializeField] private GameObject fruitPrefab;
     [SerializeField] private GameObject effectItemPrefab;
 
-    [Header("Points Providers")]
+    [Header("===Points Providers===")]
     [SerializeField] private int pacdotPoints;
     [SerializeField] private int powerPelletPoints;
     [SerializeField] private int powerPelletFailPoints;
@@ -27,7 +27,7 @@ public class ItemMazeHandler : MonoBehaviour
     [SerializeField] private Sprite pointsDisplayM200;
     [SerializeField] private Sprite pointsDisplay120;
     
-    [Header("Item Info")]
+    [Header("===Item Info===")]
     [SerializeField] private float powerPelletDuration;
     [SerializeField] private float fruitSpawnInterval;
     [SerializeField] private float effectItemSpawnInterval;
@@ -37,7 +37,7 @@ public class ItemMazeHandler : MonoBehaviour
     [SerializeField] private GameObject monsterTransformOverlayPrefab;
     [SerializeField] private GameObject pointsDisplayPrefab;
 
-    [Header("Item List")]
+    [Header("===Item List===")]
     [SerializeField] private FruitList fruitList;
     [SerializeField] private EffectItemList effectItemList;
 
@@ -126,7 +126,9 @@ public class ItemMazeHandler : MonoBehaviour
     }
 
     /*********************************************************************/
+    //
     //                             Pacdots
+    //
     /*********************************************************************/
 
     private void SpawnAllPacdots()
@@ -220,16 +222,14 @@ public class ItemMazeHandler : MonoBehaviour
     }
 
     /*********************************************************************/
+    //
     //                          PowerPellets
+    //
     /*********************************************************************/
 
     private void SpawnAllPowerPellets()
     {
-        foreach (GameObject powerPellet in powerPelletsOnPath)
-        {
-            Destroy(powerPellet);
-        }
-        powerPelletsOnPath.Clear();
+        RemoveAllPowerPellets();
 
         BoundsInt bounds = pathTilemap.cellBounds;
         List<Vector3> possiblePositions = new List<Vector3>();
@@ -274,6 +274,15 @@ public class ItemMazeHandler : MonoBehaviour
         }
     }
 
+    private void RemoveAllPowerPellets()
+    {
+        foreach (GameObject powerPellet in powerPelletsOnPath)
+        {
+            Destroy(powerPellet);
+        }
+        powerPelletsOnPath.Clear();
+    }
+
     private void CheckPowerPelletCollection(Vector2 position)
     {
         if (!IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet"))
@@ -309,6 +318,8 @@ public class ItemMazeHandler : MonoBehaviour
 
         particleEffectMazeHandler.SpawnEffectOverlay(monsterTransformOverlayPrefab, "pacman", 2.0f, "effect.monster_transform");
         particleEffectMazeHandler.SpawnTextEffect(pointsDisplayPrefab, pointsDisplay80, IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate"), POINTS_DISPLAY_DURATION);
+        RemoveAllPowerPellets();
+        
         yield return new WaitForSeconds(0.8f);
         StartCoroutine(UpdateObjectColor(monsterAmbient, AMBIENT_COLORS[0], AMBIENT_TRANSITION_SPEED));
 
@@ -349,7 +360,9 @@ public class ItemMazeHandler : MonoBehaviour
     }
 
     /*********************************************************************/
+    //
     //                          Fruits
+    //
     /*********************************************************************/
 
     private void StartSpawnFruits()
@@ -467,7 +480,9 @@ public class ItemMazeHandler : MonoBehaviour
     }
 
     /*********************************************************************/
+    //
     //                       Effect Items
+    //
     /*********************************************************************/
 
     private void StartSpawnEffectItems()

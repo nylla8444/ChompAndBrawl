@@ -7,22 +7,26 @@ public class PacmanMazeController : MonoBehaviour
 {
     [SerializeField] private bool isMazeStarted = false;
     
-    [Header("Pacman Properties")]
+    [Header("===Pacman Properties===")]
     [SerializeField] private GameObject pacman;
     [SerializeField] private float defaultSpeed;
 
-    [Header("Pacman Miscellaneous")]
+    [Header("===Pacman Miscellaneous===")]
+    [SerializeField] private LayerMask collisionLayer;
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Animator animator;
-    [SerializeField] private LayerMask collisionLayer;
     [SerializeField] private Text pointsText;
     [SerializeField] private Text playtimeText;
+    [SerializeField] private List<Image> heartImages;
+    [SerializeField] private List<Sprite> heartSprites; // 0: empty_heart, 1: full_heart
     
-    [Header("Pacman Effect Item Info")]
+    [Header("===Pacman Effect Item Info===")]
     [SerializeField] private EffectItemList effectItemList;
     [Space(4)]
     [SerializeField] private Image effectItemIcon;
+    [SerializeField] private Text effectItemText;
     [SerializeField] private Text cdText_effectItem;
+    [SerializeField] private Image cdImage_effectItem;
     [Space(4)]
     [SerializeField] private Image darknessAmbient;
     [Space(4)]
@@ -33,17 +37,22 @@ public class PacmanMazeController : MonoBehaviour
     private bool hasEffectItem = false;
     private float cd_effectItem = 0f;
     private float lastCd_effectItem = -Mathf.Infinity;
-
     private bool isRunning = false;
     
     private Vector2 direction;
     private Vector2 targetPosition;
     private Vector2 queuedDirection;
-
+    private float speedMultiplier = 0f;
+    private float windBurstSpeedAffect = 0f;
     private BoxCollider2D pacmanCollider;
 
     private const float TILE_SIZE = 0.16f;
 
+    /*********************************************************************/
+    //
+    //                            General
+    //
+    /*********************************************************************/
 
     private void Start()
     {
@@ -53,7 +62,7 @@ public class PacmanMazeController : MonoBehaviour
 
     private void OnDestroy()
     {
-        UnregisterKeyActions();
+        KeybindDataManager.ResetKeyActions();
     }
 
     public void StartPacmanController(bool triggerValue)
@@ -70,34 +79,26 @@ public class PacmanMazeController : MonoBehaviour
         KeybindDataManager.RegisterKeyAction("pacman.use_item", () => HandleInput("pacman.use_item"));
     }
 
-    private void UnregisterKeyActions()
-    {
-        KeybindDataManager.UnregisterKeyAction("pacman.face_up", () => HandleInput("pacman.face_up"));
-        KeybindDataManager.UnregisterKeyAction("pacman.face_down", () => HandleInput("pacman.face_down"));
-        KeybindDataManager.UnregisterKeyAction("pacman.face_left", () => HandleInput("pacman.face_left"));
-        KeybindDataManager.UnregisterKeyAction("pacman.face_right", () => HandleInput("pacman.face_right"));
-        KeybindDataManager.UnregisterKeyAction("pacman.use_item", () => HandleInput("pacman.use_item"));
-    }
-
-    private void FixedUpdate()
+    private void Update()
     {
         if (!isMazeStarted) return;
-
-        if (isRunning)
-        {
-            MoveTowards();
-        }
 
         if (!isRunning && queuedDirection != Vector2.zero)
         {
             direction = queuedDirection;
             targetPosition = (Vector2)pacman.transform.position + direction * TILE_SIZE;
             isRunning = true;
+            
             UpdatePacmanAnimation();
+            StartCoroutine(MovePacman());
         }
+    }
 
+    private void FixedUpdate()
+    {
         UpdateEffectItemDisplay();
         UpdateTextDisplay();
+        UpdateSpeed();
     }
 
     private void InitializePacman()
@@ -112,6 +113,112 @@ public class PacmanMazeController : MonoBehaviour
 
         animator?.SetTrigger("pacman.rest");
         StartCoroutine(IncreasePlaytime());
+        UpdateHeartDisplay();
+    }
+
+    private void UpdateHeartDisplay()
+    {
+        int pacmanLives = IngameDataManager.LoadSpecificData<int>("pacman_data.lives");
+        for (int i = 0; i < heartImages.Count; i++)
+        {
+            heartImages[i].sprite = i < pacmanLives ? heartSprites[1] : heartSprites[0];
+        }
+    }
+
+    private void UpdateSpeed()
+    {
+        float pacman_speedMultiplier = IngameDataManager.LoadSpecificData<float>("pacman_data.speed_multiplier");
+        float pacman_windBurstSpeedAffect = IngameDataManager.LoadSpecificData<float>("pacman_data.wind_burst_speed_affect");
+
+        if (speedMultiplier != pacman_speedMultiplier) { speedMultiplier = pacman_speedMultiplier; }
+        if (windBurstSpeedAffect != pacman_windBurstSpeedAffect) { windBurstSpeedAffect = pacman_windBurstSpeedAffect; }
+    }
+
+    private IEnumerator MovePacman()
+    {
+        while (isRunning)
+        {
+            Vector2 currentPosition = (Vector2)pacman.transform.position;
+
+            if (currentPosition == targetPosition)
+            {
+                if (IsAbleToMoveTo(currentPosition + queuedDirection * TILE_SIZE))
+                {
+                    direction = queuedDirection;
+                    targetPosition = currentPosition + direction * TILE_SIZE;
+                }
+                else if (IsAbleToMoveTo(currentPosition + direction * TILE_SIZE))
+                {
+                    targetPosition = currentPosition + direction * TILE_SIZE;
+                }
+                else
+                {
+                    isRunning = false;
+                    yield break;
+                }
+
+                UpdatePacmanAnimation();
+                UpdatePacmanDirection();
+            }
+
+            if (IsAbleToMoveTo(targetPosition))
+            {    
+                Vector2 newPosition = Vector2.MoveTowards(currentPosition, targetPosition, (defaultSpeed * speedMultiplier * windBurstSpeedAffect) * Time.deltaTime);
+                pacman.transform.position = newPosition;
+
+                if (newPosition == targetPosition)
+                {
+                    UpdatePacmanPosition(newPosition);
+                }
+            }
+            else
+            {
+                isRunning = false;
+            }
+
+            yield return new WaitForFixedUpdate();
+        }
+    }
+
+    private bool IsAbleToMoveTo(Vector2 targetPosition)
+    {
+        float tolerance = 0.1f;
+        RaycastHit2D hit = Physics2D.BoxCast(targetPosition, pacmanCollider.bounds.size, 0f, Vector2.zero, tolerance, collisionLayer);
+        return hit.collider == null || hit.collider.gameObject == pacman;
+    }
+
+    private void UpdatePacmanPosition(Vector2 position)
+    {
+        IngameDataManager.SaveSpecificData("pacman_data.coordinate", position);
+    }
+
+    private void UpdatePacmanDirection()
+    {
+        IngameDataManager.SaveSpecificData("pacman_data.direction", direction);
+    }
+
+    private void UpdatePacmanAnimation()
+    {
+        foreach(AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                animator.ResetTrigger(parameter.name);
+            }
+        }
+
+        bool _pacman_hasPowerPellet = IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet");
+        
+        string animatorId = direction switch
+        {
+            Vector2 v when v == Vector2.up => (!_pacman_hasPowerPellet) ? "pacman.normal_up" : "pacman.scary_up",
+            Vector2 v when v == Vector2.down => (!_pacman_hasPowerPellet) ? "pacman.normal_down" : "pacman.scary_down",
+            Vector2 v when v == Vector2.left => (!_pacman_hasPowerPellet) ? "pacman.normal_left" : "pacman.scary_left",
+            Vector2 v when v == Vector2.right => (!_pacman_hasPowerPellet) ? "pacman.normal_right" : "pacman.scary_right",
+            _ => "pacman.rest"
+        };
+
+        animator.SetTrigger(animatorId);
     }
 
     private void HandleInput(string action)
@@ -140,100 +247,18 @@ public class PacmanMazeController : MonoBehaviour
         }
     }
 
-    private void MoveTowards()
+    private IEnumerator IncreasePlaytime()
     {
-        Vector2 currentPosition = (Vector2)pacman.transform.position;
-
-        if (currentPosition == targetPosition)
+        while (true)
         {
-            if (IsAbleToMoveTo(currentPosition + queuedDirection * TILE_SIZE))
-            {
-                direction = queuedDirection;
-                targetPosition = currentPosition + direction * TILE_SIZE;
-                
-                UpdatePacmanAnimation();
-                UpdatePacmanDirection();
-            }
-            else if (IsAbleToMoveTo(currentPosition + direction * TILE_SIZE))
-            {
-                targetPosition = currentPosition + direction * TILE_SIZE;
-            }
-            else
-            {
-                isRunning = false;
-                return;
-            }
-        }
-
-        if (IsAbleToMoveTo(targetPosition))
-        {
-            float _pacman_speedMultiplier = IngameDataManager.LoadSpecificData<float>("pacman_data.speed_multiplier");
-            float _pacman_windBurstSpeedAffect = IngameDataManager.LoadSpecificData<float>("pacman_data.wind_burst_speed_affect");
+            yield return new WaitForSeconds(1.0f);
             
-            Vector2 newPosition = Vector2.MoveTowards(currentPosition, targetPosition, (defaultSpeed * _pacman_speedMultiplier * _pacman_windBurstSpeedAffect) * Time.fixedDeltaTime);
-            pacman.transform.position = newPosition;
+            int playtime = IngameDataManager.LoadSpecificData<int>("pacman_data.playtime");
+            IngameDataManager.SaveSpecificData("pacman_data.playtime", playtime + 1);
 
-            if (newPosition == targetPosition)
-            {
-                UpdatePacmanPosition(newPosition);
-            }
+            System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(playtime);
+            playtimeText.text = string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
         }
-        else
-        {
-            isRunning = false;
-        }
-    }
-
-    private bool IsAbleToMoveTo(Vector2 targetPosition)
-    {
-        float tolerance = 0.1f;
-
-        RaycastHit2D hit = Physics2D.BoxCast(targetPosition, pacmanCollider.bounds.size, 0f, Vector2.zero, tolerance, collisionLayer);
-
-        if (hit.collider != null && hit.collider.gameObject != pacman)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private void UpdatePacmanPosition(Vector2 position)
-    {
-        Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
-        _pacman_coordinate = position;
-        IngameDataManager.SaveSpecificData("pacman_data.coordinate", _pacman_coordinate);
-    }
-
-    private void UpdatePacmanDirection()
-    {
-        Vector2 _pacman_direction = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.direction");
-        _pacman_direction = direction;
-        IngameDataManager.SaveSpecificData("pacman_data.direction", _pacman_direction);
-    }
-
-    private void UpdatePacmanAnimation()
-    {
-        foreach(AnimatorControllerParameter parameter in animator.parameters)
-        {
-            if (parameter.type == AnimatorControllerParameterType.Trigger)
-            {
-                animator.ResetTrigger(parameter.name);
-            }
-        }
-
-        bool _pacman_hasPowerPellet = IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet");
-        
-        string animatorId = direction switch
-        {
-            Vector2 v when v == Vector2.up => (!_pacman_hasPowerPellet) ? "pacman.normal_up" : "pacman.scary_up",
-            Vector2 v when v == Vector2.down => (!_pacman_hasPowerPellet) ? "pacman.normal_down" : "pacman.scary_down",
-            Vector2 v when v == Vector2.left => (!_pacman_hasPowerPellet) ? "pacman.normal_left" : "pacman.scary_left",
-            Vector2 v when v == Vector2.right => (!_pacman_hasPowerPellet) ? "pacman.normal_right" : "pacman.scary_right",
-            _ => "pacman.rest"
-        };
-
-        animator.SetTrigger(animatorId);
     }
 
     public void Respawn()
@@ -248,7 +273,9 @@ public class PacmanMazeController : MonoBehaviour
     }
 
     /*********************************************************************/
+    //
     //                        Effect Items Use
+    //
     /*********************************************************************/
 
     private void UpdateEffectItemDisplay()
@@ -261,10 +288,16 @@ public class PacmanMazeController : MonoBehaviour
             var effectItem = effectItemList.effectItems.Find(item => item.name == _pacman_currentEffectItem);
             if (effectItem == null) return;
 
-            effectItemIcon.sprite = effectItem.asItemSprite;
-            effectItemIcon.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);        
-            hasEffectItem = true;
+            SetEffectItemDisplay(effectItem.name, effectItem.asItemSprite, new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
         }
+    }
+
+    private void SetEffectItemDisplay(string name, Sprite sprite, Color color, bool hasItem)
+    {
+        effectItemText.text = $"{name.Replace("_", " ")}";
+        effectItemIcon.sprite = sprite;
+        effectItemIcon.color = color;
+        hasEffectItem = hasItem;
     }
 
     private void OnUse_EffectItem()
@@ -302,9 +335,7 @@ public class PacmanMazeController : MonoBehaviour
             StartCoroutine(method());
         }
 
-        hasEffectItem = false;
-        effectItemIcon.sprite = null;
-        effectItemIcon.color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+        SetEffectItemDisplay("Effect Item", null, new Color(1.0f, 1.0f, 1.0f, 0.0f), false);
 
         cd_effectItem = effectItemList.effectItems.Find(item => item.name == _pacman_currentEffectItem).cooldown;
         lastCd_effectItem = Time.time;
@@ -313,7 +344,7 @@ public class PacmanMazeController : MonoBehaviour
         IngameDataManager.SaveSpecificData("pacman_data.current_effect_item", _pacman_currentEffectItem);
     }
 
-    // Rocket Boost
+    // =================== Rocket Boost ===================== //
 
     private IEnumerator OnUse_RocketBoost()
     {
@@ -334,7 +365,7 @@ public class PacmanMazeController : MonoBehaviour
         InOutAffectedItems(listMode, "rocket_boost", "pacman");
     }
 
-    // Zoom Out
+    // ===================== Zoom Out ======================= //
 
     private IEnumerator OnUse_ZoomOut()
     {
@@ -369,7 +400,7 @@ public class PacmanMazeController : MonoBehaviour
         IngameDataManager.SaveSpecificData("pacman_data.vision_multiplier", _pacman_visionMultiplier);
     }
 
-    // Retreat
+    // ===================== Retreat ======================== //
 
     private IEnumerator OnUse_Retreat()
     {
@@ -391,7 +422,7 @@ public class PacmanMazeController : MonoBehaviour
         InOutAffectedItems(listMode, "retreat", "pacman");
     }
 
-    // Immunity
+    // ===================== Immunity ======================= //
 
     private IEnumerator OnUse_Immunity()
     {
@@ -415,7 +446,7 @@ public class PacmanMazeController : MonoBehaviour
         InOutAffectedItems(listMode, "immunity", "pacman");
     }
 
-    // Slow Move
+    // ===================== Slow Move ====================== //
 
     private IEnumerator OnUse_SlowMove()
     {
@@ -441,7 +472,7 @@ public class PacmanMazeController : MonoBehaviour
         }
     }
 
-    // Paralyze
+    // ===================== Paralyze ======================= //
 
     private IEnumerator OnUse_Paralyze()
     {
@@ -498,7 +529,7 @@ public class PacmanMazeController : MonoBehaviour
         IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "speed_multiplier", _speedMultiplier);
     }
 
-    // Darkness
+    // ====================== Darkness ====================== //
 
     private IEnumerator OnUse_Darkness()
     {
@@ -544,7 +575,7 @@ public class PacmanMazeController : MonoBehaviour
         IngameDataManager.SaveSpecificData("ghost_data.vision_multiplier", _ghost_visionMultiplier);
     }
 
-    // Invert Control
+    // ================= Invert Control ===================== //
 
     private IEnumerator OnUse_InvertControl()
     {
@@ -604,20 +635,7 @@ public class PacmanMazeController : MonoBehaviour
         pointsText.text = _pacman_points.ToString("00,000,000");
 
         float remainCd_effectItem = Mathf.Max(0f, cd_effectItem - (Time.time - lastCd_effectItem));
+        cdImage_effectItem.enabled = remainCd_effectItem > 0f ? true : false;
         cdText_effectItem.text = remainCd_effectItem > 0 ? $"{remainCd_effectItem:F1}s" : "";
-    }
-
-    private IEnumerator IncreasePlaytime()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(1.0f);
-            
-            int playtime = IngameDataManager.LoadSpecificData<int>("pacman_data.playtime");
-            IngameDataManager.SaveSpecificData("pacman_data.playtime", playtime + 1);
-
-            System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(playtime);
-            playtimeText.text = string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
-        }
     }
 }

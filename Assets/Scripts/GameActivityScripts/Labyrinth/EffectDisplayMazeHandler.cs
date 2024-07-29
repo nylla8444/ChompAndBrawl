@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class EffectDisplayMazeHandler : MonoBehaviour
 {
-    [Header("Effect Objects")]
+    [Header("===Effect Objects===")]
     [SerializeField] private GameObject pacman_effectDisplayPrefab;
     [SerializeField] private GameObject ghost_effectDisplayPrefab;
     [SerializeField] private Transform pacman_effectDisplayAnchor;

@@ -6,9 +6,18 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/MainMenuScene.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/MapSelectionScene.unity
+    guid: 97806fac98550dd46acdf6db69851be2
+  - enabled: 1
+    path: Assets/Scenes/GamePreparationScene.unity
+    guid: 9cf90f18fd4f0ca4c9a1d7eb4bd64c6e
+  - enabled: 1
     path: Assets/Scenes/Labyrinth/TheGhostIsland.unity
     guid: 695be937f6402c64ebcd0fdec2415b5d
   - enabled: 1
-    path: Assets/Scenes/MainMenuScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+    path: Assets/Scenes/Labyrinth/DungeonLabyrinth.unity
+    guid: d7a19384c5900574bae919f009db48c8
   m_configObjects: {}

@@ -6,18 +6,19 @@ using UnityEngine.UI;
 
 public class GeneralManager : MonoBehaviour
 {
-    [Header("Default Data")]
+    [Header("===Default Data===")]
     [SerializeField] private DefaultIngameData defaultIngameData;
     [SerializeField] private DefaultPlayerData defaultPlayerData;
     [SerializeField] private DefaultInputKeybind defaultInputKeybind;
 
-    [Header("General GameObjects")]
+    [Header("===General GameObjects===")]
     [SerializeField] private GameObject menuPanel;
     [SerializeField] private GameObject dialoguePanel;
     [SerializeField] private GameObject transitionScreen;
 
-    [Header("Direct Buttons")]
+    [Header("===Direct Buttons===")]
     [SerializeField] private Button directResetButton;
+    [SerializeField] private Button directTrueResetButton;
     [SerializeField] private Button directQuitButton;
     
     private void Awake()
@@ -50,15 +51,16 @@ public class GeneralManager : MonoBehaviour
 
     private void PrepareObjectListeners()
     {
-        try { directResetButton.onClick.AddListener(PrepareResetData); } catch (Exception ex) { Debug.LogWarning("Reset button does not exist. " + ex.Message); }
-        try { directQuitButton.onClick.AddListener(ExecuteQuit); } catch (Exception ex) { Debug.LogWarning("Quit button does not exist. " + ex.Message); }
+        try { directResetButton.onClick.AddListener(PrepareResetData); } catch (Exception) {  }
+        try { directTrueResetButton.onClick.AddListener(PrepareTrueResetData); } catch (Exception) { }
+        try { directQuitButton.onClick.AddListener(ExecuteQuit); } catch (Exception) { }
     }
 
     private void InitializeUi()
     {
-        try { menuPanel.SetActive(true); } catch (Exception ex) { Debug.LogWarning("Menu panel does not exist. " + ex.Message); }
-        try { transitionScreen.SetActive(true); } catch (Exception ex) { Debug.LogWarning("Transition screen does not exist. " + ex.Message); }
-        try { dialoguePanel.SetActive(true); } catch (Exception ex) { Debug.LogWarning("Dialogue overlay does not exist. " + ex.Message); }
+        try { menuPanel.SetActive(true); } catch (Exception) { }
+        try { transitionScreen.SetActive(true); } catch (Exception) { }
+        try { dialoguePanel.SetActive(true); } catch (Exception) { }
     }
 
     public void PrepareResetData()
@@ -68,6 +70,12 @@ public class GeneralManager : MonoBehaviour
         KeybindDataManager.DeleteKeyBindings();
     }
 
+    public void PrepareTrueResetData()
+    {
+        IngameDataManager.DeleteData();
+        PlayerDataManager.DeleteData();
+        KeybindDataManager.DeleteKeyBindings();
+    }
 
     public void ExecuteQuit()
     {
@@ -103,8 +111,8 @@ public class GeneralManager : MonoBehaviour
     //     if (!hasPause) PauseOnDeviceOnly();
     // }
 
-    // private void OnApplicationQuit()
-    // {
-    //     PauseOnDeviceOnly();
-    // }
+    private void OnApplicationQuit()
+    {
+        PrepareResetData();
+    }
 }

@@ -30,7 +30,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public void OnEnable()
+    public void Start()
     {
         PlayerData playerData = PlayerDataManager.LoadData();
 

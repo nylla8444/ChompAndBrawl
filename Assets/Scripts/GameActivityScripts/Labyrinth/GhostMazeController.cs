@@ -7,43 +7,51 @@ public class GhostMazeController : MonoBehaviour
 {
     [SerializeField] private bool isMazeStarted = false;
 
-    [Header("Ghost Objects")]
+    [Header("===Ghost Objects===")]
     [SerializeField] private GameObject blinky;
     [SerializeField] private GameObject clyde;
     [SerializeField] private GameObject inky;
     [SerializeField] private GameObject pinky;
 
-    [Header("Ghost Default Speeds")]
+    [Header("===Ghost Default Speeds===")]
     [SerializeField] private float blinkyDefaultSpeed;
     [SerializeField] private float clydeDefaultSpeed;
     [SerializeField] private float inkyDefaultSpeed;
     [SerializeField] private float pinkyDefaultSpeed;
 
-    [Header("Ghost Spawnpoints")]
+    [Header("===Ghost Spawnpoints===")]
     [SerializeField] private Transform blinkySpawn;
     [SerializeField] private Transform clydeSpawn;
     [SerializeField] private Transform inkySpawn;
     [SerializeField] private Transform pinkySpawn;
 
-    [Header("Ghost Animators")]
+    [Header("===Ghost Animators===")]
     [SerializeField] private Animator blinkyAnimator;
     [SerializeField] private Animator clydeAnimator;
     [SerializeField] private Animator inkyAnimator;
     [SerializeField] private Animator pinkyAnimator;
     
-    [Header("Ghost Miscellaneous")]
+    [Header("===Ghost Miscellaneous===")]
     [SerializeField] private LayerMask collisionLayer;
+    [SerializeField] private List<Image> ghostImages;
+    [SerializeField] private List<Sprite> ghostEmptySprites;
+    [SerializeField] private List<Sprite> ghostFullSprites;
+    [SerializeField] private Image ghostOnControlImage;
     
-    [Header("Ghost Effect Item Info")]
+    [Header("===Ghost Effect Item Info===")]
     [SerializeField] private EffectItemList effectItemList;
     [Space(4)]
     [SerializeField] private Text cdText_boost;
     [SerializeField] private Text cdText_changeGhost;
     [SerializeField] private Text cdText_effectItem;
+    [SerializeField] private Image cdImage_boost;
+    [SerializeField] private Image cdImage_changeGhost;
+    [SerializeField] private Image cdImage_effectItem;
     [Space(4)]
     [SerializeField] private List<Sprite> changeGhostSprites;
     [SerializeField] private Image changeGhostIcon;
     [SerializeField] private Image effectItemIcon;
+    [SerializeField] private Text effectItemText;
     [Space(4)]
     [SerializeField] private GameObject sparkElectricParticlePrefab;
     [SerializeField] private GameObject ghostElectrifiedOverlayPrefab;
@@ -61,8 +69,6 @@ public class GhostMazeController : MonoBehaviour
     private float lastCd_inkyEffectItem = -Mathf.Infinity;
     private float lastCd_pinkyEffectItem = -Mathf.Infinity;
 
-    private bool isRunning = false;
-
     // Variables for player controlling ghost
     private GameObject onCtrl_ghost;
     private Animator onCtrl_animator;
@@ -70,12 +76,9 @@ public class GhostMazeController : MonoBehaviour
     private Vector2 onCtrl_targetPosition;
     private Vector2 onCtrl_queuedDirection;
     private float onCtrl_defaultSpeed;
+    private bool onCtrl_isRunning = false;
 
     // Variables for AI move control ghost
-    private Dictionary<string, bool> onAuto_hasReachedTarget = new Dictionary<string, bool>()
-    {
-        { "blinky", true }, { "clyde", true }, { "inky", true }, { "pinky", true }
-    };
     private Dictionary<string, Vector2> onAuto_targetPositions = new Dictionary<string, Vector2>()
     {
         { "blinky", Vector2.zero }, { "clyde", Vector2.zero }, { "inky", Vector2.zero }, { "pinky", Vector2.zero }
@@ -88,16 +91,36 @@ public class GhostMazeController : MonoBehaviour
     {
         { "blinky", new Queue<Vector2>() }, { "clyde", new Queue<Vector2>() }, { "inky", new Queue<Vector2>() }, { "pinky", new Queue<Vector2>() },
     };
-    private const float TILE_SIZE = 0.16f;
-    private const float TILE_OFFSET = 0.08f;
-    private const int MAX_RECENT_TILES = 3;
+    private Dictionary<string, bool> onAuto_isRunning = new Dictionary<string, bool>()
+    {
+        { "blinky", false }, { "clyde", false }, { "inky", false }, { "pinky", false }
+    };
+    
+    // Variables for general data
+    private Dictionary<string, float> ghost_speedMultiplier = new Dictionary<string, float>()
+    {
+        { "blinky", 0f }, { "clyde", 0f }, { "inky", 0f }, { "pinky", 0f }
+    };
+    private Dictionary<string, float> ghost_windBurstSpeedAffect = new Dictionary<string, float>()
+    {
+        { "blinky", 0f }, { "clyde", 0f }, { "inky", 0f }, { "pinky", 0f }
+    };
+    
     private const float FEIGNING_IGNORANCE_DISTANCE = 8f;
     private const float WHIMSICAL_DISTANCE = 2f;
     private const float AMBUSHER_DISTANCE = 4f;
+    private const float TILE_SIZE = 0.16f;
+    private const float TILE_OFFSET = 0.08f;
+    private const int MAX_RECENT_TILES = 3;
 
     private List<string> aliveGhosts;
     private string lastControllingGhost;
 
+    /*********************************************************************/
+    //
+    //                            General
+    //
+    /*********************************************************************/
 
     private void Start()
     {
@@ -107,7 +130,7 @@ public class GhostMazeController : MonoBehaviour
 
     private void OnDestroy()
     {
-        UnregisterKeyActions();
+        KeybindDataManager.ResetKeyActions();
     }
 
     public void StartGhostController(bool triggerValue)
@@ -126,37 +149,25 @@ public class GhostMazeController : MonoBehaviour
         KeybindDataManager.RegisterKeyAction("ghost.use_unique_item", () => HandleInput("ghost.use_unique_item"));
     }
 
-    private void UnregisterKeyActions()
+    private void Update()
     {
-        KeybindDataManager.UnregisterKeyAction("ghost.face_up", () => HandleInput("ghost.face_up"));
-        KeybindDataManager.UnregisterKeyAction("ghost.face_down", () => HandleInput("ghost.face_down"));
-        KeybindDataManager.UnregisterKeyAction("ghost.face_left", () => HandleInput("ghost.face_left"));
-        KeybindDataManager.UnregisterKeyAction("ghost.face_right", () => HandleInput("ghost.face_right"));
-        KeybindDataManager.UnregisterKeyAction("ghost.change_ghost", () => HandleInput("ghost.change_ghost"));
-        KeybindDataManager.UnregisterKeyAction("ghost.use_boost_item", () => HandleInput("ghost.use_boost_item"));
-        KeybindDataManager.UnregisterKeyAction("ghost.use_unique_item", () => HandleInput("ghost.use_unique_item"));
+        if (!isMazeStarted) return;
+
+        if (!onCtrl_isRunning && onCtrl_ghost != null && onCtrl_queuedDirection != Vector2.zero)
+        {
+            onCtrl_direction = onCtrl_queuedDirection;
+            onCtrl_targetPosition = (Vector2)onCtrl_ghost.transform.position + onCtrl_direction * TILE_SIZE;
+            onCtrl_isRunning = true;
+            
+            UpdateGhostAnimation(onCtrl_animator, onCtrl_direction, onCtrl_ghost.name);
+            StartCoroutine(MoveControllingGhost());
+        }
     }
 
     private void FixedUpdate()
     {
-        if (!isMazeStarted) return;
-
-        MoveNonControlledGhosts();
-
-        if (isRunning)
-        {
-            MoveTowards();
-        }
-        
-        if (!isRunning && onCtrl_ghost != null && onCtrl_queuedDirection != Vector2.zero)
-        {
-            onCtrl_direction = onCtrl_queuedDirection;
-            onCtrl_targetPosition = (Vector2)onCtrl_ghost.transform.position + onCtrl_direction * TILE_SIZE;
-            isRunning = true;
-            UpdateGhostAnimation(onCtrl_animator, onCtrl_direction, onCtrl_ghost.name);
-        }
-
         UpdateTextDisplay();
+        UpdateSpeed();
     }
 
     private void InitializeGhosts()
@@ -177,6 +188,7 @@ public class GhostMazeController : MonoBehaviour
 
         foreach (string ghostName in aliveGhosts)
         {
+            StartCoroutine(MoveGhostCoroutine(ghostName));
             if (!ghostData.TryGetValue(ghostName, out var ghostInfo))
             {
                 Debug.LogWarning($"No game object found for {ghostName}");
@@ -189,6 +201,128 @@ public class GhostMazeController : MonoBehaviour
             _ghost.transform.position = (_coordinate != Vector2.zero) ? _coordinate : _spawnPoint.position;
             _animator?.SetTrigger($"{_ghost.name}.rest");
         }
+
+        UpdateGhostDisplay();
+    }
+
+    private void UpdateGhostDisplay()
+    {
+        List<string> ghostNames = new List<string> { "blinky", "clyde", "inky", "pinky" };
+        for (int i = 0; i < ghostNames.Count; i++)
+        {
+            ghostImages[i].sprite = (aliveGhosts.Contains(ghostNames[i])) ? ghostFullSprites[i] : ghostEmptySprites[i];
+        }
+    }
+
+    private void UpdateSpeed()
+    {
+        List<string> ghostNames = new List<string> { "blinky", "clyde", "inky", "pinky" };
+
+        foreach (string ghostName in ghostNames)
+        {
+            float speedMultiplier = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", ghostName, "speed_multiplier");
+            float windBurstSpeedAffect = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", ghostName, "wind_burst_speed_affect");
+
+            if (ghost_speedMultiplier[ghostName] != speedMultiplier)
+            {
+                ghost_speedMultiplier[ghostName] = speedMultiplier;
+            }
+
+            if (ghost_windBurstSpeedAffect[ghostName] != windBurstSpeedAffect)
+            {
+                ghost_windBurstSpeedAffect[ghostName] = windBurstSpeedAffect;
+            }
+        }
+    }
+
+    private IEnumerator MoveControllingGhost()
+    {
+        while (onCtrl_isRunning)
+        {
+            Vector2 currentPosition = (Vector2)onCtrl_ghost.transform.position;
+
+            if (currentPosition == onCtrl_targetPosition)
+            {
+                if (onCtrl_queuedDirection != Vector2.zero && IsAbleToMoveTo(currentPosition + onCtrl_queuedDirection * TILE_SIZE, onCtrl_ghost))
+                {
+                    onCtrl_direction = onCtrl_queuedDirection;
+                    onCtrl_targetPosition = currentPosition + onCtrl_direction * TILE_SIZE;
+                    onCtrl_queuedDirection = Vector2.zero;
+                }
+                else if (IsAbleToMoveTo(currentPosition + onCtrl_direction * TILE_SIZE, onCtrl_ghost))
+                {
+                    onCtrl_targetPosition = currentPosition + onCtrl_direction * TILE_SIZE;
+                }
+                else
+                {
+                    onCtrl_isRunning = false;
+                    yield break;
+                }
+
+                UpdateGhostAnimation(onCtrl_animator, onCtrl_direction, onCtrl_ghost.name);
+                UpdateGhostDirection(onCtrl_ghost.name, onCtrl_direction);
+            }
+
+            if (IsAbleToMoveTo(onCtrl_targetPosition, onCtrl_ghost))
+            {
+                Vector2 newPosition = Vector2.MoveTowards(currentPosition, onCtrl_targetPosition, (onCtrl_defaultSpeed * ghost_speedMultiplier[onCtrl_ghost.name] * ghost_windBurstSpeedAffect[onCtrl_ghost.name]) * Time.deltaTime);
+                onCtrl_ghost.transform.position = newPosition;
+
+                if (newPosition == onCtrl_targetPosition)
+                {
+                    UpdateGhostPosition(onCtrl_ghost.name, newPosition);
+                }
+            }
+            else
+            {
+                onCtrl_isRunning = false;
+            }
+
+            yield return new WaitForFixedUpdate();
+        }
+    }
+
+    private bool IsAbleToMoveTo(Vector2 targetPosition, GameObject ghost)
+    {
+        BoxCollider2D ghostCollider = ghost.GetComponent<BoxCollider2D>();
+        if (ghostCollider == null) return false;
+
+        RaycastHit2D hit = Physics2D.BoxCast(targetPosition, ghostCollider.bounds.size, 0f, Vector2.zero, 0f, collisionLayer);
+        return hit.collider == null || hit.collider.gameObject == ghost || hit.collider.isTrigger;
+    }
+
+    private void UpdateGhostPosition(string ghostName, Vector2 _position)
+    {
+        IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "coordinate", _position);
+    }
+
+    private void UpdateGhostDirection(string ghostName, Vector2 _direction)
+    {
+        IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "direction", _direction);
+    }
+
+    private void UpdateGhostAnimation(Animator animator, Vector2 direction, string ghostName)
+    {
+        foreach(AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                animator.ResetTrigger(parameter.name);
+            }
+        }
+
+        bool _pacman_hasPowerPellet = IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet");
+
+        string animatorId = direction switch
+        {
+            Vector2 v when v == Vector2.up => (!_pacman_hasPowerPellet) ? $"{ghostName}.normal_up" : $"{ghostName}.frighten_up",
+            Vector2 v when v == Vector2.down => (!_pacman_hasPowerPellet) ? $"{ghostName}.normal_down" : $"{ghostName}.frighten_down",
+            Vector2 v when v == Vector2.left => (!_pacman_hasPowerPellet) ? $"{ghostName}.normal_left" : $"{ghostName}.frighten_left",
+            Vector2 v when v == Vector2.right => (!_pacman_hasPowerPellet) ? $"{ghostName}.normal_right" : $"{ghostName}.frighten_right",
+            _ => $"{ghostName}.rest"
+        };
+
+        animator.SetTrigger(animatorId);
     }
 
     private void HandleInput(string action)
@@ -228,102 +362,10 @@ public class GhostMazeController : MonoBehaviour
         }
     }
 
-    private void MoveTowards()
-    {
-        Vector2 currentPosition = (Vector2)onCtrl_ghost.transform.position;
-
-        if (currentPosition == onCtrl_targetPosition)
-        {
-            if (onCtrl_queuedDirection != Vector2.zero && IsAbleToMoveTo(currentPosition + onCtrl_queuedDirection * TILE_SIZE, onCtrl_ghost))
-            {
-                onCtrl_direction = onCtrl_queuedDirection;
-                onCtrl_targetPosition = currentPosition + onCtrl_direction * TILE_SIZE;
-                onCtrl_queuedDirection = Vector2.zero;
-                
-                UpdateGhostAnimation(onCtrl_animator, onCtrl_direction, onCtrl_ghost.name);
-                UpdateGhostDirection(onCtrl_ghost.name, onCtrl_direction);
-            }
-            else if (IsAbleToMoveTo(currentPosition + onCtrl_direction * TILE_SIZE, onCtrl_ghost))
-            {
-                onCtrl_targetPosition = currentPosition + onCtrl_direction * TILE_SIZE;
-            }
-            else
-            {
-                isRunning = false;
-                return;
-            }
-        }
-
-        if (IsAbleToMoveTo(onCtrl_targetPosition, onCtrl_ghost))
-        {
-            float _speedMultiplier = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", onCtrl_ghost.name, "speed_multiplier");
-            float _windBurstSpeedAffect = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", onCtrl_ghost.name, "wind_burst_speed_affect");
-
-            Vector2 newPosition = Vector2.MoveTowards(currentPosition, onCtrl_targetPosition, (onCtrl_defaultSpeed * _speedMultiplier * _windBurstSpeedAffect) * Time.fixedDeltaTime);
-            onCtrl_ghost.transform.position = newPosition;
-
-            if (newPosition == onCtrl_targetPosition)
-            {
-                UpdateGhostPosition(onCtrl_ghost.name, newPosition);
-            }
-        }
-        else
-        {
-            isRunning = false;
-        }
-    }
-
-    private bool IsAbleToMoveTo(Vector2 targetPosition, GameObject ghost)
-    {
-        BoxCollider2D ghostCollider = ghost.GetComponent<BoxCollider2D>();
-        if (ghostCollider == null) return false;
-
-        RaycastHit2D hit = Physics2D.BoxCast(targetPosition, ghostCollider.bounds.size, 0f, Vector2.zero, 0f, collisionLayer);
-
-        if (hit.collider != null && hit.collider.gameObject != ghost && !hit.collider.isTrigger)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private void UpdateGhostPosition(string ghostName, Vector2 _position)
-    {
-        IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "coordinate", _position);
-    }
-
-    private void UpdateGhostDirection(string ghostName, Vector2 _direction)
-    {
-        IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "direction", _direction);
-    }
-
-    private void UpdateGhostAnimation(Animator animator, Vector2 direction, string ghostName)
-    {
-        foreach(AnimatorControllerParameter parameter in animator.parameters)
-        {
-            if (parameter.type == AnimatorControllerParameterType.Trigger)
-            {
-                animator.ResetTrigger(parameter.name);
-            }
-        }
-
-        bool _pacman_hasPowerPellet = IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet");
-
-        string animatorId = direction switch
-        {
-            Vector2 v when v == Vector2.up => (!_pacman_hasPowerPellet) ? $"{ghostName}.normal_up" : $"{ghostName}.frighten_up",
-            Vector2 v when v == Vector2.down => (!_pacman_hasPowerPellet) ? $"{ghostName}.normal_down" : $"{ghostName}.frighten_down",
-            Vector2 v when v == Vector2.left => (!_pacman_hasPowerPellet) ? $"{ghostName}.normal_left" : $"{ghostName}.frighten_left",
-            Vector2 v when v == Vector2.right => (!_pacman_hasPowerPellet) ? $"{ghostName}.normal_right" : $"{ghostName}.frighten_right",
-            _ => $"{ghostName}.rest"
-        };
-
-        animator.SetTrigger(animatorId);
-    }
-
     /*********************************************************************/
-    //                         Effect Items Use
+    //
+    //                        Effect Items Use
+    //
     /*********************************************************************/
 
     private void OnUse_ChangeGhostItem()
@@ -363,10 +405,6 @@ public class GhostMazeController : MonoBehaviour
 
         if (onCtrl_ghost != null)
         {
-            string _ghost_currentControlling = IngameDataManager.LoadSpecificData<string>("ghost_data.current_controlling");
-            
-            _ghost_currentControlling = ghostName;
-
             Vector2 _coordinate = IngameDataManager.LoadSpecificListData<Vector2>("ghost_data.ghost_single_info", ghostName, "coordinate");
             onCtrl_ghost.transform.position = GetTileCenter(_coordinate);
 
@@ -375,13 +413,29 @@ public class GhostMazeController : MonoBehaviour
 
             onCtrl_animator.SetTrigger($"{onCtrl_ghost.name}.rest");
 
-            IngameDataManager.SaveSpecificData("ghost_data.current_controlling", _ghost_currentControlling);
-            isRunning = false;
+            IngameDataManager.SaveSpecificData("ghost_data.current_controlling", ghostName);
+            onCtrl_isRunning = false;
+            onAuto_isRunning[onCtrl_ghost.name] = false;
         }
 
         lastControllingGhost = ghostName;
         UpdateEffectItemDisplay(ghostName);
+        UpdateGhostOnControlIcon(ghostName);
         UpdateChangeGhostIcon(nextGhostIndex);
+    }
+
+    private void UpdateGhostOnControlIcon(string ghostName)
+    {
+        int spriteIndex = ghostName switch
+        {
+            "blinky" => 0,
+            "clyde" => 1,
+            "inky" => 2,
+            "pinky" => 3,
+            _ => -1
+        };
+
+        ghostOnControlImage.sprite = ghostFullSprites[spriteIndex];
     }
 
     private void UpdateChangeGhostIcon(int ghostIndex)
@@ -444,7 +498,13 @@ public class GhostMazeController : MonoBehaviour
         var effectItem = effectItemList.effectItems.Find(item => item.name == _ownedEffectItem);
         if (effectItem == null) return;
 
-        effectItemIcon.sprite = effectItem.asItemSprite;
+        SetEffectItemDisplay(effectItem.name, effectItem.asItemSprite);
+    }
+
+    private void SetEffectItemDisplay(string name, Sprite sprite)
+    {
+        effectItemText.text = $"{name.Replace("_", " ")}";
+        effectItemIcon.sprite = sprite;
     }
 
     private void OnUse_EffectItem()
@@ -500,7 +560,7 @@ public class GhostMazeController : MonoBehaviour
         }
     }
 
-    // Imitate Speed
+    // ================== Imitate Speed ===================== //
 
     private IEnumerator OnUse_ImitateSpeed()
     {
@@ -542,7 +602,7 @@ public class GhostMazeController : MonoBehaviour
         }
     }
 
-    // Electroshock
+    // ================== Electroshock ====================== //
 
     private IEnumerator OnUse_Electroshock()
     {
@@ -591,7 +651,7 @@ public class GhostMazeController : MonoBehaviour
         }
     }
     
-    // Wind Burst
+    // ==================== Wind Burst ====================== //
 
     private IEnumerator OnUse_WindBurst()
     {
@@ -680,7 +740,7 @@ public class GhostMazeController : MonoBehaviour
         };
     }
 
-    // Sticky Goo
+    // ==================== Sticky Goo ====================== //
 
     private IEnumerator OnUse_StickyGoo()
     {
@@ -783,11 +843,13 @@ public class GhostMazeController : MonoBehaviour
     {
         var item_changeGhost = effectItemList.effectItems.Find(item => item.name == "change_ghost");
         float remainCd_changeGhost = Mathf.Max(0f, item_changeGhost.cooldown - (Time.time - lastCd_changeGhost));
+        cdImage_changeGhost.enabled = remainCd_changeGhost > 0 ? true : false;
         cdText_changeGhost.text = remainCd_changeGhost > 0 ? $"{remainCd_changeGhost:F1}s" : "";
         
         var item_boost = effectItemList.effectItems.Find(item => item.name == "boost");
-        float remainCd_Boost = Mathf.Max(0f, item_boost.cooldown - (Time.time - lastCd_boost));
-        cdText_boost.text = remainCd_Boost > 0 ? $"{remainCd_Boost:F1}s" : "";
+        float remainCd_boost = Mathf.Max(0f, item_boost.cooldown - (Time.time - lastCd_boost));
+        cdImage_boost.enabled = remainCd_boost > 0 ? true : false;
+        cdText_boost.text = remainCd_boost > 0 ? $"{remainCd_boost:F1}s" : "";
 
         string _ownedEffectItem = IngameDataManager.LoadSpecificListData<string>("ghost_data.ghost_single_info", onCtrl_ghost.name, "effect_item");
         float cooldown = effectItemList.effectItems.Find(item => item.name == _ownedEffectItem).cooldown;
@@ -802,26 +864,39 @@ public class GhostMazeController : MonoBehaviour
         };
 
         float remainCd_effectItem = Mathf.Max(0f, cooldown - (Time.time - lastCd));
+        cdImage_effectItem.enabled = remainCd_effectItem > 0 ? true : false;
         cdText_effectItem.text = remainCd_effectItem > 0 ? $"{remainCd_effectItem:F1}s" : "";
+        
     }
 
     /*********************************************************************/
-    //                       Ghost AI Movement
+    //
+    //                        Ghost AI Movement
+    //
     /*********************************************************************/
 
-    private void MoveNonControlledGhosts()
+    private IEnumerator MoveGhostCoroutine(string ghostName)
     {
-        foreach (string ghostName in aliveGhosts)
+        while (true)
         {
-            if (ghostName != onCtrl_ghost.name)
+            if (!onAuto_isRunning[ghostName]) 
             {
-                AutoMoveGhost(ghostName);
+                onAuto_isRunning[ghostName] = true;
+                StartCoroutine(AutoMoveGhost(ghostName));
             }
+            
+            yield return new WaitForFixedUpdate();
         }
     }
 
-    private void AutoMoveGhost(string ghostName)
+    private IEnumerator AutoMoveGhost(string ghostName)
     {
+        if (onCtrl_ghost.name == ghostName) 
+        {
+            onAuto_isRunning[ghostName] = false;
+            yield break;
+        }
+        
         GameObject onAuto_ghost;
         Animator onAuto_animator;
         float onAuto_defaultSpeed;
@@ -834,17 +909,16 @@ public class GhostMazeController : MonoBehaviour
             { "pinky", (pinky, pinkyAnimator, pinkyDefaultSpeed) }
         };
 
-        if (!ghostData.TryGetValue(ghostName, out var ghostInfo)) return;
+        if (!ghostData.TryGetValue(ghostName, out var ghostInfo)) yield break;
 
         (onAuto_ghost, onAuto_animator, onAuto_defaultSpeed) = ghostInfo;
-
-        Vector2 currentPosition = onAuto_ghost.transform.position;
-
-        if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
+    
+        while (onAuto_isRunning[ghostName])
         {
-            if (onAuto_hasReachedTarget[ghostName])
+            Vector2 currentPosition = onAuto_ghost.transform.position;
+
+            if ((Vector2)onAuto_ghost.transform.position == GetTileCenter((Vector2)onAuto_ghost.transform.position))
             {
-                onAuto_hasReachedTarget[ghostName] = false;
                 IngameData.PacmanData _pacmanData = IngameDataManager.LoadSpecificData<IngameData.PacmanData>("pacman_data");
                 IngameData.GhostData _ghostData = IngameDataManager.LoadSpecificData<IngameData.GhostData>("ghost_data");
 
@@ -864,26 +938,24 @@ public class GhostMazeController : MonoBehaviour
                 }
                 recentTiles.Enqueue(GetTileCenter(currentPosition));
             }
-        }
 
-        if (!onAuto_hasReachedTarget[ghostName] && IsAbleToMoveTo(onAuto_targetPositions[ghostName], onAuto_ghost))
-        {
-            float _speedMultiplier = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", onAuto_ghost.name, "speed_multiplier");
-            float _windBurstSpeedAffect = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", onAuto_ghost.name, "wind_burst_speed_affect");
+            if (IsAbleToMoveTo(onAuto_targetPositions[ghostName], onAuto_ghost))
+            { 
+                Vector2 newPosition = Vector2.MoveTowards(currentPosition, onAuto_targetPositions[ghostName], (onAuto_defaultSpeed * ghost_speedMultiplier[ghostName] * ghost_windBurstSpeedAffect[ghostName]) * Time.deltaTime);
+                onAuto_ghost.transform.position = newPosition;
 
-            Vector2 newPosition = Vector2.MoveTowards(currentPosition, onAuto_targetPositions[ghostName], (onAuto_defaultSpeed * _speedMultiplier * _windBurstSpeedAffect) * Time.deltaTime);
-            onAuto_ghost.transform.position = newPosition;
-
-            if (newPosition == GetTileCenter(newPosition))
-            {
-                UpdateGhostPosition(ghostName, newPosition);
-                onAuto_hasReachedTarget[ghostName] = true;
+                if (newPosition == GetTileCenter(newPosition))
+                {
+                    UpdateGhostPosition(ghostName, newPosition);
+                }
             }
-        }
-        else
-        {
-            onAuto_ghost.transform.position = GetTileCenter(currentPosition);
-            onAuto_hasReachedTarget[ghostName] = true;
+            else
+            {
+                onAuto_ghost.transform.position = GetTileCenter(currentPosition);
+                onAuto_isRunning[ghostName] = false;
+            }
+
+            yield return new WaitForFixedUpdate();
         }
     }
 
@@ -923,11 +995,10 @@ public class GhostMazeController : MonoBehaviour
     private Vector2 GetValidDirection(Vector2 currentPosition, Vector2 currentDirection, GameObject ghost, Vector2 targetPosition, IngameData.PacmanData pacmanData)
     {
         bool hasPowerPellet = pacmanData.has_power_pellet;
-
         Vector2[] possibleDirections = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
         Vector2 reverseDirection = -currentDirection;
 
-        Vector2 bestDirection = Vector2.zero;
+        Vector2 bestDirection = reverseDirection;
         float bestDistance = hasPowerPellet ? 0f : float.MaxValue;
 
         foreach (Vector2 direction in possibleDirections)
@@ -935,28 +1006,25 @@ public class GhostMazeController : MonoBehaviour
             if (direction == reverseDirection) continue;
 
             Vector2 newPosition = currentPosition + direction * TILE_SIZE;
-            if (IsAbleToMoveTo(newPosition, ghost))
+            if (!IsAbleToMoveTo(newPosition, ghost)) continue;
+
+            float distanceToTarget = Vector2.SqrMagnitude(newPosition - targetPosition);
+            bool isBetterDirection = hasPowerPellet ? distanceToTarget > bestDistance : distanceToTarget < bestDistance;
+
+            if (isBetterDirection)
             {
-                float distanceToTarget = Vector2.Distance(newPosition, targetPosition);
-                if ((hasPowerPellet && distanceToTarget > bestDistance) || (!hasPowerPellet && distanceToTarget < bestDistance))
-                {
-                    bestDistance = distanceToTarget;
-                    bestDirection = direction;
-                }
+                bestDistance = distanceToTarget;
+                bestDirection = direction;
             }
         }
 
-        if (bestDirection == Vector2.zero)
-        {
-            bestDirection = reverseDirection;
-        }
-
-        if (bestDirection == currentDirection && IsAbleToMoveTo(currentPosition + bestDirection * TILE_SIZE, ghost))
+        Vector2 potentialPosition = currentPosition + bestDirection * TILE_SIZE;
+        if (bestDirection != reverseDirection || IsAbleToMoveTo(potentialPosition, ghost))
         {
             return bestDirection;
         }
 
-        return bestDirection;
+        return reverseDirection;
     }
 
     private Vector2 GetNearestNonCollisionTile(Vector2 targetTile, GameObject ghost)

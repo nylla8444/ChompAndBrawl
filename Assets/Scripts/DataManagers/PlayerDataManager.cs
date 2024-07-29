@@ -7,6 +7,7 @@ using UnityEngine;
 [Serializable]
 public class PlayerData
 {
+    public string selected_map;
     public Audio audio;
 
     [Serializable]
@@ -61,7 +62,7 @@ public static class PlayerDataManager
     {
         if (defaultPlayerData == null)
         {
-            Debug.LogError("DefaultPlayerData is not set. Call Initialize() first.");
+            Debug.LogWarning("DefaultPlayerData is not set. Call Initialize() first.");
             return null;
         }
 
