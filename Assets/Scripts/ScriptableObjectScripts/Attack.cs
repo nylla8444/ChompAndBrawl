@@ -9,6 +9,7 @@ public class Attack : ScriptableObject {
     public float chargeDuration;
     public float hitDuration;
     public float missDuration;
+    public float attackCooldown;
     public Vector2 rootVelocity;
     public Vector2 otherVelocity;
     public Vector2 attackBoxOffset;

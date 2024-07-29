@@ -13,13 +13,17 @@ MonoBehaviour:
   m_Name: Punch2
   m_EditorClassIdentifier: 
   damage: 5
-  stunDuration: 0.3
-  chargeDuration: 0.1
-  hitDuration: 0.1
-  missDuration: 0.4
+  stunDuration: 0.5
+  chargeDuration: 0.25
+  hitDuration: 0.4
+  missDuration: 1
+  attackCooldown: 0
   rootVelocity: {x: 4, y: 0}
-  otherVelocity: {x: 6, y: 0}
+  otherVelocity: {x: 5, y: 0}
   attackBoxOffset: {x: 0.625, y: 0.425}
   attackBoxSize: {x: 1.25, y: 0.75}
   nextAttack: {fileID: 11400000, guid: 78e1603b0c349b44680f262845d7767d, type: 2}
-  camShakeStrength: 0
+  attackCategory: 0
+  shakeCam: 1
+  camShakeStrength: 0.1
+  camShakeDuration: 0.05

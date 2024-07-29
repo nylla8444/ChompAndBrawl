@@ -21,8 +21,9 @@ using UnityEngine.UIElements;
     private const float COLLIDER_MARGIN = 0.02f;
 
     [Header("Fighter Stats")]
-    [SerializeField] private float health;
+    [SerializeField] private float maxHealth;
     [SerializeField] private Attack punchAttack;
+    [SerializeField] private Attack basicAttack;
     [SerializeField] private InputHandler inputHandler;
 
     private BrawlManager brawlManager;
@@ -36,6 +37,9 @@ using UnityEngine.UIElements;
     private Rigidbody2D opponentRigidBody;
     private Attack lastAttack;
 
+    public float damageMultiplier; // add skill power hp here
+    public GameObject healthUi;
+
     [HideInInspector] public bool facingRight;
     [HideInInspector] public bool isBlocking;
     [HideInInspector] public bool isCrouching;
@@ -43,6 +47,7 @@ using UnityEngine.UIElements;
     [HideInInspector] public float chargeAttack;
     [HideInInspector] public float stunTime;
     [HideInInspector] public float attackCooldown;
+    [HideInInspector] public float health;
 
     [System.Serializable] public class InputHandler {
         [SerializeField] private KeyCode jumpKey;
@@ -50,6 +55,7 @@ using UnityEngine.UIElements;
         [SerializeField] private KeyCode crouchKey;
         [SerializeField] private KeyCode rightKey;
         [SerializeField] private KeyCode punchKey;
+        [SerializeField] private KeyCode basicSkillKey;
         private PlayerBehavior playerBehavior;
 
         public void Initialize(PlayerBehavior behavior) {
@@ -83,6 +89,7 @@ using UnityEngine.UIElements;
         public bool IsJumping() { return Input.GetKey(jumpKey); }
         public bool Crouching() { return Input.GetKey(crouchKey); }
         public bool IsPunching() { return Input.GetKeyDown(punchKey); }
+        public bool UsedBasicSkill() { return Input.GetKeyDown(basicSkillKey); }
     }
 
     private void Start() {
@@ -110,6 +117,7 @@ using UnityEngine.UIElements;
         }
 
         inputHandler.Initialize(this);
+        health = maxHealth;
     }
 
     private void Update() {
@@ -127,6 +135,11 @@ using UnityEngine.UIElements;
             } else {
                 queuedAttack = punchAttack;
             }
+        }
+
+        // basic skill
+        if (inputHandler.UsedBasicSkill()) {
+
         }
 
         // Post attack cd
@@ -183,6 +196,9 @@ using UnityEngine.UIElements;
 
     private void registerAttack(Attack attack) {
         // reminder for self: implement last attack then remove the stuff from register attack 
+        BoxCollider2D n = attackBox.GetComponent<BoxCollider2D>();
+        if (n) { Destroy(n); }
+
         BoxCollider2D attackHitbox = attackBox.AddComponent<BoxCollider2D>();
         if (!attack) {Debug.Log("AttackArgument Missing"); return; }
         Debug.Log(attack.name);
@@ -200,6 +216,7 @@ using UnityEngine.UIElements;
                 lastAttack = null;
             } else {
                 opponentBehavior.stun(attack.stunDuration, new Vector2(attack.otherVelocity.x * attackDirection, attack.otherVelocity.y));
+                opponentBehavior.damage(attack.damage * damageMultiplier);
                 attackCooldown = attack.hitDuration;
                 lastAttack = attack;
 
@@ -219,7 +236,12 @@ using UnityEngine.UIElements;
         stunTime = seconds;
         rigidBody.velocity = knockback;
         queuedAttack = null;
-        
+        lastAttack = null;
+    }
+
+    public void damage(float amount) {
+        health -= amount;
+        healthUi.transform.localScale = new Vector3(health / maxHealth, 1, 1);
     }
 
     // private BoxCollider2D setAttackBox(Attack attackInfo) {
