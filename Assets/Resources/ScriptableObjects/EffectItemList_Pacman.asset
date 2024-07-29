@@ -12,4 +12,92 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a46e595c9a266448849c0019423be03, type: 3}
   m_Name: EffectItemList_Pacman
   m_EditorClassIdentifier: 
-  effectItems: []
+  effectItems:
+  - name: rocket_boost
+    description: Increase movement speed
+    asItemSprite: {fileID: -724520673, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+    startParticleSprite: {fileID: 1166816574, guid: 5aab2c49cae536a43ab2fd391db375a7, type: 3}
+    useTime: 2.5
+    cooldown: 1.5
+    spawnChance: 100
+    inEffect:
+      id: speed_boost
+      description: Increase movement speed
+      iconSprite: {fileID: 1271271988, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+  - name: zoom_out
+    description: Increase wide vision
+    asItemSprite: {fileID: 1686728571, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+    startParticleSprite: {fileID: 766889607, guid: 5aab2c49cae536a43ab2fd391db375a7, type: 3}
+    useTime: 5
+    cooldown: 1.5
+    spawnChance: 80
+    inEffect:
+      id: zoom_out
+      description: Increase wide vision
+      iconSprite: {fileID: -1642341683, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+  - name: retreat
+    description: Teleport to safe zone after 3 seconds
+    asItemSprite: {fileID: -674732789, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+    startParticleSprite: {fileID: 191838373, guid: 5aab2c49cae536a43ab2fd391db375a7, type: 3}
+    useTime: 3
+    cooldown: 1.5
+    spawnChance: 45
+    inEffect:
+      id: retreating
+      description: Teleporting to the safe zone
+      iconSprite: {fileID: 905753932, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+  - name: immunity
+    description: Immune from ghosts
+    asItemSprite: {fileID: -2053906448, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+    startParticleSprite: {fileID: 1301334917, guid: 5aab2c49cae536a43ab2fd391db375a7, type: 3}
+    useTime: 5
+    cooldown: 1.5
+    spawnChance: 30
+    inEffect:
+      id: immune
+      description: Immune to ghost but disables collecting
+      iconSprite: {fileID: 361094161, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+  - name: slow_move
+    description: Decrease ghost's movement speed
+    asItemSprite: {fileID: 1525094629, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+    startParticleSprite: {fileID: 1853336617, guid: 5aab2c49cae536a43ab2fd391db375a7, type: 3}
+    useTime: 2.5
+    cooldown: 1.5
+    spawnChance: 90
+    inEffect:
+      id: slowness
+      description: Decrease movement speed
+      iconSprite: {fileID: -618867028, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+  - name: paralyze
+    description: Paralyze the nearest ghost
+    asItemSprite: {fileID: 1049722366, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+    startParticleSprite: {fileID: -1731937862, guid: 5aab2c49cae536a43ab2fd391db375a7, type: 3}
+    useTime: 6
+    cooldown: 1.5
+    spawnChance: 70
+    inEffect:
+      id: paralyzed
+      description: Paralyze every 1.5 seconds
+      iconSprite: {fileID: -1765224533, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+  - name: darkness
+    description: Decrease and darkens ghost's vision
+    asItemSprite: {fileID: -858369387, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+    startParticleSprite: {fileID: -2032026699, guid: 5aab2c49cae536a43ab2fd391db375a7, type: 3}
+    useTime: 5
+    cooldown: 1.5
+    spawnChance: 50
+    inEffect:
+      id: darkness
+      description: Decrease and darkens vision
+      iconSprite: {fileID: 1178951183, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+  - name: invert_control
+    description: Inverts ghost's keybind/control
+    asItemSprite: {fileID: -1968986577, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}
+    startParticleSprite: {fileID: -1274571555, guid: 5aab2c49cae536a43ab2fd391db375a7, type: 3}
+    useTime: 7
+    cooldown: 1.5
+    spawnChance: 35
+    inEffect:
+      id: inverted
+      description: Invert keybind/control
+      iconSprite: {fileID: -2003765313, guid: 02b0293ede4a0ba43ae58ce3f6957708, type: 3}

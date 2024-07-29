@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class GeneralManager : MonoBehaviour
 {
     [Header("Default Data")]
-    [SerializeField] private DefaultGameData defaultGameData;
+    [SerializeField] private DefaultIngameData defaultIngameData;
     [SerializeField] private DefaultPlayerData defaultPlayerData;
     [SerializeField] private DefaultInputKeybind defaultInputKeybind;
 
@@ -43,7 +43,7 @@ public class GeneralManager : MonoBehaviour
     private void PrepareAllData()
     {
         // Initialize data managers with the default data
-        try { GameDataManager.Initialize(defaultGameData); } catch (Exception) { }
+        try { IngameDataManager.Initialize(defaultIngameData); } catch (Exception) { }
         try { PlayerDataManager.Initialize(defaultPlayerData); } catch (Exception) { }
         try { KeybindDataManager.Initialize(defaultInputKeybind); } catch (Exception) { }
     }
@@ -63,7 +63,7 @@ public class GeneralManager : MonoBehaviour
 
     public void PrepareResetData()
     {
-        GameDataManager.DeleteData();
+        IngameDataManager.DeleteData();
         PlayerDataManager.DeleteData();
         KeybindDataManager.DeleteKeyBindings();
     }

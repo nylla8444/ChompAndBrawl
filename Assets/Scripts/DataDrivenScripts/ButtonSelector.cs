@@ -24,14 +24,14 @@ public class ButtonGroup
     [Header("Button Type")]
     public ButtonType buttonType;
 
-    [Header("Single Button Item Properties")]
+    [Header("Single Button Item Properties"), Space(4)]
     public List<Button> buttons;
 
-    [Header("Label Button Item Properties")]
+    [Header("Label Button Item Properties"), Space(4)]
     public Text label;
     public List<Button> labelButtons;
 
-    [Header("Navigable Button Item Properties")]
+    [Header("Navigable Button Item Properties"), Space(4)]
     public Button navigableButton;
     public List<Button> targetButtons;
 

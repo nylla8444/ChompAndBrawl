@@ -15,6 +15,7 @@ public class Fruit
     public string name;
     public Sprite asItemSprite;
     public int points;
+    public Sprite pointsSprite;
     public int ghostRequirement;
     public int spawnChance;
 }

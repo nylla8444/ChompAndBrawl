@@ -13,9 +13,19 @@ public class EffectItemList : ScriptableObject
 public class EffectItem
 {
     public string name;
+    public string description;
     public Sprite asItemSprite;
-    public Sprite inEffectIconSprite;
     public Sprite startParticleSprite;
     public float useTime;
+    public float cooldown;
     public int spawnChance;
+    public InEffect inEffect;
+
+    [Serializable]
+    public class InEffect
+    {
+        public string id;
+        public string description;
+        public Sprite iconSprite;
+    }
 }

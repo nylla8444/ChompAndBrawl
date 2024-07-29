@@ -78,23 +78,6 @@ public static class KeybindDataManager
         }
     }
 
-    /**************************************************************/
-    // Might not need since there is already register and unregister key action functions
-    //
-    // public static bool IsKeyActionTriggered(string actionName)
-    // {
-    //     foreach (var category in keyBindingCategories.Values)
-    //     {
-    //         var keybind = category.input_keybinds.Find(key => key.actionName == actionName);
-    //         if (keybind != null)
-    //         {
-    //             return Input.GetKeyDown(keybind.key_code);
-    //         }
-    //     }
-    //     return false;
-    // }
-    /**************************************************************/
-
     public static void RegisterKeyAction(string actionName, KeyActionDelegate action)
     {
         if (!keyActionMap.ContainsKey(actionName))
