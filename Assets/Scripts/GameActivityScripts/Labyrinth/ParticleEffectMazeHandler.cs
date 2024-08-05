@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MEC;
 
 public class ParticleEffectMazeHandler : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public class ParticleEffectMazeHandler : MonoBehaviour
 
         particleSystem.Play();
 
-        StartCoroutine(FollowTarget(particleInstance, transforms[character], particleSystem.main.duration + particleSystem.main.startLifetime.constantMax));
+        Timing.RunCoroutine(FollowTarget(particleInstance, transforms[character], particleSystem.main.duration + particleSystem.main.startLifetime.constantMax));
     }
 
     public void SpawnEffectParticle(GameObject particlePrefab, string character)
@@ -49,7 +50,7 @@ public class ParticleEffectMazeHandler : MonoBehaviour
 
         particleSystem.Play();
 
-        StartCoroutine(FollowTarget(particleInstance, transforms[character], particleSystem.main.duration + particleSystem.main.startLifetime.constantMax));
+        Timing.RunCoroutine(FollowTarget(particleInstance, transforms[character], particleSystem.main.duration + particleSystem.main.startLifetime.constantMax));
     }
 
     public void SpawnEffectOverlay(GameObject overlayPrefab, string character, float duration, string animatorId = null)
@@ -83,7 +84,7 @@ public class ParticleEffectMazeHandler : MonoBehaviour
         Destroy(textInstance, duration);
     }
 
-    private IEnumerator FollowTarget(GameObject particleInstance, Transform followTransform, float duration)
+    private IEnumerator<float> FollowTarget(GameObject particleInstance, Transform followTransform, float duration)
     {
         float timer = 0f;
 
@@ -95,7 +96,7 @@ public class ParticleEffectMazeHandler : MonoBehaviour
             }
 
             timer += Time.deltaTime;
-            yield return null;
+            yield return 0f;
         }
 
         Destroy(particleInstance);

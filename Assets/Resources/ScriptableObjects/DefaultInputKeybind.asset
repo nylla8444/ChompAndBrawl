@@ -27,6 +27,24 @@ MonoBehaviour:
     - translated_action_name: Go Back
       action_name: general.go_back
       key_code: 27
+    - translated_action_name: Ready Player 1
+      action_name: general.ready_player_one
+      key_code: 306
+    - translated_action_name: Ready Player 2
+      action_name: general.ready_player_two
+      key_code: 305
+    - translated_action_name: Pacman Next Tutorial
+      action_name: general.pacman_next_tutorial
+      key_code: 304
+    - translated_action_name: Pacman Skip Tutorial
+      action_name: general.pacman_skip_tutorial
+      key_code: 306
+    - translated_action_name: Ghost Next Tutorial
+      action_name: general.ghost_next_tutorial
+      key_code: 303
+    - translated_action_name: Ghost Skip Tutorial
+      action_name: general.ghost_skip_tutorial
+      key_code: 305
   - category_name: Pacman
     input_keybinds:
     - translated_action_name: Face Up

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using MEC;
 
 public class EffectDisplayMazeHandler : MonoBehaviour
 {
@@ -15,26 +16,26 @@ public class EffectDisplayMazeHandler : MonoBehaviour
     
     private void Start()
     {
-        StartCoroutine(UpdatePacmanEffectDisplay());
-        StartCoroutine(UpdateGhostEffectDisplay());
+        Timing.RunCoroutine(UpdatePacmanEffectDisplay());
+        Timing.RunCoroutine(UpdateGhostEffectDisplay());
     }
     
-    private IEnumerator UpdatePacmanEffectDisplay()
+    private IEnumerator<float> UpdatePacmanEffectDisplay()
     {
         while (true)
         {
-            yield return new WaitForSeconds(0.2f);
+            yield return Timing.WaitForSeconds(0.2f);
 
             List<string> _pacman_affectedItems = IngameDataManager.LoadSpecificData<List<string>>("pacman_data.affected_items");
             DisplayEffects(_pacman_affectedItems, pacman_effectDisplayAnchor, pacman_effectDisplayPrefab, true);
         }
     }
 
-    private IEnumerator UpdateGhostEffectDisplay()
+    private IEnumerator<float> UpdateGhostEffectDisplay()
     {
         while (true)
         {
-            yield return new WaitForSeconds(0.2f);
+            yield return Timing.WaitForSeconds(0.2f);
 
             string _ghost_currentControlling = IngameDataManager.LoadSpecificData<string>("ghost_data.current_controlling");
             List<string> _ghost_affectedItems = IngameDataManager.LoadSpecificListData<List<string>>("ghost_data.ghost_single_info", _ghost_currentControlling, "affected_items");

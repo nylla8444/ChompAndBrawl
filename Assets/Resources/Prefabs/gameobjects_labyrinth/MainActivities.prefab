@@ -99,6 +99,82 @@ MonoBehaviour:
   clydeTransform: {fileID: 0}
   inkyTransform: {fileID: 0}
   pinkyTransform: {fileID: 0}
+--- !u!1 &3058413126343916888
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1880882223131499550}
+  - component: {fileID: 3855979621730343485}
+  m_Layer: 0
+  m_Name: IngamePrepareHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1880882223131499550
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3058413126343916888}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8823609240881930095}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3855979621730343485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3058413126343916888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb0200b3660597746ba0f4409e3188bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainSceneIds: {fileID: 11400000, guid: a213d55d707e5ea46b95a9e1ba0f4c94, type: 2}
+  ingameMapSceneIds: {fileID: 11400000, guid: f3e9a418f61a40342ab966eef8c466cc, type: 2}
+  tutorialPanel: {fileID: 0}
+  tutorialList: {fileID: 11400000, guid: 57302ab96d6eee347bb7347e4c421fa2, type: 2}
+  pacmanTutorialSide: {fileID: 0}
+  ghostTutorialSide: {fileID: 0}
+  pacmanWaitingSide: {fileID: 0}
+  ghostWaitingSide: {fileID: 0}
+  countdownPanel: {fileID: 0}
+  countdownText: {fileID: 0}
+  lightsLeft:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  lightsRight:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  pacmanMazeController: {fileID: 5366468098498393255}
+  ghostMazeController: {fileID: 1212074582422392060}
+  itemMazeHandler: {fileID: 4735484392978848195}
+  sceneTransitionManager: {fileID: 0}
+  mazeToBrawlPacmanImage: {fileID: 0}
+  mazeToBrawlGhostImage: {fileID: 0}
+  pacmanBrawlSprites:
+  - {fileID: 160714487, guid: e5d94b490e93d8d4ea0a00ebde9ec9fa, type: 3}
+  - {fileID: 1034500965, guid: 6fafb49c3c27643408bb87086b86950a, type: 3}
+  ghostBrawlSprites:
+  - {fileID: -1109962912, guid: 75626694881112b4c9ea28117122dc9a, type: 3}
+  - {fileID: 336383894, guid: 8f9540a7aa3777547b2e29d22e9d7766, type: 3}
+  - {fileID: -1841023284, guid: 0aa873d08121db84b8d460ea32fd7529, type: 3}
+  - {fileID: -56628483, guid: 5a0f2b74008730047a4ab592ea8860f3, type: 3}
 --- !u!1 &4072383773383904158
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,7 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d43e3cf002a3d347b24bae0d27a7f49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMazeStarted: 1
+  isMazeStarted: 0
   pacman: {fileID: 0}
   defaultSpeed: 0.6
   collisionLayer:
@@ -198,6 +274,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1880882223131499550}
   - {fileID: 5550020678305888462}
   - {fileID: 4959080754261243610}
   - {fileID: 3872347666221189896}
@@ -250,7 +327,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2820580b95ab57c489472811443f905a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isMazeStarted: 1
+  isMazeStarted: 0
   blinky: {fileID: 0}
   clyde: {fileID: 0}
   inky: {fileID: 0}
@@ -285,6 +362,7 @@ MonoBehaviour:
   - {fileID: 1068661461, guid: ace0e7a005e2b484c8cc9bd36751f24c, type: 3}
   - {fileID: -1311548452, guid: 01ea548859a7a024dba0473578fcfdb2, type: 3}
   - {fileID: -348098888, guid: bef96989bbeab914b98d4bcbe849f91f, type: 3}
+  ghostOnControlImage: {fileID: 0}
   effectItemList: {fileID: 11400000, guid: 83a13f4b1a7575246960d6af65ee0c76, type: 2}
   cdText_boost: {fileID: 0}
   cdText_changeGhost: {fileID: 0}

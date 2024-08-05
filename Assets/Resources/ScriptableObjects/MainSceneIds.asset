@@ -25,7 +25,7 @@ MonoBehaviour:
     sceneName: MapSelectionScene
   - sceneAsset: {fileID: 102900000, guid: 9cf90f18fd4f0ca4c9a1d7eb4bd64c6e, type: 3}
     sceneName: GamePreparationScene
-  - sceneAsset: {fileID: 0}
-    sceneName: 
-  - sceneAsset: {fileID: 0}
-    sceneName: 
+  - sceneAsset: {fileID: 102900000, guid: b2f16caa0700d944ab9f331933115b0a, type: 3}
+    sceneName: LeaderboardScene
+  - sceneAsset: {fileID: 102900000, guid: 0ca7a5402c9b3354c98c3e423c6f879c, type: 3}
+    sceneName: SettingsScene

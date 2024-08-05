@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 173640a506d4a5d409b7968d3afe9b50, type: 3}
+  m_Name: DefaultLeaderboardData
+  m_EditorClassIdentifier: 
+  leaderboardData:
+    rowData:
+    - code_name: KURTA
+      winner_name: GHOST
+      pac_points: 10000
+      playtime: 200
+    - code_name: LEVIN
+      winner_name: GHOST
+      pac_points: 17500
+      playtime: 275
+    - code_name: MEIRO
+      winner_name: GHOST
+      pac_points: 22500
+      playtime: 350
+    - code_name: ALLYN
+      winner_name: PAC-MAN
+      pac_points: 40000
+      playtime: 650
+    - code_name: CALIX
+      winner_name: PAC-MAN
+      pac_points: 60000
+      playtime: 800

@@ -1234,7 +1234,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: LSHIFT
+  m_Text: L.SHIFT
 --- !u!222 &1038911116
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1450,7 +1450,9 @@ MonoBehaviour:
   leaderboardButton: {fileID: 0}
   settingsButton: {fileID: 0}
   mainSceneIds: {fileID: 11400000, guid: a213d55d707e5ea46b95a9e1ba0f4c94, type: 2}
-  mazeMapList: {fileID: 11400000, guid: 6252ddfebf9a82c4e94e2e94557219ed, type: 2}
+  ingameMapSceneIds: {fileID: 0}
+  ingameMapList: {fileID: 11400000, guid: 6252ddfebf9a82c4e94e2e94557219ed, type: 2}
+  audioManager: {fileID: 1971930701}
   prevMapButton: {fileID: 709291627}
   nextMapButton: {fileID: 1146916258}
   backMapButton: {fileID: 1700671047}
@@ -1470,6 +1472,18 @@ MonoBehaviour:
   ghostPrepMessages: []
   preparingMessageObj: {fileID: 0}
   loadingScreen: {fileID: 0}
+  loadingFloaterObject: {fileID: 0}
+  loadingAnchors: []
+  loadMapDisplay: {fileID: 0}
+  loadMapTitleText: {fileID: 0}
+  rowBoardPrefab: {fileID: 0}
+  rowAnchor: {fileID: 0}
+  backLeadButton: {fileID: 0}
+  musicVolumeButtons: []
+  sfxVolumeButtons: []
+  musicVolumeBars: []
+  sfxVolumeBars: []
+  backSettingsButton: {fileID: 0}
 --- !u!1 &1270200156
 GameObject:
   m_ObjectHideFlags: 0
@@ -1517,9 +1531,9 @@ MonoBehaviour:
   defaultIngameData: {fileID: 0}
   defaultPlayerData: {fileID: 11400000, guid: c4ba7b4a78539fd41bd2b9732179c7cb, type: 2}
   defaultInputKeybind: {fileID: 11400000, guid: 71e20637733cb534bb8bf5a0eacc2ebb, type: 2}
+  defaultLeaderboardData: {fileID: 0}
   menuPanel: {fileID: 0}
   dialoguePanel: {fileID: 0}
-  transitionScreen: {fileID: 0}
   directResetButton: {fileID: 0}
   directTrueResetButton: {fileID: 0}
   directQuitButton: {fileID: 0}

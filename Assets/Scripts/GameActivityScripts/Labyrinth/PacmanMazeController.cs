@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using MEC;
 
 public class PacmanMazeController : MonoBehaviour
 {
@@ -57,7 +58,6 @@ public class PacmanMazeController : MonoBehaviour
     private void Start()
     {
         InitializePacman();
-        RegisterKeyActions();
     }
 
     private void OnDestroy()
@@ -68,6 +68,11 @@ public class PacmanMazeController : MonoBehaviour
     public void StartPacmanController(bool triggerValue)
     {
         isMazeStarted = triggerValue;
+        if (isMazeStarted) 
+        {
+            RegisterKeyActions();
+            Timing.RunCoroutine(IncreasePlaytime());
+        }
     }
 
     private void RegisterKeyActions()
@@ -94,26 +99,20 @@ public class PacmanMazeController : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        UpdateEffectItemDisplay();
-        UpdateTextDisplay();
-        UpdateSpeed();
-    }
-
     private void InitializePacman()
     {
-        Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
+        pacman.transform.position = new Vector2(Mathf.Round(spawnPoint.position.x * 100.0f) / 100.0f, Mathf.Round(spawnPoint.position.y * 100.0f) / 100.0f);
+        UpdatePacmanPosition(pacman.transform.position);
 
-        pacman.transform.position = (_pacman_coordinate != Vector2.zero) 
-            ? new Vector2(Mathf.Round(_pacman_coordinate.x * 100.0f) / 100.0f, Mathf.Round(_pacman_coordinate.y * 100.0f) / 100.0f)
-            : new Vector2(Mathf.Round(spawnPoint.position.x * 100.0f) / 100.0f, Mathf.Round(spawnPoint.position.y * 100.0f) / 100.0f);
-        
         pacmanCollider = pacman.GetComponent<BoxCollider2D>();
-
         animator?.SetTrigger("pacman.rest");
-        StartCoroutine(IncreasePlaytime());
+        
         UpdateHeartDisplay();
+        SetToNormalData();
+        
+        Timing.RunCoroutine(UpdateEffectItemDisplay());
+        Timing.RunCoroutine(UpdateTextDisplay());
+        Timing.RunCoroutine(UpdateSavedSpeed());
     }
 
     private void UpdateHeartDisplay()
@@ -125,13 +124,37 @@ public class PacmanMazeController : MonoBehaviour
         }
     }
 
-    private void UpdateSpeed()
+    private void SetToNormalData()
     {
-        float pacman_speedMultiplier = IngameDataManager.LoadSpecificData<float>("pacman_data.speed_multiplier");
-        float pacman_windBurstSpeedAffect = IngameDataManager.LoadSpecificData<float>("pacman_data.wind_burst_speed_affect");
+        IngameDataManager.SaveSpecificData("pacman_data.speed_multiplier", 1.0f);
+        IngameDataManager.SaveSpecificData("pacman_data.vision_multiplier", 1.0f);
+        IngameDataManager.SaveSpecificData("pacman_data.wind_burst_speed_affect", 1.0f);
+        IngameDataManager.SaveSpecificData("pacman_data.has_power_pellet", false);
+        IngameDataManager.SaveSpecificData("pacman_data.is_immune_to_ghost", false);
+        IngameDataManager.SaveSpecificData("pacman_data.current_effect_item", "");
 
-        if (speedMultiplier != pacman_speedMultiplier) { speedMultiplier = pacman_speedMultiplier; }
-        if (windBurstSpeedAffect != pacman_windBurstSpeedAffect) { windBurstSpeedAffect = pacman_windBurstSpeedAffect; }
+        List<string> _affectedItems = IngameDataManager.LoadSpecificData<List<string>>("pacman_data.affected_items");
+        _affectedItems.Clear();
+        IngameDataManager.SaveSpecificData("pacman_data.affected_items", _affectedItems);
+    }
+
+    public void SetSlowSpeed()
+    {
+        IngameDataManager.SaveSpecificData("pacman_data.speed_multiplier", 0.02f);
+    }
+
+    private IEnumerator<float> UpdateSavedSpeed()
+    {
+        while (true)
+        {   
+            float pacman_speedMultiplier = IngameDataManager.LoadSpecificData<float>("pacman_data.speed_multiplier");
+            float pacman_windBurstSpeedAffect = IngameDataManager.LoadSpecificData<float>("pacman_data.wind_burst_speed_affect");
+
+            if (speedMultiplier != pacman_speedMultiplier) { speedMultiplier = pacman_speedMultiplier; }
+            if (windBurstSpeedAffect != pacman_windBurstSpeedAffect) { windBurstSpeedAffect = pacman_windBurstSpeedAffect; }
+
+            yield return Timing.WaitForSeconds(0.1f);
+        }
     }
 
     private IEnumerator MovePacman()
@@ -162,7 +185,7 @@ public class PacmanMazeController : MonoBehaviour
             }
 
             if (IsAbleToMoveTo(targetPosition))
-            {    
+            {
                 Vector2 newPosition = Vector2.MoveTowards(currentPosition, targetPosition, (defaultSpeed * speedMultiplier * windBurstSpeedAffect) * Time.deltaTime);
                 pacman.transform.position = newPosition;
 
@@ -174,8 +197,9 @@ public class PacmanMazeController : MonoBehaviour
             else
             {
                 isRunning = false;
+                yield break;
             }
-
+            
             yield return new WaitForFixedUpdate();
         }
     }
@@ -247,11 +271,11 @@ public class PacmanMazeController : MonoBehaviour
         }
     }
 
-    private IEnumerator IncreasePlaytime()
+    public IEnumerator<float> IncreasePlaytime()
     {
         while (true)
         {
-            yield return new WaitForSeconds(1.0f);
+            yield return Timing.WaitForSeconds(1.0f);
             
             int playtime = IngameDataManager.LoadSpecificData<int>("pacman_data.playtime");
             IngameDataManager.SaveSpecificData("pacman_data.playtime", playtime + 1);
@@ -278,17 +302,22 @@ public class PacmanMazeController : MonoBehaviour
     //
     /*********************************************************************/
 
-    private void UpdateEffectItemDisplay()
+    private IEnumerator<float> UpdateEffectItemDisplay()
     {
-        if (!hasEffectItem)
+        while (true)
         {
-            string _pacman_currentEffectItem = IngameDataManager.LoadSpecificData<string>("pacman_data.current_effect_item");
-            if (System.String.IsNullOrEmpty(_pacman_currentEffectItem)) return;
+            yield return Timing.WaitForSeconds(0.1f);
 
-            var effectItem = effectItemList.effectItems.Find(item => item.name == _pacman_currentEffectItem);
-            if (effectItem == null) return;
+            if (!hasEffectItem)
+            {
+                string _pacman_currentEffectItem = IngameDataManager.LoadSpecificData<string>("pacman_data.current_effect_item");
+                if (System.String.IsNullOrEmpty(_pacman_currentEffectItem)) continue;
 
-            SetEffectItemDisplay(effectItem.name, effectItem.asItemSprite, new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
+                var effectItem = effectItemList.effectItems.Find(item => item.name == _pacman_currentEffectItem);
+                if (effectItem == null) continue;
+
+                SetEffectItemDisplay(effectItem.name, effectItem.asItemSprite, new Color(1.0f, 1.0f, 1.0f, 1.0f), true);
+            }
         }
     }
 
@@ -315,10 +344,9 @@ public class PacmanMazeController : MonoBehaviour
         }
 
         string _pacman_currentEffectItem = IngameDataManager.LoadSpecificData<string>("pacman_data.current_effect_item");
-        
         if (System.String.IsNullOrEmpty(_pacman_currentEffectItem)) return;
 
-        var actions = new Dictionary<string, System.Func<IEnumerator>>
+        var actions = new Dictionary<string, System.Func<IEnumerator<float>>>
         {
             { "rocket_boost", OnUse_RocketBoost },
             { "zoom_out", OnUse_ZoomOut },
@@ -332,7 +360,7 @@ public class PacmanMazeController : MonoBehaviour
 
         if (actions.TryGetValue(_pacman_currentEffectItem, out var method))
         {
-            StartCoroutine(method());
+            Timing.RunCoroutine(method());
         }
 
         SetEffectItemDisplay("Effect Item", null, new Color(1.0f, 1.0f, 1.0f, 0.0f), false);
@@ -346,13 +374,13 @@ public class PacmanMazeController : MonoBehaviour
 
     // =================== Rocket Boost ===================== //
 
-    private IEnumerator OnUse_RocketBoost()
+    private IEnumerator<float> OnUse_RocketBoost()
     {
         var item_rocketBoost = effectItemList.effectItems.Find(item => item.name == "rocket_boost");
         const float SPEED_MULTIPLIER_INCREASE = 0.5f;
 
         InEffect_RocketBoost("add", SPEED_MULTIPLIER_INCREASE);
-        yield return new WaitForSeconds(item_rocketBoost.useTime);
+        yield return Timing.WaitForSeconds(item_rocketBoost.useTime);
         InEffect_RocketBoost("remove", -SPEED_MULTIPLIER_INCREASE);
     }
 
@@ -367,18 +395,18 @@ public class PacmanMazeController : MonoBehaviour
 
     // ===================== Zoom Out ======================= //
 
-    private IEnumerator OnUse_ZoomOut()
+    private IEnumerator<float> OnUse_ZoomOut()
     {
         var item_zoomOut = effectItemList.effectItems.Find(item => item.name == "zoom_out");
         const float VISION_MULTIPLIER_INCREASE = 0.4f;
         const float VISION_DURATION = 1.0f;
 
-        yield return StartCoroutine(InEffect_ZoomOut("add", VISION_MULTIPLIER_INCREASE, VISION_DURATION));
-        yield return new WaitForSeconds(item_zoomOut.useTime);
-        yield return StartCoroutine(InEffect_ZoomOut("remove", -VISION_MULTIPLIER_INCREASE, VISION_DURATION));
+        Timing.RunCoroutine(InEffect_ZoomOutPacman("add", VISION_MULTIPLIER_INCREASE, VISION_DURATION));
+        yield return Timing.WaitForSeconds(item_zoomOut.useTime);
+        Timing.RunCoroutine(InEffect_ZoomOutPacman("remove", -VISION_MULTIPLIER_INCREASE, VISION_DURATION));
     }
 
-    private IEnumerator InEffect_ZoomOut(string listMode, float increase, float duration)
+    public IEnumerator<float> InEffect_ZoomOutPacman(string listMode, float increase, float duration)
     {
         InOutAffectedItems(listMode, "zoom_out", "pacman");
         
@@ -393,22 +421,42 @@ public class PacmanMazeController : MonoBehaviour
             IngameDataManager.SaveSpecificData("pacman_data.vision_multiplier", _pacman_visionMultiplier);
 
             elapsedTime += Time.deltaTime;
-            yield return null;
+            yield return 0f;
         }
 
         _pacman_visionMultiplier = targetValue;
         IngameDataManager.SaveSpecificData("pacman_data.vision_multiplier", _pacman_visionMultiplier);
     }
 
+    public IEnumerator<float> InEffect_ZoomOutGhost(float increase, float duration)
+    {
+        float _ghost_visionMultiplier = IngameDataManager.LoadSpecificData<float>("ghost_data.vision_multiplier");
+        float startValue = _ghost_visionMultiplier;
+        float targetValue = _ghost_visionMultiplier + increase;
+        float elapsedTime = 0f;
+        
+        while (elapsedTime < duration)
+        {
+            _ghost_visionMultiplier = Mathf.Lerp(startValue, targetValue, elapsedTime / duration);
+            IngameDataManager.SaveSpecificData("ghost_data.vision_multiplier", _ghost_visionMultiplier);
+
+            elapsedTime += Time.deltaTime;
+            yield return 0f;
+        }
+
+        _ghost_visionMultiplier = targetValue;
+        IngameDataManager.SaveSpecificData("ghost_data.vision_multiplier", _ghost_visionMultiplier);
+    }
+
     // ===================== Retreat ======================== //
 
-    private IEnumerator OnUse_Retreat()
+    private IEnumerator<float> OnUse_Retreat()
     {
         var item_retreat = effectItemList.effectItems.Find(item => item.name == "retreat");
         const float SPEED_MULTIPLIER_INCREASE = 0.75f;
 
         InEffect_Retreat("add", -SPEED_MULTIPLIER_INCREASE);
-        yield return new WaitForSeconds(item_retreat.useTime);
+        yield return Timing.WaitForSeconds(item_retreat.useTime);
         InEffect_Retreat("remove", SPEED_MULTIPLIER_INCREASE);
         Respawn();
     }
@@ -424,12 +472,12 @@ public class PacmanMazeController : MonoBehaviour
 
     // ===================== Immunity ======================= //
 
-    private IEnumerator OnUse_Immunity()
+    private IEnumerator<float> OnUse_Immunity()
     {
         var item_immunity = effectItemList.effectItems.Find(item => item.name == "immunity");
 
         InEffect_Immunity("add", true);
-        yield return new WaitForSeconds(item_immunity.useTime);
+        yield return Timing.WaitForSeconds(item_immunity.useTime);
         InEffect_Immunity("remove", false);
     }
 
@@ -439,22 +487,19 @@ public class PacmanMazeController : MonoBehaviour
             ? new Color(1.0f, 1.0f, 1.0f, 0.5f) 
             : new Color(1.0f, 1.0f, 1.0f, 1.0f);
         
-        bool _pacman_isImmuneToGhost = IngameDataManager.LoadSpecificData<bool>("pacman_data.is_immune_to_ghost");
-        _pacman_isImmuneToGhost = isImmune;
-        
-        IngameDataManager.SaveSpecificData("pacman_data.is_immune_to_ghost", _pacman_isImmuneToGhost);
+        IngameDataManager.SaveSpecificData("pacman_data.is_immune_to_ghost", isImmune);
         InOutAffectedItems(listMode, "immunity", "pacman");
     }
 
     // ===================== Slow Move ====================== //
 
-    private IEnumerator OnUse_SlowMove()
+    private IEnumerator<float> OnUse_SlowMove()
     {
         var item_slowMove = effectItemList.effectItems.Find(item => item.name == "slow_move");
         const float SPEED_MULTIPLIER_INCREASE = 0.25f;
 
         InEffect_SlowMove("add", -SPEED_MULTIPLIER_INCREASE);
-        yield return new WaitForSeconds(item_slowMove.useTime);
+        yield return Timing.WaitForSeconds(item_slowMove.useTime);
         InEffect_SlowMove("remove", SPEED_MULTIPLIER_INCREASE);
     }
 
@@ -474,7 +519,7 @@ public class PacmanMazeController : MonoBehaviour
 
     // ===================== Paralyze ======================= //
 
-    private IEnumerator OnUse_Paralyze()
+    private IEnumerator<float> OnUse_Paralyze()
     {
         var item_paralyze = effectItemList.effectItems.Find(item => item.name == "paralyze");
         const float SPEED_MULTIPLIER_INCREASE = 0.95f;
@@ -510,10 +555,10 @@ public class PacmanMazeController : MonoBehaviour
             InEffect_Paralyze(-SPEED_MULTIPLIER_INCREASE, nearestGhost);
             particleEffectMazeHandler.SpawnEffectParticle(sparkParalyzeParticlePrefab, nearestGhost);
 
-            yield return new WaitForSeconds(PARALYZE_DURATION);
+            yield return Timing.WaitForSeconds(PARALYZE_DURATION);
             InEffect_Paralyze(SPEED_MULTIPLIER_INCREASE, nearestGhost);
 
-            yield return new WaitForSeconds((item_paralyze.useTime / 4.0f) - PARALYZE_DURATION);
+            yield return Timing.WaitForSeconds((item_paralyze.useTime / 4.0f) - PARALYZE_DURATION);
             paralyzeCount++;
         }
 
@@ -531,7 +576,7 @@ public class PacmanMazeController : MonoBehaviour
 
     // ====================== Darkness ====================== //
 
-    private IEnumerator OnUse_Darkness()
+    private IEnumerator<float> OnUse_Darkness()
     {
         var item_darkness = effectItemList.effectItems.Find(item => item.name == "darkness");
         const float VISION_MULTIPLIER_INCREASE = 0.1f;
@@ -542,12 +587,12 @@ public class PacmanMazeController : MonoBehaviour
         };
         const float DARKNESS_DURATION = 1.0f;
 
-        yield return StartCoroutine(InEffect_Darkness("add", AMBIENT_COLORS[0], -VISION_MULTIPLIER_INCREASE, DARKNESS_DURATION));
-        yield return new WaitForSeconds(item_darkness.useTime);
-        yield return StartCoroutine(InEffect_Darkness("remove", AMBIENT_COLORS[1], VISION_MULTIPLIER_INCREASE, DARKNESS_DURATION));
+        Timing.RunCoroutine(InEffect_Darkness("add", AMBIENT_COLORS[0], -VISION_MULTIPLIER_INCREASE, DARKNESS_DURATION));
+        yield return Timing.WaitForSeconds(item_darkness.useTime);
+        Timing.RunCoroutine(InEffect_Darkness("remove", AMBIENT_COLORS[1], VISION_MULTIPLIER_INCREASE, DARKNESS_DURATION));
     }
 
-    private IEnumerator InEffect_Darkness(string listMode, Color changeColor, float increase, float duration)
+    private IEnumerator<float> InEffect_Darkness(string listMode, Color changeColor, float increase, float duration)
     {
         List<string> _ghost_listAlive = IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive");
         foreach (string ghostName in _ghost_listAlive)
@@ -568,7 +613,7 @@ public class PacmanMazeController : MonoBehaviour
             IngameDataManager.SaveSpecificData("ghost_data.vision_multiplier", _ghost_visionMultiplier);
 
             elapsedTime += Time.deltaTime;
-            yield return null;
+            yield return 0f;
         }
 
         _ghost_visionMultiplier = targetValue;
@@ -577,12 +622,12 @@ public class PacmanMazeController : MonoBehaviour
 
     // ================= Invert Control ===================== //
 
-    private IEnumerator OnUse_InvertControl()
+    private IEnumerator<float> OnUse_InvertControl()
     {
         var item_invertControl = effectItemList.effectItems.Find(item => item.name == "invert_control");
 
         InEffect_InvertControl("add", true);
-        yield return new WaitForSeconds(item_invertControl.useTime);
+        yield return Timing.WaitForSeconds(item_invertControl.useTime);
         InEffect_InvertControl("remove", false);
     }
 
@@ -593,26 +638,22 @@ public class PacmanMazeController : MonoBehaviour
         {
             InOutAffectedItems(listMode, "invert_control", "ghost", ghostName);
         }
-        
-        bool _ghost_isControlInverted = IngameDataManager.LoadSpecificData<bool>("ghost_data.is_control_inverted");
-        _ghost_isControlInverted = isInvert;
 
-        IngameDataManager.SaveSpecificData("ghost_data.is_control_inverted", _ghost_isControlInverted);
+        IngameDataManager.SaveSpecificData("ghost_data.is_control_inverted", isInvert);
     }
+
+    // ============== For Display Effects =================== //
 
     private void InOutAffectedItems(string listMode, string effectItemName, string character, string ghostName = null)
     {
-        List<string> _affectedItems = new List<string>();
-        
-        if (character == "pacman") 
-            _affectedItems = IngameDataManager.LoadSpecificData<List<string>>("pacman_data.affected_items");
-        else if (character == "ghost" && ghostName != null) 
-            _affectedItems = IngameDataManager.LoadSpecificListData<List<string>>("ghost_data.ghost_single_info", ghostName, "affected_items");
+        List<string> _affectedItems = (character == "pacman") 
+            ? IngameDataManager.LoadSpecificData<List<string>>("pacman_data.affected_items") 
+            : IngameDataManager.LoadSpecificListData<List<string>>("ghost_data.ghost_single_info", ghostName, "affected_items");
 
         if (listMode == "add")
         {
             _affectedItems.Add(effectItemName);
-            EffectItem effectItem = effectItemList.effectItems.Find(item => item.name == effectItemName);
+            var effectItem = effectItemList.effectItems.Find(item => item.name == effectItemName);
             particleEffectMazeHandler.SpawnStartParticle(startParticlePrefab, 
                                                         effectItem.startParticleSprite, 
                                                         effectItem.inEffect.id, 
@@ -623,19 +664,28 @@ public class PacmanMazeController : MonoBehaviour
             _affectedItems.Remove(effectItemName);
         }
 
-        if (character == "pacman") 
+        if (character == "pacman")
+        {
             IngameDataManager.SaveSpecificData("pacman_data.affected_items", _affectedItems);
-        else if (character == "ghost" && ghostName != null) 
+        }
+        else if (character == "ghost" && ghostName != null)
+        {
             IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "affected_items", _affectedItems);
+        }
     }
 
-    private void UpdateTextDisplay()
+    private IEnumerator<float> UpdateTextDisplay()
     {
-        int _pacman_points = IngameDataManager.LoadSpecificData<int>("pacman_data.points"); 
-        pointsText.text = _pacman_points.ToString("00,000,000");
+        while (true)
+        {
+            int _pacman_points = IngameDataManager.LoadSpecificData<int>("pacman_data.points"); 
+            pointsText.text = _pacman_points.ToString("00,000,000");
 
-        float remainCd_effectItem = Mathf.Max(0f, cd_effectItem - (Time.time - lastCd_effectItem));
-        cdImage_effectItem.enabled = remainCd_effectItem > 0f ? true : false;
-        cdText_effectItem.text = remainCd_effectItem > 0 ? $"{remainCd_effectItem:F1}s" : "";
+            float remainCd_effectItem = Mathf.Max(0f, cd_effectItem - (Time.time - lastCd_effectItem));
+            cdImage_effectItem.enabled = remainCd_effectItem > 0f ? true : false;
+            cdText_effectItem.text = remainCd_effectItem > 0 ? $"{remainCd_effectItem:F1}s" : "";
+
+            yield return Timing.WaitForSeconds(0.1f);
+        }
     }
 }

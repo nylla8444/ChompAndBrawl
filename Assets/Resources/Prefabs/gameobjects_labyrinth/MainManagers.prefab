@@ -24,13 +24,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1294427085996181868}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5836503641691937511}
   - {fileID: 943491825453531851}
+  - {fileID: 5653812591488876042}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3210136629520777301
@@ -78,6 +79,64 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioList: {fileID: 11400000, guid: d4956dfff98d330489e6e3b2049b5c27, type: 2}
+--- !u!1 &4026808588628241388
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5653812591488876042}
+  - component: {fileID: 8749336530889034848}
+  - component: {fileID: 1130907593576831279}
+  m_Layer: 0
+  m_Name: TransitionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5653812591488876042
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4026808588628241388}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5267630221024306574}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8749336530889034848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4026808588628241388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1faeb817146e0147bea4963ebe81c6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transitions: {fileID: 11400000, guid: 7f2c5055e3d839941ae89ac9241a1b87, type: 2}
+--- !u!114 &1130907593576831279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4026808588628241388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1d6a23dd9c701040949c1c679162c7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4630326828428505594
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,8 +184,10 @@ MonoBehaviour:
   defaultIngameData: {fileID: 11400000, guid: fa3005a3129be5d42ab07d7843232c41, type: 2}
   defaultPlayerData: {fileID: 11400000, guid: c4ba7b4a78539fd41bd2b9732179c7cb, type: 2}
   defaultInputKeybind: {fileID: 11400000, guid: 71e20637733cb534bb8bf5a0eacc2ebb, type: 2}
+  defaultLeaderboardData: {fileID: 0}
   menuPanel: {fileID: 0}
   dialoguePanel: {fileID: 0}
   transitionScreen: {fileID: 0}
   directResetButton: {fileID: 0}
+  directTrueResetButton: {fileID: 0}
   directQuitButton: {fileID: 0}

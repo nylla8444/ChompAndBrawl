@@ -7,8 +7,8 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioList audioList;
     private Dictionary<string, AudioSource> activeAudioSources = new Dictionary<string, AudioSource>();
 
-    private float musicVolume = 1.0f;
-    private float sfxVolume = 1.0f;
+    private float musicVolume = 0.5f;
+    private float sfxVolume = 0.5f;
 
     public float MusicVolume
     {
@@ -17,6 +17,10 @@ public class AudioManager : MonoBehaviour
         {
             musicVolume = Mathf.Clamp01(value);
             UpdateVolume("music");
+
+            PlayerData playerData = PlayerDataManager.LoadData();
+            playerData.audio.music_volume = musicVolume;
+            PlayerDataManager.SaveData(playerData);
         }
     }
 
@@ -27,6 +31,10 @@ public class AudioManager : MonoBehaviour
         {
             sfxVolume = Mathf.Clamp01(value);
             UpdateVolume("sfx");
+
+            PlayerData playerData = PlayerDataManager.LoadData();
+            playerData.audio.sfx_volume = sfxVolume;
+            PlayerDataManager.SaveData(playerData);
         }
     }
 

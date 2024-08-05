@@ -5,13 +5,16 @@ using UnityEngine;
 
 public class TransitionHandler : MonoBehaviour
 {
+    [SerializeField] private GameObject transitionScreen;
     private Animator transitionAnimator;
+    
     private void Start()
     {
         // Get the transition data
         string transitionId = TransitionData.transitionId;
         string endTransitionName = TransitionData.endTransitionName;
         
+        transitionScreen.SetActive(true);
         try
         {
             transitionAnimator = GameObject.Find(transitionId).GetComponent<Animator>();
@@ -29,6 +32,7 @@ public class TransitionHandler : MonoBehaviour
         if (_transitionAnimator != null && !string.IsNullOrEmpty(_endTransitionName))
         {
             _transitionAnimator.SetTrigger(_endTransitionName);
+            transitionScreen.SetActive(false);
         }
     }
 }

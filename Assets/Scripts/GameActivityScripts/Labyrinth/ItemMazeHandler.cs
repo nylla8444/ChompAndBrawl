@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using MEC;
 
 public class ItemMazeHandler : MonoBehaviour
 {
@@ -49,9 +50,6 @@ public class ItemMazeHandler : MonoBehaviour
     private Dictionary<GameObject, EffectItem> effectItemDictionary = new Dictionary<GameObject, EffectItem>();
     
     private Vector2 lastPacmanPosition;
-    private Coroutine fruitSpawnCoroutine;
-    private Coroutine effectItemSpawnCoroutine;
-
     private const float TILE_SIZE = 0.16f;
     private const float TILE_OFFSET = 0.08f;
     private const int MAX_COUNT_POWER_PELLETS = 2;
@@ -65,16 +63,24 @@ public class ItemMazeHandler : MonoBehaviour
 
     private void Start()
     {
-        isMazeStarted = true;   // remove after test
-        InitializeItems();
-        StartCoroutine(CheckCollection());
+        InitializePacdots();
     }
 
-    private IEnumerator CheckCollection()
+    public void StartItemController(bool triggerValue)
+    {
+        isMazeStarted = triggerValue;
+        if (isMazeStarted)
+        {
+            InitializeItems();
+            Timing.RunCoroutine(CheckCollection());
+        }
+    }
+
+    private IEnumerator<float> CheckCollection()
     {
         while (true)
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return Timing.WaitForSeconds(0.1f);
             if (isMazeStarted && !IngameDataManager.LoadSpecificData<bool>("pacman_data.is_immune_to_ghost"))
             {
                 Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
@@ -90,32 +96,31 @@ public class ItemMazeHandler : MonoBehaviour
         }
     }
 
-    public void StartItemController(bool triggerValue)
-    {
-        isMazeStarted = triggerValue;
-    }
-
-    private void InitializeItems()
+    private void InitializePacdots()
     {
         List<Vector2> _item_pacdotPositions = IngameDataManager.LoadSpecificData<List<Vector2>>("item_data.pacdot_positions");
         bool _pacman_hasWonAtFight = IngameDataManager.LoadSpecificData<bool>("pacman_data.has_won_at_fight");
 
-        if (_item_pacdotPositions == null || _item_pacdotPositions.Count == 0)
+        if (_pacman_hasWonAtFight)
         {
-            SpawnAllPacdots();
+            SpawnAllPacdots(_item_pacdotPositions);
         }
-        else if (_pacman_hasWonAtFight)
+        else if ((!_pacman_hasWonAtFight) && (_item_pacdotPositions == null || _item_pacdotPositions.Count == 0))
         {
-            SpawnAllPacdots();
+            SpawnAllPacdots(_item_pacdotPositions);
         }
         else
         {
-            SpawnSavedPacdots();
+            SpawnSavedPacdots(_item_pacdotPositions);
         }
+        IngameDataManager.SaveSpecificData("pacman_data.has_won_at_fight", false);
+    }
 
+    private void InitializeItems()
+    {
         SpawnAllPowerPellets();
-        StartSpawnFruits();
-        StartSpawnEffectItems();
+        Timing.RunCoroutine(SpawnFruits());
+        Timing.RunCoroutine(SpawnEffectItems());
     }
 
     private void IncreasePoints(int points)
@@ -131,34 +136,42 @@ public class ItemMazeHandler : MonoBehaviour
     //
     /*********************************************************************/
 
-    private void SpawnAllPacdots()
+    private void SpawnAllPacdots(List<Vector2> _item_pacdotPositions)
     {
-        List<Vector2> _item_pacdotPositions = IngameDataManager.LoadSpecificData<List<Vector2>>("item_data.pacdot_positions");
         _item_pacdotPositions.Clear();
+        pacdotsOnPath.Clear();
 
         BoundsInt bounds = pathTilemap.cellBounds;
+        Vector3 tilemapPosition = pathTilemap.transform.position;
+        Vector3 tileOffset = new Vector3(TILE_OFFSET, TILE_OFFSET, 0);
+
+        List<Vector3> positions = new List<Vector3>();
+        
         for (int x = bounds.xMin; x < bounds.xMax; x++)
         {
             for (int y = bounds.yMin; y < bounds.yMax; y++)
             {
-                Vector3Int localTile = new Vector3Int(x, y, (int)pathTilemap.transform.position.z);
+                Vector3Int localTile = new Vector3Int(x, y, (int)tilemapPosition.z);
                 if (pathTilemap.HasTile(localTile))
                 {
-                    Vector3 worldPosition = pathTilemap.CellToWorld(localTile) + new Vector3(TILE_OFFSET, TILE_OFFSET, 0);
-                    GameObject pacdot = Instantiate(pacdotPrefab, worldPosition, Quaternion.identity);
-                    pacdotsOnPath.Add(pacdot);
-
-                    _item_pacdotPositions.Add(worldPosition);   
+                    Vector3 worldPosition = pathTilemap.CellToWorld(localTile) + tileOffset;
+                    positions.Add(worldPosition);
                 }
             }
+        }
+
+        foreach (var position in positions)
+        {
+            GameObject pacdot = Instantiate(pacdotPrefab, position, Quaternion.identity);
+            pacdotsOnPath.Add(pacdot);
+            _item_pacdotPositions.Add(position);
         }
         
         IngameDataManager.SaveSpecificData("item_data.pacdot_positions", _item_pacdotPositions);
     }
 
-    private void SpawnSavedPacdots()
+    private void SpawnSavedPacdots(List<Vector2> _item_pacdotPositions)
     {
-        List<Vector2> _item_pacdotPositions = IngameDataManager.LoadSpecificData<List<Vector2>>("item_data.pacdot_positions");
         foreach (Vector2 pos in _item_pacdotPositions)
         {
             GameObject pacdot = Instantiate(pacdotPrefab, pos, Quaternion.identity);
@@ -232,17 +245,23 @@ public class ItemMazeHandler : MonoBehaviour
         RemoveAllPowerPellets();
 
         BoundsInt bounds = pathTilemap.cellBounds;
+        Vector3 tilemapPosition = pathTilemap.transform.position;
+        Vector3 tileOffset = new Vector3(TILE_OFFSET, TILE_OFFSET, 0);
+        float minDistanceFromOrigin = MIN_DISTANCE_POWER_PELLETS_FROM_ORIGIN * TILE_SIZE + TILE_OFFSET;
+        float minDistanceBetweenPellets = MIN_DISTANCE_BETWEEN_POWER_PELLETS * TILE_SIZE + TILE_OFFSET;
+        Vector3 zeroVector = Vector3.zero;
+
         List<Vector3> possiblePositions = new List<Vector3>();
 
         for (int x = bounds.xMin; x < bounds.xMax; x++)
         {
             for (int y = bounds.yMin; y < bounds.yMax; y++)
             {
-                Vector3Int localTile = new Vector3Int(x, y, (int)pathTilemap.transform.position.z);
+                Vector3Int localTile = new Vector3Int(x, y, (int)tilemapPosition.z);
                 if (pathTilemap.HasTile(localTile))
                 {
-                    Vector3 worldPosition = pathTilemap.CellToWorld(localTile) + new Vector3(TILE_OFFSET, TILE_OFFSET, 0);
-                    if (Vector3.Distance(Vector3.zero, worldPosition) > MIN_DISTANCE_POWER_PELLETS_FROM_ORIGIN * TILE_SIZE + TILE_OFFSET)
+                    Vector3 worldPosition = pathTilemap.CellToWorld(localTile) + tileOffset;
+                    if (Vector3.Distance(zeroVector, worldPosition) > minDistanceFromOrigin)
                     {
                         possiblePositions.Add(worldPosition);
                     }
@@ -250,15 +269,17 @@ public class ItemMazeHandler : MonoBehaviour
             }
         }
 
-        while (powerPelletsOnPath.Count < MAX_COUNT_POWER_PELLETS && possiblePositions.Count > 0)
+        int maxCount = Mathf.Min(MAX_COUNT_POWER_PELLETS, possiblePositions.Count);
+        while (powerPelletsOnPath.Count < maxCount)
         {
-            Vector3 position = possiblePositions[Random.Range(0, possiblePositions.Count)];
-            possiblePositions.Remove(position);
+            int randomIndex = Random.Range(0, possiblePositions.Count);
+            Vector3 position = possiblePositions[randomIndex];
+            possiblePositions.RemoveAt(randomIndex);
 
             bool validPosition = true;
             foreach (GameObject powerPellet in powerPelletsOnPath)
             {
-                if (Vector3.Distance(powerPellet.transform.position, position) < MIN_DISTANCE_BETWEEN_POWER_PELLETS * TILE_SIZE + TILE_OFFSET)
+                if (Vector3.Distance(powerPellet.transform.position, position) < minDistanceBetweenPellets)
                 {
                     validPosition = false;
                     break;
@@ -365,16 +386,11 @@ public class ItemMazeHandler : MonoBehaviour
     //
     /*********************************************************************/
 
-    private void StartSpawnFruits()
-    {
-        fruitSpawnCoroutine = StartCoroutine(SpawnFruitsCoroutine());
-    }
-
-    private IEnumerator SpawnFruitsCoroutine()
+    private IEnumerator<float> SpawnFruits()
     {
         while (true)
         {
-            yield return new WaitForSeconds(fruitSpawnInterval);
+            yield return Timing.WaitForSeconds(fruitSpawnInterval);
             if (fruitsOnPath.Count < MAX_COUNT_FRUITS && isMazeStarted)
             {
                 SpawnFruit();
@@ -485,16 +501,11 @@ public class ItemMazeHandler : MonoBehaviour
     //
     /*********************************************************************/
 
-    private void StartSpawnEffectItems()
-    {
-        effectItemSpawnCoroutine = StartCoroutine(SpawnEffectItemsCoroutine());
-    }
-
-    private IEnumerator SpawnEffectItemsCoroutine()
+    private IEnumerator<float> SpawnEffectItems()
     {
         while (true)
         {
-            yield return new WaitForSeconds(effectItemSpawnInterval);
+            yield return Timing.WaitForSeconds(effectItemSpawnInterval);
             if (effectItemsOnPath.Count < MAX_COUNT_EFFECT_ITEMS && isMazeStarted)
             {
                 SpawnEffectItem();

@@ -37,13 +37,11 @@ public class AudioSettingsManager : MonoBehaviour
 
     private void UpdateVolumeUi()
     {
-        PlayerData playerData = PlayerDataManager.LoadData();
-        
-        float musicVolume = playerData.audio.music_volume;
+        float musicVolume = audioManager.MusicVolume;
         musicSlider.value = musicVolume;
         UpdateMusicIcon(musicVolume);
 
-        float sfxVolume = playerData.audio.sfx_volume;
+        float sfxVolume = audioManager.SfxVolume;
         sfxSlider.value = sfxVolume;
         UpdateSfxIcon(sfxVolume);
     }
@@ -60,51 +58,31 @@ public class AudioSettingsManager : MonoBehaviour
 
     public void ToggleMusicMute()
     {
-        PlayerData playerData = PlayerDataManager.LoadData();
-        
-        float newVolume = (playerData.audio.music_volume > 0f) ? 0f : 0.5f;
-        playerData.audio.music_volume = newVolume;
+        float newVolume = (audioManager.MusicVolume > 0f) ? 0f : 0.5f;
+        audioManager.MusicVolume = newVolume;
         musicSlider.value = newVolume;
         UpdateMusicIcon(newVolume);
-        audioManager.MusicVolume = newVolume;
-        
-        PlayerDataManager.SaveData(playerData);
     }
 
     public void ToggleSfxMute()
     {
-        PlayerData playerData = PlayerDataManager.LoadData();
-        
-        float newVolume = (playerData.audio.sfx_volume > 0f) ? 0f : 0.5f;
-        playerData.audio.sfx_volume = newVolume;
+        float newVolume = (audioManager.SfxVolume > 0f) ? 0f : 0.5f;
+        audioManager.SfxVolume = newVolume;
         sfxSlider.value = newVolume;
         UpdateSfxIcon(newVolume);
-        audioManager.SfxVolume = newVolume;
-        
-        PlayerDataManager.SaveData(playerData);
     }
 
     public void OnMusicSliderChanged()
     {
-        PlayerData playerData = PlayerDataManager.LoadData();
-        
         float volume = musicSlider.value;
-        playerData.audio.music_volume = volume;
-        UpdateMusicIcon(volume);
         audioManager.MusicVolume = volume;
-        
-        PlayerDataManager.SaveData(playerData);
+        UpdateMusicIcon(volume);
     }
 
     public void OnSfxSliderChanged()
     {
-        PlayerData playerData = PlayerDataManager.LoadData();
-        
         float volume = sfxSlider.value;
-        playerData.audio.sfx_volume = volume;
-        UpdateSfxIcon(volume);
         audioManager.SfxVolume = volume;
-        
-        PlayerDataManager.SaveData(playerData);
+        UpdateSfxIcon(volume);
     }
 }

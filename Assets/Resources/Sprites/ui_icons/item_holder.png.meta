@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ae297c765b4b03444b26f48475c242ed
+guid: 8a75da48cf8097146b11f3f09c097b2e
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -110,7 +110,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: beta_tileset_0
+      name: item_holder
       rect:
         serializedVersion: 2
         x: 0
@@ -124,14 +124,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1f7d93fc535f2e84a9ef9649d520357f
-      internalID: 671886231
+      spriteID: 4d23e7b51f7d9e843a12679ca0d96c2a
+      internalID: 912257376
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: beta_tileset_1
+      name: cooldown_holder
       rect:
         serializedVersion: 2
         x: 16
@@ -145,71 +145,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 91dc0c72f5257b8418f595d7de1b2bfd
-      internalID: -1912657574
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: beta_tileset_2
-      rect:
-        serializedVersion: 2
-        x: 32
-        y: 0
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 968870f52d929c34ba1f314154ebf81e
-      internalID: 1175057397
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: beta_tileset_3
-      rect:
-        serializedVersion: 2
-        x: 48
-        y: 0
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ea46ec803cbc18c49b9344e6cc758d4e
-      internalID: 43117252
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: beta_tileset_4
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 0
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d7108d8d6cc7ae94ebbf3aa0cd5933bc
-      internalID: 1312312469
+      spriteID: 4135340bb4421744e925d578da6ef96e
+      internalID: 2039426132
       vertices: []
       indices: 
       edges: []
@@ -225,11 +162,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      beta_tileset_0: 671886231
-      beta_tileset_1: -1912657574
-      beta_tileset_2: 1175057397
-      beta_tileset_3: 43117252
-      beta_tileset_4: 1312312469
+      cooldown_holder: 2039426132
+      item_holder: 912257376
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
