@@ -18,6 +18,7 @@ MonoBehaviour:
   - game_preparation_scene
   - leaderboard_scene
   - settings_scene
+  - aftergame_scene
   sceneFields:
   - sceneAsset: {fileID: 102900000, guid: 2cda990e2423bbf4892e6590ba056729, type: 3}
     sceneName: MainMenuScene
@@ -29,3 +30,5 @@ MonoBehaviour:
     sceneName: LeaderboardScene
   - sceneAsset: {fileID: 102900000, guid: 0ca7a5402c9b3354c98c3e423c6f879c, type: 3}
     sceneName: SettingsScene
+  - sceneAsset: {fileID: 102900000, guid: b0451e17daea88b43b700b03c356aa50, type: 3}
+    sceneName: AftergameScene

@@ -12145,7 +12145,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4048873995769217341, guid: c10b094807d61a943928fed5c99bdbf2, type: 3}
       propertyPath: m_Name
-      value: InterfacePanel
+      value: InterfaceMazePanel
       objectReference: {fileID: 0}
     - target: {fileID: 6155825544197248175, guid: c10b094807d61a943928fed5c99bdbf2, type: 3}
       propertyPath: m_Color.b
@@ -109567,7 +109567,7 @@ GameObject:
   - component: {fileID: 1846922138}
   - component: {fileID: 1846922139}
   m_Layer: 0
-  m_Name: Overview
+  m_Name: Map Overview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

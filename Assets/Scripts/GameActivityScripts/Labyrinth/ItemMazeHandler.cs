@@ -72,15 +72,15 @@ public class ItemMazeHandler : MonoBehaviour
         if (isMazeStarted)
         {
             InitializeItems();
-            Timing.RunCoroutine(CheckCollection());
+            StartCoroutine(CheckCollection());
         }
     }
 
-    private IEnumerator<float> CheckCollection()
+    private IEnumerator CheckCollection()
     {
         while (true)
         {
-            yield return Timing.WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.1f);
             if (isMazeStarted && !IngameDataManager.LoadSpecificData<bool>("pacman_data.is_immune_to_ghost"))
             {
                 Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
