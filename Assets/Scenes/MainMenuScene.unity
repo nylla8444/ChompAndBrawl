@@ -422,7 +422,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: LSHIFT
+  m_Text: L.SHIFT
 --- !u!222 &137488163
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -673,7 +673,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: db5b24b9293a8ba47a1223b423dbdd70, type: 3}
-    m_FontSize: 18
+    m_FontSize: 20
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -1217,6 +1217,7 @@ MonoBehaviour:
     highlightType: 1
     highlightColor: {r: 1, g: 0.7418387, b: 0, a: 1}
     highlightBackgroundSprite: {fileID: 0}
+  audioManager: {fileID: 325382357}
 --- !u!1 &746655100
 GameObject:
   m_ObjectHideFlags: 0
@@ -1557,7 +1558,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: db5b24b9293a8ba47a1223b423dbdd70, type: 3}
-    m_FontSize: 18
+    m_FontSize: 20
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -1819,10 +1820,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startButton: {fileID: 1601333923}
-  leaderboardButton: {fileID: 0}
-  settingsButton: {fileID: 0}
+  leaderboardButton: {fileID: 54665082}
+  settingsButton: {fileID: 756872500}
   mainSceneIds: {fileID: 11400000, guid: a213d55d707e5ea46b95a9e1ba0f4c94, type: 2}
-  mazeMapList: {fileID: 0}
+  ingameMapSceneIds: {fileID: 0}
+  ingameMapList: {fileID: 0}
+  audioManager: {fileID: 325382357}
   prevMapButton: {fileID: 0}
   nextMapButton: {fileID: 0}
   backMapButton: {fileID: 0}
@@ -1839,6 +1842,18 @@ MonoBehaviour:
   ghostPrepMessages: []
   preparingMessageObj: {fileID: 0}
   loadingScreen: {fileID: 0}
+  loadingFloaterObject: {fileID: 0}
+  loadingAnchors: []
+  loadMapDisplay: {fileID: 0}
+  loadMapTitleText: {fileID: 0}
+  rowBoardPrefab: {fileID: 0}
+  rowAnchor: {fileID: 0}
+  backLeadButton: {fileID: 0}
+  musicVolumeButtons: []
+  sfxVolumeButtons: []
+  musicVolumeBars: []
+  sfxVolumeBars: []
+  backSettingsButton: {fileID: 0}
 --- !u!1 &1331551465
 GameObject:
   m_ObjectHideFlags: 0
@@ -2186,9 +2201,9 @@ MonoBehaviour:
   defaultIngameData: {fileID: 0}
   defaultPlayerData: {fileID: 11400000, guid: c4ba7b4a78539fd41bd2b9732179c7cb, type: 2}
   defaultInputKeybind: {fileID: 11400000, guid: 71e20637733cb534bb8bf5a0eacc2ebb, type: 2}
+  defaultLeaderboardData: {fileID: 0}
   menuPanel: {fileID: 0}
   dialoguePanel: {fileID: 0}
-  transitionScreen: {fileID: 0}
   directResetButton: {fileID: 0}
   directTrueResetButton: {fileID: 0}
   directQuitButton: {fileID: 746655102}
@@ -2326,7 +2341,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: db5b24b9293a8ba47a1223b423dbdd70, type: 3}
-    m_FontSize: 18
+    m_FontSize: 20
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0

@@ -49,7 +49,7 @@ public static class PlayerDataManager
                 binaryFormatter.Serialize(fileStream, jsonData);
             }
 
-            Debug.Log("Data saved successfully. " + jsonData);
+            // Debug.Log("Data saved successfully. " + jsonData);
         }
         catch (Exception ex)
         {

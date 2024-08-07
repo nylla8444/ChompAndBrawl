@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using MEC;
 
 public class GhostMazeController : MonoBehaviour
 {
@@ -106,6 +107,7 @@ public class GhostMazeController : MonoBehaviour
         { "blinky", 0f }, { "clyde", 0f }, { "inky", 0f }, { "pinky", 0f }
     };
     
+    private List<string> ghostNames = new List<string> { "blinky", "clyde", "inky", "pinky" };
     private const float FEIGNING_IGNORANCE_DISTANCE = 8f;
     private const float WHIMSICAL_DISTANCE = 2f;
     private const float AMBUSHER_DISTANCE = 4f;
@@ -125,7 +127,6 @@ public class GhostMazeController : MonoBehaviour
     private void Start()
     {
         InitializeGhosts();
-        RegisterKeyActions();
     }
 
     private void OnDestroy()
@@ -136,6 +137,14 @@ public class GhostMazeController : MonoBehaviour
     public void StartGhostController(bool triggerValue)
     {
         isMazeStarted = triggerValue;
+        if (isMazeStarted) 
+        {
+            RegisterKeyActions();
+            foreach (string ghostName in aliveGhosts)
+            {
+                StartCoroutine(MoveGhostCoroutine(ghostName));
+            }
+        }
     }
 
     private void RegisterKeyActions()
@@ -164,12 +173,6 @@ public class GhostMazeController : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        UpdateTextDisplay();
-        UpdateSpeed();
-    }
-
     private void InitializeGhosts()
     {
         var ghostData = new Dictionary<string, (GameObject ghost, Transform spawnPoint, Animator animator)>
@@ -181,14 +184,13 @@ public class GhostMazeController : MonoBehaviour
         };
         
         aliveGhosts = IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive");
-        lastControllingGhost = IngameDataManager.LoadSpecificData<string>("ghost_data.current_controlling");
+        lastControllingGhost = aliveGhosts[0];
         
         int currentGhostIndex = (aliveGhosts.IndexOf(lastControllingGhost)) % aliveGhosts.Count;
         InEffect_ChangeGhost(lastControllingGhost, currentGhostIndex);
 
         foreach (string ghostName in aliveGhosts)
         {
-            StartCoroutine(MoveGhostCoroutine(ghostName));
             if (!ghostData.TryGetValue(ghostName, out var ghostInfo))
             {
                 Debug.LogWarning($"No game object found for {ghostName}");
@@ -197,41 +199,80 @@ public class GhostMazeController : MonoBehaviour
 
             (GameObject _ghost, Transform _spawnPoint, Animator _animator) = ghostInfo;
             
-            Vector2 _coordinate = IngameDataManager.LoadSpecificListData<Vector2>("ghost_data.ghost_single_info", ghostName, "coordinate");
-            _ghost.transform.position = (_coordinate != Vector2.zero) ? _coordinate : _spawnPoint.position;
+            _ghost.transform.position = _spawnPoint.position;
+            UpdateGhostPosition(ghostName, _spawnPoint.position);
             _animator?.SetTrigger($"{_ghost.name}.rest");
         }
 
         UpdateGhostDisplay();
+        SetToNormalData();
+
+        Timing.RunCoroutine(UpdateTextDisplay());
+        Timing.RunCoroutine(UpdateSavedSpeed());
     }
 
     private void UpdateGhostDisplay()
     {
-        List<string> ghostNames = new List<string> { "blinky", "clyde", "inky", "pinky" };
         for (int i = 0; i < ghostNames.Count; i++)
         {
             ghostImages[i].sprite = (aliveGhosts.Contains(ghostNames[i])) ? ghostFullSprites[i] : ghostEmptySprites[i];
         }
     }
 
-    private void UpdateSpeed()
+    private void SetToNormalData()
     {
-        List<string> ghostNames = new List<string> { "blinky", "clyde", "inky", "pinky" };
-
+        IngameDataManager.SaveSpecificData("ghost_data.current_fighting", "");
+        IngameDataManager.SaveSpecificData("ghost_data.vision_multiplier", 1.0f);
+        IngameDataManager.SaveSpecificData("ghost_data.is_control_inverted", false);
         foreach (string ghostName in ghostNames)
         {
-            float speedMultiplier = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", ghostName, "speed_multiplier");
-            float windBurstSpeedAffect = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", ghostName, "wind_burst_speed_affect");
+            IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "speed_multiplier", 1.0f);
+            IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "wind_burst_speed_affect", 1.0f);
+            IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "is_paralyzed", false);
 
-            if (ghost_speedMultiplier[ghostName] != speedMultiplier)
+            List<string> _affectedItems = IngameDataManager.LoadSpecificListData<List<string>>("ghost_data.ghost_single_info", ghostName, "affected_items");
+            _affectedItems.Clear();
+            IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "affected_items", _affectedItems);
+        }
+
+        int diedGhostCount = 4 - aliveGhosts.Count;
+        const float INCREASE_DEFAULT_SPEED = 0.075f; 
+    
+        blinkyDefaultSpeed = blinkyDefaultSpeed + (blinkyDefaultSpeed * (INCREASE_DEFAULT_SPEED * diedGhostCount));
+        clydeDefaultSpeed = clydeDefaultSpeed + (clydeDefaultSpeed * (INCREASE_DEFAULT_SPEED * diedGhostCount));
+        inkyDefaultSpeed = inkyDefaultSpeed + (inkyDefaultSpeed * (INCREASE_DEFAULT_SPEED * diedGhostCount));
+        pinkyDefaultSpeed = pinkyDefaultSpeed + (pinkyDefaultSpeed * (INCREASE_DEFAULT_SPEED * diedGhostCount));
+    }
+
+    public void SetSlowSpeed()
+    {
+        foreach (string ghostName in ghostNames)
+        {
+            IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "speed_multiplier", 0.02f);
+        }
+    }
+
+    private IEnumerator<float> UpdateSavedSpeed()
+    {
+        while (true)
+        {
+            foreach (string ghostName in ghostNames)
             {
-                ghost_speedMultiplier[ghostName] = speedMultiplier;
+                float speedMultiplier = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", ghostName, "speed_multiplier");
+                float windBurstSpeedAffect = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", ghostName, "wind_burst_speed_affect");
+
+                if (ghost_speedMultiplier[ghostName] != speedMultiplier)
+                {
+                    ghost_speedMultiplier[ghostName] = speedMultiplier;
+                }
+
+                if (ghost_windBurstSpeedAffect[ghostName] != windBurstSpeedAffect)
+                {
+                    ghost_windBurstSpeedAffect[ghostName] = windBurstSpeedAffect;
+                }
             }
 
-            if (ghost_windBurstSpeedAffect[ghostName] != windBurstSpeedAffect)
-            {
-                ghost_windBurstSpeedAffect[ghostName] = windBurstSpeedAffect;
-            }
+            yield return Timing.WaitForSeconds(0.1f);
         }
     }
 
@@ -276,6 +317,7 @@ public class GhostMazeController : MonoBehaviour
             else
             {
                 onCtrl_isRunning = false;
+                yield break;
             }
 
             yield return new WaitForFixedUpdate();
@@ -377,6 +419,7 @@ public class GhostMazeController : MonoBehaviour
             return;
         }
 
+        Timing.KillCoroutines($"{lastControllingGhost}");
         int currentGhostIndex = aliveGhosts.IndexOf(lastControllingGhost);
         int nextGhostIndex = (currentGhostIndex + 1) % aliveGhosts.Count;
         string nextGhostName = aliveGhosts[nextGhostIndex];
@@ -419,9 +462,15 @@ public class GhostMazeController : MonoBehaviour
         }
 
         lastControllingGhost = ghostName;
+
         UpdateEffectItemDisplay(ghostName);
         UpdateGhostOnControlIcon(ghostName);
         UpdateChangeGhostIcon(nextGhostIndex);
+    }
+
+    public void DirectChangeGhost(string ghostName)
+    {
+        IngameDataManager.SaveSpecificData("ghost_data.current_controlling", ghostName);
     }
 
     private void UpdateGhostOnControlIcon(string ghostName)
@@ -473,21 +522,22 @@ public class GhostMazeController : MonoBehaviour
         }
         
         lastCd_boost = Time.time;
+        string recentGhostControlling = onCtrl_ghost.name;
         float SPEED_MULTIPLIER_INCREASE = 0.8f;
         
-        InEffect_Boost("add", SPEED_MULTIPLIER_INCREASE);
+        InEffect_Boost("add", recentGhostControlling, SPEED_MULTIPLIER_INCREASE);
         yield return new WaitForSeconds(item_boost.useTime);
-        InEffect_Boost("remove", -SPEED_MULTIPLIER_INCREASE);
+        InEffect_Boost("remove", recentGhostControlling, -SPEED_MULTIPLIER_INCREASE);
     }
 
-    private void InEffect_Boost(string listMode, float increase)
+    private void InEffect_Boost(string listMode, string ghostName, float increase)
     {
-        InOutAffectedItems(listMode, "boost", "ghost", onCtrl_ghost.name);
+        InOutAffectedItems(listMode, "boost", "ghost", ghostName);
         
-        float _speedMultiplier = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", onCtrl_ghost.name, "speed_multiplier");
+        float _speedMultiplier = IngameDataManager.LoadSpecificListData<float>("ghost_data.ghost_single_info", ghostName, "speed_multiplier");
         _speedMultiplier += increase;
 
-        IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", onCtrl_ghost.name, "speed_multiplier", _speedMultiplier);
+        IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "speed_multiplier", _speedMultiplier);
     }
 
     private void UpdateEffectItemDisplay(string ghostName)
@@ -527,7 +577,7 @@ public class GhostMazeController : MonoBehaviour
             return;
         }
 
-        var actions = new Dictionary<string, System.Func<IEnumerator>>
+        var actions = new Dictionary<string, System.Func<IEnumerator<float>>>
         {
             { "imitate_speed", OnUse_ImitateSpeed },
             { "electroshock", OnUse_Electroshock },
@@ -537,7 +587,7 @@ public class GhostMazeController : MonoBehaviour
 
         if (actions.TryGetValue(_ownedEffectItem, out var method))
         {
-            StartCoroutine(method());
+            Timing.RunCoroutine(method());
         }
 
         switch (_ownedEffectItem)
@@ -562,7 +612,7 @@ public class GhostMazeController : MonoBehaviour
 
     // ================== Imitate Speed ===================== //
 
-    private IEnumerator OnUse_ImitateSpeed()
+    private IEnumerator<float> OnUse_ImitateSpeed()
     {
         var item_imitateSpeed = effectItemList.effectItems.Find(item => item.name == "imitate_speed");
         List<float> prevDefaultSpeeds = new List<float>
@@ -572,7 +622,7 @@ public class GhostMazeController : MonoBehaviour
         const float PACMAN_DEFAULT_SPEED = 0.6f;
 
         InEffect_ImitateSpeed("add", true, PACMAN_DEFAULT_SPEED);
-        yield return new WaitForSeconds(item_imitateSpeed.useTime);
+        yield return Timing.WaitForSeconds(item_imitateSpeed.useTime);
         InEffect_ImitateSpeed("remove", false, -Mathf.Infinity, prevDefaultSpeeds);
     }
 
@@ -604,7 +654,7 @@ public class GhostMazeController : MonoBehaviour
 
     // ================== Electroshock ====================== //
 
-    private IEnumerator OnUse_Electroshock()
+    private IEnumerator<float> OnUse_Electroshock()
     {
         var item_electroshock = effectItemList.effectItems.Find(item => item.name == "electroshock");
         const float PACMAN_SPEED_MULTIPLIER_INCREASE = 0.4f;
@@ -616,7 +666,7 @@ public class GhostMazeController : MonoBehaviour
         IngameDataManager.SaveSpecificData<bool>("pacman_data.has_power_pellet", _pacman_hasPowerPellet);
 
         InEffect_Electroshock("add", -PACMAN_SPEED_MULTIPLIER_INCREASE, -GHOST_SPEED_MULTIPLIER_INCREASE, duration);
-        yield return new WaitForSeconds(duration);
+        yield return Timing.WaitForSeconds(duration);
         InEffect_Electroshock("remove", PACMAN_SPEED_MULTIPLIER_INCREASE, GHOST_SPEED_MULTIPLIER_INCREASE);
     }
 
@@ -653,18 +703,19 @@ public class GhostMazeController : MonoBehaviour
     
     // ==================== Wind Burst ====================== //
 
-    private IEnumerator OnUse_WindBurst()
+    private IEnumerator<float> OnUse_WindBurst()
     {
         var item_windBurst = effectItemList.effectItems.Find(item => item.name == "wind_burst");
         const float SPEED_MULTIPLIER_INCREASE_LEFT = 0.5f;
         const float SPEED_MULTIPLIER_INCREASE_RIGHT = 0.35f;
         float duration = item_windBurst.useTime;
 
-        yield return StartCoroutine(InEffect_WindBurst(-SPEED_MULTIPLIER_INCREASE_LEFT, SPEED_MULTIPLIER_INCREASE_RIGHT, duration));
+        Timing.RunCoroutine(InEffect_WindBurst(-SPEED_MULTIPLIER_INCREASE_LEFT, SPEED_MULTIPLIER_INCREASE_RIGHT, duration));
+        yield return Timing.WaitForSeconds(duration);
         StopEffect_WindBurst();
     }
 
-    private IEnumerator InEffect_WindBurst(float increaseLeft, float increaseRight, float duration)
+    private IEnumerator<float> InEffect_WindBurst(float increaseLeft, float increaseRight, float duration)
     {
         particleEffectMazeHandler.SpawnAmbientParticle(windBurstParticlePrefab, new Vector2(-4.0f, 4.0f));
         List<string> _ghost_listAlive = IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive");
@@ -707,7 +758,7 @@ public class GhostMazeController : MonoBehaviour
             }
 
             elapsedTime += Time.deltaTime;
-            yield return null;
+            yield return 0f;
         }
     }
 
@@ -742,15 +793,16 @@ public class GhostMazeController : MonoBehaviour
 
     // ==================== Sticky Goo ====================== //
 
-    private IEnumerator OnUse_StickyGoo()
+    private IEnumerator<float> OnUse_StickyGoo()
     {
         var item_stickyGoo = effectItemList.effectItems.Find(item => item.name == "sticky_goo");
         float duration = item_stickyGoo.cooldown;
 
-        yield return StartCoroutine(WaitForEffect_StickyGoo(duration));
+        Timing.RunCoroutine(WaitForEffect_StickyGoo(duration));
+        yield return 0f;
     }
 
-    private IEnumerator WaitForEffect_StickyGoo(float duration)
+    private IEnumerator<float> WaitForEffect_StickyGoo(float duration)
     {
         GameObject stickyGoo = Instantiate(stickyGooPrefab, GetTileCenter(onCtrl_ghost.transform.position), Quaternion.identity);
         
@@ -761,19 +813,19 @@ public class GhostMazeController : MonoBehaviour
             Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
             if (_pacman_coordinate == (Vector2)stickyGoo.transform.position)
             {
-                StartCoroutine(StartEffect_StickyGoo());
+                Timing.RunCoroutine(StartEffect_StickyGoo());
                 Destroy(stickyGoo);
                 yield break;
             }
 
             elapsedTime += Time.deltaTime;
-            yield return null;
+            yield return 0f;
         }
         
         Destroy(stickyGoo);
     }
 
-    private IEnumerator StartEffect_StickyGoo()
+    private IEnumerator<float> StartEffect_StickyGoo()
     {
         var item_stickyGoo = effectItemList.effectItems.Find(item => item.name == "sticky_goo");
         const float SPEED_MULTIPLIER_INCREASE = 0.8f;
@@ -781,12 +833,12 @@ public class GhostMazeController : MonoBehaviour
         const float STICKY_DURATION = 1.0f;
         float USE_TIME_DURATION = item_stickyGoo.useTime;
 
-        yield return StartCoroutine(InEffect_StickyGoo("add", -SPEED_MULTIPLIER_INCREASE, -VISION_MULTIPLIER_INCREASE, STICKY_DURATION, USE_TIME_DURATION));
-        yield return new WaitForSeconds(USE_TIME_DURATION);
-        yield return StartCoroutine(InEffect_StickyGoo("remove", SPEED_MULTIPLIER_INCREASE, VISION_MULTIPLIER_INCREASE, STICKY_DURATION));
+        Timing.RunCoroutine(InEffect_StickyGoo("add", -SPEED_MULTIPLIER_INCREASE, -VISION_MULTIPLIER_INCREASE, STICKY_DURATION, USE_TIME_DURATION));
+        yield return Timing.WaitForSeconds(USE_TIME_DURATION);
+        Timing.RunCoroutine(InEffect_StickyGoo("remove", SPEED_MULTIPLIER_INCREASE, VISION_MULTIPLIER_INCREASE, STICKY_DURATION));
     }
 
-    private IEnumerator InEffect_StickyGoo(string listMode, float speedIncrease, float visionIncrease, float stickyDuration, float useTimeDuration = 0f)
+    private IEnumerator<float> InEffect_StickyGoo(string listMode, float speedIncrease, float visionIncrease, float stickyDuration, float useTimeDuration = 0f)
     {
         InOutAffectedItems(listMode, "sticky_goo", "pacman");
         particleEffectMazeHandler.SpawnEffectOverlay(gooOverlayPrefab, "pacman", useTimeDuration);
@@ -806,7 +858,7 @@ public class GhostMazeController : MonoBehaviour
             IngameDataManager.SaveSpecificData("pacman_data.vision_multiplier", _pacman_visionMultiplier);
 
             elapsedTime += Time.deltaTime;
-            yield return null;
+            yield return 0f;
         }
 
         _pacman_visionMultiplier = targetValue;
@@ -815,58 +867,66 @@ public class GhostMazeController : MonoBehaviour
 
     private void InOutAffectedItems(string listMode, string effectItemName, string character, string ghostName = null)
     {
-        List<string> _affectedItems = new List<string>();
-        
-        if (character == "pacman") 
-            _affectedItems = IngameDataManager.LoadSpecificData<List<string>>("pacman_data.affected_items");
-        else if (character == "ghost" && ghostName != null) 
-            _affectedItems = IngameDataManager.LoadSpecificListData<List<string>>("ghost_data.ghost_single_info", ghostName, "affected_items");
+        List<string> _affectedItems = (character == "pacman") 
+            ? IngameDataManager.LoadSpecificData<List<string>>("pacman_data.affected_items") 
+            : IngameDataManager.LoadSpecificListData<List<string>>("ghost_data.ghost_single_info", ghostName, "affected_items");
 
         if (listMode == "add")
         {
             _affectedItems.Add(effectItemName);
-            EffectItem effectItem = effectItemList.effectItems.Find(item => item.name == effectItemName);
-            particleEffectMazeHandler.SpawnStartParticle(startParticlePrefab, effectItem.startParticleSprite, effectItem.inEffect.id, ((character == "pacman") ? "pacman" : ghostName));
+            var effectItem = effectItemList.effectItems.Find(item => item.name == effectItemName);
+            particleEffectMazeHandler.SpawnStartParticle(startParticlePrefab, 
+                                                        effectItem.startParticleSprite, 
+                                                        effectItem.inEffect.id, 
+                                                        (character == "pacman") ? "pacman" : ghostName);
         }
-        else if (listMode == "remove")
-        { 
+        else if (listMode == "remove") 
+        {
             _affectedItems.Remove(effectItemName);
         }
 
-        if (character == "pacman") 
+        if (character == "pacman")
+        {
             IngameDataManager.SaveSpecificData("pacman_data.affected_items", _affectedItems);
-        else if (character == "ghost" && ghostName != null) 
+        }
+        else if (character == "ghost" && ghostName != null)
+        {
             IngameDataManager.SaveSpecificListData("ghost_data.ghost_single_info", ghostName, "affected_items", _affectedItems);
+        }
     }
 
-    private void UpdateTextDisplay()
+    private IEnumerator<float> UpdateTextDisplay()
     {
-        var item_changeGhost = effectItemList.effectItems.Find(item => item.name == "change_ghost");
-        float remainCd_changeGhost = Mathf.Max(0f, item_changeGhost.cooldown - (Time.time - lastCd_changeGhost));
-        cdImage_changeGhost.enabled = remainCd_changeGhost > 0 ? true : false;
-        cdText_changeGhost.text = remainCd_changeGhost > 0 ? $"{remainCd_changeGhost:F1}s" : "";
-        
-        var item_boost = effectItemList.effectItems.Find(item => item.name == "boost");
-        float remainCd_boost = Mathf.Max(0f, item_boost.cooldown - (Time.time - lastCd_boost));
-        cdImage_boost.enabled = remainCd_boost > 0 ? true : false;
-        cdText_boost.text = remainCd_boost > 0 ? $"{remainCd_boost:F1}s" : "";
-
-        string _ownedEffectItem = IngameDataManager.LoadSpecificListData<string>("ghost_data.ghost_single_info", onCtrl_ghost.name, "effect_item");
-        float cooldown = effectItemList.effectItems.Find(item => item.name == _ownedEffectItem).cooldown;
-
-        float lastCd = _ownedEffectItem switch
+        while (true)
         {
-            "imitate_speed" => lastCd_blinkyEffectItem,
-            "electroshock" => lastCd_clydeEffectItem,
-            "wind_burst" => lastCd_inkyEffectItem,
-            "sticky_goo" => lastCd_pinkyEffectItem,
-            _ => -Mathf.Infinity
-        };
+            var item_changeGhost = effectItemList.effectItems.Find(item => item.name == "change_ghost");
+            float remainCd_changeGhost = Mathf.Max(0f, item_changeGhost.cooldown - (Time.time - lastCd_changeGhost));
+            cdImage_changeGhost.enabled = remainCd_changeGhost > 0 ? true : false;
+            cdText_changeGhost.text = remainCd_changeGhost > 0 ? $"{remainCd_changeGhost:F1}s" : "";
+            
+            var item_boost = effectItemList.effectItems.Find(item => item.name == "boost");
+            float remainCd_boost = Mathf.Max(0f, item_boost.cooldown - (Time.time - lastCd_boost));
+            cdImage_boost.enabled = remainCd_boost > 0 ? true : false;
+            cdText_boost.text = remainCd_boost > 0 ? $"{remainCd_boost:F1}s" : "";
 
-        float remainCd_effectItem = Mathf.Max(0f, cooldown - (Time.time - lastCd));
-        cdImage_effectItem.enabled = remainCd_effectItem > 0 ? true : false;
-        cdText_effectItem.text = remainCd_effectItem > 0 ? $"{remainCd_effectItem:F1}s" : "";
-        
+            string _ownedEffectItem = IngameDataManager.LoadSpecificListData<string>("ghost_data.ghost_single_info", onCtrl_ghost.name, "effect_item");
+            float cooldown = effectItemList.effectItems.Find(item => item.name == _ownedEffectItem).cooldown;
+
+            float lastCd = _ownedEffectItem switch
+            {
+                "imitate_speed" => lastCd_blinkyEffectItem,
+                "electroshock" => lastCd_clydeEffectItem,
+                "wind_burst" => lastCd_inkyEffectItem,
+                "sticky_goo" => lastCd_pinkyEffectItem,
+                _ => -Mathf.Infinity
+            };
+
+            float remainCd_effectItem = Mathf.Max(0f, cooldown - (Time.time - lastCd));
+            cdImage_effectItem.enabled = remainCd_effectItem > 0 ? true : false;
+            cdText_effectItem.text = remainCd_effectItem > 0 ? $"{remainCd_effectItem:F1}s" : "";
+
+            yield return Timing.WaitForSeconds(0.1f);
+        }
     }
 
     /*********************************************************************/
@@ -879,24 +939,25 @@ public class GhostMazeController : MonoBehaviour
     {
         while (true)
         {
-            if (!onAuto_isRunning[ghostName]) 
+            if (!onAuto_isRunning[ghostName])
             {
                 onAuto_isRunning[ghostName] = true;
                 StartCoroutine(AutoMoveGhost(ghostName));
             }
-            
+
             yield return new WaitForFixedUpdate();
         }
     }
 
     private IEnumerator AutoMoveGhost(string ghostName)
     {
-        if (onCtrl_ghost.name == ghostName) 
+        if (onCtrl_ghost.name == ghostName)
         {
             onAuto_isRunning[ghostName] = false;
+            onAuto_targetPositions[ghostName] = Vector2.zero;
             yield break;
         }
-        
+
         GameObject onAuto_ghost;
         Animator onAuto_animator;
         float onAuto_defaultSpeed;
@@ -912,7 +973,7 @@ public class GhostMazeController : MonoBehaviour
         if (!ghostData.TryGetValue(ghostName, out var ghostInfo)) yield break;
 
         (onAuto_ghost, onAuto_animator, onAuto_defaultSpeed) = ghostInfo;
-    
+
         while (onAuto_isRunning[ghostName])
         {
             Vector2 currentPosition = onAuto_ghost.transform.position;
@@ -940,7 +1001,7 @@ public class GhostMazeController : MonoBehaviour
             }
 
             if (IsAbleToMoveTo(onAuto_targetPositions[ghostName], onAuto_ghost))
-            { 
+            {
                 Vector2 newPosition = Vector2.MoveTowards(currentPosition, onAuto_targetPositions[ghostName], (onAuto_defaultSpeed * ghost_speedMultiplier[ghostName] * ghost_windBurstSpeedAffect[ghostName]) * Time.deltaTime);
                 onAuto_ghost.transform.position = newPosition;
 

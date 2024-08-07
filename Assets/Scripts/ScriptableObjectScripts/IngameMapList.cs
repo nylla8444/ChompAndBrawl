@@ -3,18 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "MazeMapList", menuName = "Objects/ObjectList/MazeMapList")]
-public class MazeMapList : ScriptableObject
+[CreateAssetMenu(fileName = "IngameMapList", menuName = "Objects/ObjectList/IngameMapList")]
+public class IngameMapList : ScriptableObject
 {
-    public List<MazeMap> mazeMaps;
+    public List<IngameMap> ingameMaps;
 }
 
 [Serializable]
-public class MazeMap
+public class IngameMap
 {
     public string mapId;
     public string translatedName;
     public string description;
     public Sprite mapImage;
-    public SceneField mapScene;
 }

@@ -13,4 +13,8 @@ MonoBehaviour:
   m_Name: AudioList
   m_EditorClassIdentifier: 
   musicCategories: []
-  sfxCategories: []
+  sfxCategories:
+  - name: general
+    audioClips:
+    - id: button_pressed
+      audioClip: {fileID: 8300000, guid: cf9d380f3aa3c6341a97aecc2ec1d13b, type: 3}

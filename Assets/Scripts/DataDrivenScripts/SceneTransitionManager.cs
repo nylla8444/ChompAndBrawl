@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class SceneTransitionManager : MonoBehaviour
 {
+    [SerializeField] private GameObject transitionScreen;
     [SerializeField] private TransitionDictionary transitions;
     private string startTransitionName;
     private string endTransitionName;
@@ -29,6 +30,7 @@ public class SceneTransitionManager : MonoBehaviour
         TransitionData.transitionId = transitionId;
         TransitionData.endTransitionName = endTransitionName;
         
+        transitionScreen.SetActive(true);
         transitionAnimator = GameObject.Find(transitionId).GetComponent<Animator>();
         StartCoroutine(LoadSceneAsync(sceneName));
     }

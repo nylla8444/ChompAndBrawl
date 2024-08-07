@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
@@ -216,13 +217,13 @@ public static class IngameDataManager
         IngameData ingameData = LoadData() ?? InitializeDefaultData();
         object data = ingameData;
 
-        foreach (var part in listPath.Split('.'))
+        string[] parts = listPath.Split('.');
+        foreach (var part in parts)
         {
-            var type = data.GetType();
-            var p_field = type.GetField(part);
-            if (p_field == null) throw new Exception($"Field '{part}' not found in type '{type}'");
+            FieldInfo pField = data.GetType().GetField(part);
+            if (pField == null) throw new Exception($"Field '{part}' not found in type '{data.GetType()}'");
 
-            data = p_field.GetValue(data);
+            data = pField.GetValue(data);
         }
 
         if (!(data is IList list)) throw new Exception("The specified path does not point to a list");
@@ -230,7 +231,7 @@ public static class IngameDataManager
         object element = null;
         foreach (var item in list)
         {
-            var nameField = item.GetType().GetField("name");
+            FieldInfo nameField = item.GetType().GetField("name");
             if (nameField != null && (string)nameField.GetValue(item) == elementName)
             {
                 element = item;
@@ -239,10 +240,10 @@ public static class IngameDataManager
         }
         if (element == null) throw new Exception($"Element with name '{elementName}' not found in the list");
 
-        var n_field = element.GetType().GetField(fieldName);
-        if (n_field == null) throw new Exception($"Field '{fieldName}' not found in type '{element.GetType()}'");
+        FieldInfo nField = element.GetType().GetField(fieldName);
+        if (nField == null) throw new Exception($"Field '{fieldName}' not found in type '{element.GetType()}'");
 
-        return (T)n_field.GetValue(element);
+        return (T)nField.GetValue(element);
     }
 
     public static void SaveSpecificListData<T>(string listPath, string elementName, string fieldName, T value)
@@ -250,13 +251,13 @@ public static class IngameDataManager
         IngameData ingameData = LoadData() ?? InitializeDefaultData();
         object data = ingameData;
 
-        foreach (var part in listPath.Split('.'))
+        string[] parts = listPath.Split('.');
+        foreach (var part in parts)
         {
-            var type = data.GetType();
-            var p_field = type.GetField(part);
-            if (p_field == null) throw new Exception($"Field '{part}' not found in type '{type}'");
+            FieldInfo pField = data.GetType().GetField(part);
+            if (pField == null) throw new Exception($"Field '{part}' not found in type '{data.GetType()}'");
 
-            data = p_field.GetValue(data);
+            data = pField.GetValue(data);
         }
 
         if (!(data is IList list)) throw new Exception("The specified path does not point to a list");
@@ -264,7 +265,7 @@ public static class IngameDataManager
         object element = null;
         foreach (var item in list)
         {
-            var nameField = item.GetType().GetField("name");
+            FieldInfo nameField = item.GetType().GetField("name");
             if (nameField != null && (string)nameField.GetValue(item) == elementName)
             {
                 element = item;
@@ -273,10 +274,10 @@ public static class IngameDataManager
         }
         if (element == null) throw new Exception($"Element with name '{elementName}' not found in the list");
 
-        var n_field = element.GetType().GetField(fieldName);
-        if (n_field == null) throw new Exception($"Field '{fieldName}' not found in type '{element.GetType()}'");
+        FieldInfo nField = element.GetType().GetField(fieldName);
+        if (nField == null) throw new Exception($"Field '{fieldName}' not found in type '{element.GetType()}'");
 
-        n_field.SetValue(element, value);
+        nField.SetValue(element, value);
         SaveData(ingameData);
     }
 }

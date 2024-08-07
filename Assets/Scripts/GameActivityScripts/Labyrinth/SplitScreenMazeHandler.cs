@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using MEC;
 
 public class SplitScreenMazeHandler : MonoBehaviour
 {
@@ -29,7 +30,8 @@ public class SplitScreenMazeHandler : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(InitiateCurrentControllingGhost());
+        Timing.RunCoroutine(InitiateCurrentControllingGhost());
+        Timing.RunCoroutine(CameraFollowCoroutine());
 
         arrowInstance = Instantiate(arrowPrefab);
         arrowInstance.SetActive(false);
@@ -37,9 +39,17 @@ public class SplitScreenMazeHandler : MonoBehaviour
 
     private void Update()
     {
-        CameraFollowPacman();
-        CameraFollowGhost();
         UpdateArrowVisibilityAndPosition();
+    }
+
+    private IEnumerator<float> CameraFollowCoroutine()
+    {
+        while (true)
+        {
+            CameraFollowPacman();
+            CameraFollowGhost();
+            yield return 0f;
+        }
     }
 
     private void CameraFollowPacman()
@@ -81,7 +91,7 @@ public class SplitScreenMazeHandler : MonoBehaviour
         return new Vector3(target.position.x, target.position.y, camera.transform.position.z) + offset;
     }
 
-    private IEnumerator InitiateCurrentControllingGhost()
+    private IEnumerator<float> InitiateCurrentControllingGhost()
     {
         string _ghost_currentControlling = IngameDataManager.LoadSpecificData<string>("ghost_data.current_controlling");
         foreach (Transform ghost in allGhosts)
@@ -89,7 +99,7 @@ public class SplitScreenMazeHandler : MonoBehaviour
             if (ghost.name == _ghost_currentControlling)
             {
                 currentGhost = ghost;
-                yield return new WaitForSeconds(0.01f);
+                yield return Timing.WaitForSeconds(0.01f);
                 
                 player2Camera.transform.position = GetTargetPosition(ghost, player2Camera);
                 break;

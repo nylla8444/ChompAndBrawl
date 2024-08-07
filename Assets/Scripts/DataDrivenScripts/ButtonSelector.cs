@@ -28,7 +28,7 @@ public class ButtonGroup
     public List<Button> buttons;
 
     [Header("Label Button Item Properties"), Space(4)]
-    public Text label;
+    public GameObject label;
     public List<Button> labelButtons;
 
     [Header("Navigable Button Item Properties"), Space(4)]
@@ -46,6 +46,7 @@ public class ButtonGroup
 public class ButtonSelector : MonoBehaviour
 {
     [SerializeField] private List<ButtonGroup> buttonGroupList;
+    [SerializeField] private AudioManager audioManager;
 
     private List<List<ButtonItem>> allButtonGroups;
     private int currentGroupIndex = 0;
@@ -59,18 +60,11 @@ public class ButtonSelector : MonoBehaviour
 
     private void OnDestroy()
     {
-        UnregisterKeyActions();
+        KeybindDataManager.ResetKeyActions();
         ClearButtonReferences();
     }
 
     private void RegisterKeyActions()
-    {
-        KeybindDataManager.RegisterKeyAction("general.move_next_selection", MoveToNextSelection);
-        KeybindDataManager.RegisterKeyAction("general.move_previous_selection", MoveToPreviousSelection);
-        KeybindDataManager.RegisterKeyAction("general.go_select", SelectButton);
-    }
-
-    private void UnregisterKeyActions()
     {
         KeybindDataManager.RegisterKeyAction("general.move_next_selection", MoveToNextSelection);
         KeybindDataManager.RegisterKeyAction("general.move_previous_selection", MoveToPreviousSelection);
@@ -130,12 +124,23 @@ public class ButtonSelector : MonoBehaviour
     private void MoveToNextSelection()
     {
         if (allButtonGroups.Count == 0) return;
-        
+
+        var currentButtonItem = allButtonGroups[currentGroupIndex][currentButtonIndex] as LabelButtonItem;
+        if (currentButtonItem != null && currentButtonItem.ButtonCount > 1)
+        {
+            currentButtonItem.MoveToNextButton();
+            return;
+        }
+
         currentButtonIndex++;
         if (currentButtonIndex >= allButtonGroups[currentGroupIndex].Count)
         {
             currentButtonIndex = 0;
-            currentGroupIndex = (currentGroupIndex + 1) % allButtonGroups.Count;
+            currentGroupIndex++;
+            if (currentGroupIndex >= allButtonGroups.Count)
+            {
+                currentGroupIndex = 0;
+            }
         }
         HighlightButton(currentGroupIndex, currentButtonIndex);
     }
@@ -143,11 +148,22 @@ public class ButtonSelector : MonoBehaviour
     private void MoveToPreviousSelection()
     {
         if (allButtonGroups.Count == 0) return;
-        
+
+        var currentButtonItem = allButtonGroups[currentGroupIndex][currentButtonIndex] as LabelButtonItem;
+        if (currentButtonItem != null && currentButtonItem.ButtonCount > 1)
+        {
+            currentButtonItem.MoveToPreviousButton();
+            return;
+        }
+
         currentButtonIndex--;
         if (currentButtonIndex < 0)
         {
-            currentGroupIndex = (currentGroupIndex - 1 + allButtonGroups.Count) % allButtonGroups.Count;
+            currentGroupIndex--;
+            if (currentGroupIndex < 0)
+            {
+                currentGroupIndex = allButtonGroups.Count - 1;
+            }
             currentButtonIndex = allButtonGroups[currentGroupIndex].Count - 1;
         }
         HighlightButton(currentGroupIndex, currentButtonIndex);
@@ -293,11 +309,13 @@ public class SingleButtonItem : ButtonItem
 
 public class LabelButtonItem : ButtonItem
 {
-    private Text label;
+    private GameObject label;
     private List<Button> buttons;
     private int currentButtonIndex = 0;
 
-    public LabelButtonItem(Text label, List<Button> buttons, HighlightType highlightType, Color highlightColor, Sprite highlightBackgroundSprite)
+    public int ButtonCount => buttons.Count;
+
+    public LabelButtonItem(GameObject label, List<Button> buttons, HighlightType highlightType, Color highlightColor, Sprite highlightBackgroundSprite)
         :base(highlightType, highlightColor, highlightBackgroundSprite)
         {
             this.label = label;
@@ -306,10 +324,14 @@ public class LabelButtonItem : ButtonItem
 
     public override void Highlight(bool isHighlighted)
     {
-        SetHighlight(label.gameObject, isHighlighted);
+        SetHighlight(label, isHighlighted);
         if (isHighlighted && buttons.Count > 0)
         {
             HighlightButton(currentButtonIndex, true);
+        }
+        else
+        {
+            HighlightButton(currentButtonIndex, false);
         }
     }
 
@@ -319,6 +341,20 @@ public class LabelButtonItem : ButtonItem
         {
             SetHighlight(buttons[i].gameObject, i == index && isHighlighted);
         }
+    }
+
+    public void MoveToNextButton()
+    {
+        HighlightButton(currentButtonIndex, false);
+        currentButtonIndex = (currentButtonIndex + 1) % buttons.Count;
+        HighlightButton(currentButtonIndex, true);
+    }
+
+    public void MoveToPreviousButton()
+    {
+        HighlightButton(currentButtonIndex, false);
+        currentButtonIndex = (currentButtonIndex - 1 + buttons.Count) % buttons.Count;
+        HighlightButton(currentButtonIndex, true);
     }
 
     public override void Press()

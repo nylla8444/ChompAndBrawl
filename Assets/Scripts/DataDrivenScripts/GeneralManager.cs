@@ -10,11 +10,11 @@ public class GeneralManager : MonoBehaviour
     [SerializeField] private DefaultIngameData defaultIngameData;
     [SerializeField] private DefaultPlayerData defaultPlayerData;
     [SerializeField] private DefaultInputKeybind defaultInputKeybind;
+    [SerializeField] private DefaultLeaderboardData defaultLeaderboardData;
 
     [Header("===General GameObjects===")]
     [SerializeField] private GameObject menuPanel;
     [SerializeField] private GameObject dialoguePanel;
-    [SerializeField] private GameObject transitionScreen;
 
     [Header("===Direct Buttons===")]
     [SerializeField] private Button directResetButton;
@@ -47,6 +47,7 @@ public class GeneralManager : MonoBehaviour
         try { IngameDataManager.Initialize(defaultIngameData); } catch (Exception) { }
         try { PlayerDataManager.Initialize(defaultPlayerData); } catch (Exception) { }
         try { KeybindDataManager.Initialize(defaultInputKeybind); } catch (Exception) { }
+        try { LeaderboardDataManager.Initialize(defaultLeaderboardData); } catch (Exception) { }
     }
 
     private void PrepareObjectListeners()
@@ -59,7 +60,6 @@ public class GeneralManager : MonoBehaviour
     private void InitializeUi()
     {
         try { menuPanel.SetActive(true); } catch (Exception) { }
-        try { transitionScreen.SetActive(true); } catch (Exception) { }
         try { dialoguePanel.SetActive(true); } catch (Exception) { }
     }
 
@@ -75,6 +75,7 @@ public class GeneralManager : MonoBehaviour
         IngameDataManager.DeleteData();
         PlayerDataManager.DeleteData();
         KeybindDataManager.DeleteKeyBindings();
+        LeaderboardDataManager.DeleteData();
     }
 
     public void ExecuteQuit()
