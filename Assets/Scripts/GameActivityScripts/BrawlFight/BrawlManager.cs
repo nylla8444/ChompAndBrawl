@@ -117,7 +117,7 @@ public class BrawlManager : MonoBehaviour {
         Ghost.enabled = true;
     }
 
-    private void EndMatch() {
+    public void EndMatch() {
         matchState = MatchState.ending;
         StopCoroutine(TickPlaytime());
     }
@@ -135,7 +135,7 @@ public class BrawlManager : MonoBehaviour {
     }
 
     private void UpdateFighterDirection() {
-        if (Pacman.transform.position.x < Ghost.transform.position.y) {
+        if (Pacman.transform.position.x < Ghost.transform.position.x) {
             if (!Pacman.facingLeft) { return; }
             Pacman.facingLeft = false;
             Ghost.facingLeft = true;

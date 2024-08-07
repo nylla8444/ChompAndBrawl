@@ -12,9 +12,12 @@ public class FighterBehavior : MonoBehaviour {
         crouched,
         jumping,
         blocking,
+        block_walking,
+        block_stunned,
         stunned,
         knocked,
-        aired
+        aired,
+        charging
     }
 
     private enum WalkDirection {
@@ -28,10 +31,12 @@ public class FighterBehavior : MonoBehaviour {
     // SCRIPTS
     private BrawlManager brawlManager;
     private FighterBehavior opponent;
-    private Action action;
 
     // STATS
     private FighterInfo fighterInfo;
+    private float movementSmoothTime;
+    private float walkSpeed;
+    private float blockSpeed;
 
     // COMPONENTS
     private SpriteRenderer fighterSprite;
@@ -44,9 +49,11 @@ public class FighterBehavior : MonoBehaviour {
     private State currentState;
     private int currentHealth;
     private WalkDirection walkDirection;
-    private float horizontalMovement;
     private float horizontalVelocity;
-    public bool facingLeft;
+    [HideInInspector] public bool facingLeft;
+    private float timer = 0f;
+    private AttackInfo lastAttack;
+    private AttackInfo queuedAttack;
 
     
     // GETTERS AND SETTERS
@@ -64,11 +71,14 @@ public class FighterBehavior : MonoBehaviour {
         fighterSprite = gameObject.GetComponent<SpriteRenderer>();
         fighterHitbox = gameObject.GetComponent<BoxCollider2D>();
         fighterPhysics = gameObject.GetComponent<Rigidbody2D>();
-        attackHitbox = gameObject.GetComponentInChildren<BoxCollider2D>();
+        attackHitbox = gameObject.transform.GetChild(0).GetComponent<BoxCollider2D>();
 
         currentHealth = brawlManager.GetMaxHealth();
-        action = new Action(this);
+        movementSmoothTime = brawlManager.GetSmoothTime();
+        walkSpeed = brawlManager.GetWalkSpeed();
+        blockSpeed = brawlManager.GetBlockSpeed();
     }
+
     private void Start() {
         RegisterKeyActions();
     }
@@ -78,86 +88,49 @@ public class FighterBehavior : MonoBehaviour {
     }
 
     private void Update() {
-        currentState = GetFighterState(); // Update state
-        walkDirection = WalkDirection.none; // reset direction every update
-
-        KeybindDataManager.Update();
-        TickMovement();
+        TickPreInput();
+        if (timer > 0) { KeybindDataManager.Update(); }
+        TickPostInput();
     }
 
-    private void FixedUpdate() {
-        float targetSpeed = currentState == State.blocking ? brawlManager.GetBlockSpeed() : brawlManager.GetWalkSpeed();
-        float smoothTime = brawlManager.GetSmoothTime();
-        
-        float newVelocity = Mathf.SmoothDamp(fighterPhysics.velocity.x, horizontalMovement * targetSpeed, ref horizontalVelocity, smoothTime);
-        fighterPhysics.velocity = new Vector2(newVelocity, fighterPhysics.velocity.y);
+private void FixedUpdate() {
+    if (currentState == State.blocking) {
+        fighterPhysics.velocity = Vector2.zero;
+    } else if (currentState == State.grounded || currentState == State.block_walking) {
+        float targetSpeed = (currentState == State.grounded) ? walkSpeed : blockSpeed;
+        float desiredVelocityX = (int)walkDirection * targetSpeed;
+
+        float newVelocityX = Mathf.SmoothDamp(
+            fighterPhysics.velocity.x,
+            desiredVelocityX,
+            ref horizontalVelocity,
+            movementSmoothTime
+        );
+
+        fighterPhysics.velocity = new Vector2(newVelocityX, fighterPhysics.velocity.y);
     }
-
-    private class Action {
-        private FighterBehavior self;
-
-        public Action(FighterBehavior fighterBehavior) {
-            self = fighterBehavior;
-        }
-
-        public void Jump() {
-            if (self.currentState == State.grounded) {
-                self.fighterPhysics.velocity = new Vector2(self.fighterPhysics.velocity.x, self.brawlManager.GetJumpPower());
-            }
-        }
-
-        public void Crouch() {
-            Debug.Log("Implement crouch logic");
-        }
-
-        public void WalkLeft() {
-            if (self.currentState != State.grounded) { return; }
-
-            if (self.walkDirection == WalkDirection.right) {
-                self.walkDirection = WalkDirection.both;
-            } else {
-                self.walkDirection = WalkDirection.left;
-            }
-        }
-
-        public void WalkRight() {
-            if (self.currentState != State.grounded) { return; }
-
-            if (self.walkDirection == WalkDirection.left) {
-                self.walkDirection = WalkDirection.both;
-            } else {
-                self.walkDirection = WalkDirection.right;
-            }
-        }
-
-        public void Punch() {
-
-        }
-
-        public void UseBasic() {
-
-        }
-
-        public void UseUnique() {
-
-        }
-    }
+}
 
     private void RegisterKeyActions() {
         string fighterName = brawlManager.GetPacman() == this ? "pacman" : "ghost";
 
-        KeybindDataManager.RegisterKeyAction(fighterName + ".jump", action.Jump);
-        KeybindDataManager.RegisterKeyAction(fighterName + ".crouch", action.Crouch);
-        KeybindDataManager.RegisterKeyAction(fighterName + ".walk_left", action.WalkLeft);
-        KeybindDataManager.RegisterKeyAction(fighterName + ".walk_right", action.WalkRight);
-        KeybindDataManager.RegisterKeyAction(fighterName + ".punch", action.Punch);
-        KeybindDataManager.RegisterKeyAction(fighterName + ".basic", action.UseBasic);
-        KeybindDataManager.RegisterKeyAction(fighterName + ".unique", action.UseUnique);
+        KeybindDataManager.RegisterKeyAction(fighterName + ".jump", Jump);
+        KeybindDataManager.RegisterKeyAction(fighterName + ".crouch", Crouch);
+        KeybindDataManager.RegisterKeyAction(fighterName + ".walk_left", WalkLeft);
+        KeybindDataManager.RegisterKeyAction(fighterName + ".walk_right", WalkRight);
+        KeybindDataManager.RegisterKeyAction(fighterName + ".punch", Punch);
+        KeybindDataManager.RegisterKeyAction(fighterName + ".basic", UseBasic);
+        KeybindDataManager.RegisterKeyAction(fighterName + ".unique", UseUnique);
     }
 
-    private State GetFighterState() {
-        if (IsGrounded()) { return State.grounded; }
-        return State.jumping;
+    private void TickPreInput() {
+        TickTimer();
+        walkDirection = WalkDirection.none; // Reset Movement Input
+        UpdateCurrentState();
+    }
+
+    private void TickPostInput() {
+
     }
 
     private bool IsGrounded() {
@@ -168,14 +141,97 @@ public class FighterBehavior : MonoBehaviour {
         return feetValue < floorValue + brawlManager.COLLIDER_MARGIN;
     }
 
-    public void TickMovement() {
-        if (walkDirection == WalkDirection.both) {
-            horizontalMovement = 0;
-            currentState = State.blocking;
-        } else {
-            horizontalMovement = (int)walkDirection;
-            currentState = State.grounded;
+    private void UpdateCurrentState() {
+        if (timer > 0) { return; }
+
+        switch (currentState) {
+
+            case State.grounded: return;
+
+            case State.jumping:
+                if (!IsGrounded()) { return; }
+                currentState = State.grounded;
+                return;
+
+            default:
+                currentState = State.grounded;
+                return;
         }
+    }
+
+    private void TickTimer() {
+        if (timer <= 0) { return; }
+        timer -= Time.deltaTime;
+    }
+
+    private void Jump() {
+        if (currentState != State.grounded) { return; }
+        currentState = State.jumping;
+        fighterPhysics.velocity = new Vector2(fighterPhysics.velocity.x, brawlManager.GetJumpPower());
+    }
+
+    private void Crouch() {
+        if (currentState != State.grounded) { return; }
+        currentState = State.crouched;
+        Debug.Log("Shorten Hitbox"); // Implement this when sprites are done
+    }
+
+    private void WalkLeft() {
+        if (currentState != State.grounded) { return; }
+
+        switch (walkDirection) {
+            case WalkDirection.none:
+                if (!facingLeft) { currentState = State.block_walking; }
+                walkDirection = WalkDirection.left;
+                break;
+
+            case WalkDirection.right:
+                currentState = State.blocking;
+                walkDirection = WalkDirection.both;
+                break;
+        }
+    }
+
+    private void WalkRight() {
+        if (currentState != State.grounded) { return; }
+        
+        switch (walkDirection) {
+            case WalkDirection.none:
+                if (facingLeft) { currentState = State.block_walking; }
+                walkDirection = WalkDirection.right;
+                break;
+
+            case WalkDirection.left:
+                currentState = State.blocking;
+                walkDirection = WalkDirection.both;
+                break;
+        }
+    }
+
+    private void Punch() {
+        if (currentState != State.grounded) { return; }
+        
+        currentState = State.charging;
+        if (lastAttack && lastAttack.attackCategory == AttackCategory.punch) {
+            timer = lastAttack.nextAttack.chargeDuration;
+            queuedAttack = lastAttack.nextAttack;
+        } else {
+            AttackInfo punchAttack = brawlManager.GetPunchAttack();
+            timer = punchAttack.chargeDuration;
+            queuedAttack = punchAttack;
+        }
+    }
+
+    private void UseBasic() {
+
+    }
+
+    private void UseUnique() {
+
+    }
+
+    public void Damage(int damage) {
+
     }
 }
 
