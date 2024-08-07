@@ -10,6 +10,7 @@ public class InputKeybind
     public string translated_action_name;
     public string action_name;
     public KeyCode key_code;
+    public bool holdDown;
 }
 
 [Serializable]
@@ -53,8 +54,11 @@ public static class KeybindDataManager
         {
             foreach (var keyAction in category.input_keybinds)
             {
-                if (Input.GetKeyDown(keyAction.key_code))
-                {
+                bool keyPressed = Input.GetKeyDown(keyAction.key_code);
+                bool keyHeld = keyAction.holdDown && Input.GetKey(keyAction.key_code);
+
+                if (keyPressed || keyHeld)
+                {   
                     if (keyActionMap.ContainsKey(keyAction.action_name))
                     {
                         keyActionMap[keyAction.action_name]?.Invoke();
