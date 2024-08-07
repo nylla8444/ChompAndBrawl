@@ -18,15 +18,19 @@ MonoBehaviour:
     - translated_action_name: Move Next Selection
       action_name: general.move_next_selection
       key_code: 9
+      holdDown: 0
     - translated_action_name: Move Previous Selection
       action_name: general.move_previous_selection
       key_code: 304
+      holdDown: 0
     - translated_action_name: Go Select
       action_name: general.go_select
       key_code: 13
+      holdDown: 0
     - translated_action_name: Go Back
       action_name: general.go_back
       key_code: 27
+      holdDown: 0
     - translated_action_name: Ready Player 1
       action_name: general.ready_player_one
       key_code: 306
@@ -50,38 +54,106 @@ MonoBehaviour:
     - translated_action_name: Face Up
       action_name: pacman.face_up
       key_code: 119
+      holdDown: 1
     - translated_action_name: Face Down
       action_name: pacman.face_down
       key_code: 115
+      holdDown: 0
     - translated_action_name: Face Left
       action_name: pacman.face_left
       key_code: 97
+      holdDown: 0
     - translated_action_name: Face Right
       action_name: pacman.face_right
       key_code: 100
+      holdDown: 0
     - translated_action_name: Use Item
       action_name: pacman.use_item
       key_code: 101
+      holdDown: 0
+    - translated_action_name: Jump
+      action_name: pacman.jump
+      key_code: 119
+      holdDown: 1
+    - translated_action_name: Crouch
+      action_name: pacman.crouch
+      key_code: 115
+      holdDown: 1
+    - translated_action_name: Walk Left
+      action_name: pacman.walk_left
+      key_code: 97
+      holdDown: 1
+    - translated_action_name: Walk Right
+      action_name: pacman.walk_right
+      key_code: 100
+      holdDown: 1
+    - translated_action_name: Punch
+      action_name: pacman.punch
+      key_code: 101
+      holdDown: 0
+    - translated_action_name: Basic
+      action_name: pacman.basic
+      key_code: 113
+      holdDown: 0
+    - translated_action_name: Unique
+      action_name: pacman.unique
+      key_code: 114
+      holdDown: 0
   - category_name: Ghost
     input_keybinds:
     - translated_action_name: Face Up
       action_name: ghost.face_up
       key_code: 273
+      holdDown: 1
     - translated_action_name: Face Down
       action_name: ghost.face_down
       key_code: 274
+      holdDown: 0
     - translated_action_name: Face Left
       action_name: ghost.face_left
       key_code: 276
+      holdDown: 0
     - translated_action_name: Face Right
       action_name: ghost.face_right
       key_code: 275
+      holdDown: 0
     - translated_action_name: Change Ghost
       action_name: ghost.change_ghost
       key_code: 13
+      holdDown: 0
     - translated_action_name: Use Boost Item
       action_name: ghost.use_boost_item
       key_code: 303
+      holdDown: 0
     - translated_action_name: Use Unique Item
       action_name: ghost.use_unique_item
       key_code: 305
+      holdDown: 0
+    - translated_action_name: Jump
+      action_name: ghost.jump
+      key_code: 273
+      holdDown: 1
+    - translated_action_name: Crouch
+      action_name: ghost.crouch
+      key_code: 274
+      holdDown: 1
+    - translated_action_name: Walk Left
+      action_name: ghost.walk_left
+      key_code: 276
+      holdDown: 1
+    - translated_action_name: Walk Right
+      action_name: ghost.walk_right
+      key_code: 275
+      holdDown: 1
+    - translated_action_name: Punch
+      action_name: ghost.punch
+      key_code: 47
+      holdDown: 0
+    - translated_action_name: Basic
+      action_name: ghost.basic
+      key_code: 46
+      holdDown: 0
+    - translated_action_name: Unique
+      action_name: ghost.unique
+      key_code: 44
+      holdDown: 0

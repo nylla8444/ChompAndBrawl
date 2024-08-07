@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewAttack", menuName = "BrawlMode/Attack")]
-public class Attack : ScriptableObject {
+
+[CreateAssetMenu(fileName = "NewAttackInfo", menuName = "BrawlMode/AttackInfo")]
+public class AttackInfo : ScriptableObject {
     public int damage;
     public float stunDuration;
     public float chargeDuration;
@@ -14,7 +15,7 @@ public class Attack : ScriptableObject {
     public Vector2 otherVelocity;
     public Vector2 attackBoxOffset;
     public Vector2 attackBoxSize;
-    public Attack nextAttack;
+    public AttackInfo nextAttack;
     public AttackCategory attackCategory;
     public bool shakeCam;
     public float camShakeStrength;

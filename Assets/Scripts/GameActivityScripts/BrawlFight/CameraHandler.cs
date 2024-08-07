@@ -20,9 +20,8 @@ public class CameraHandler : MonoBehaviour {
     private GameObject ghost;
 
     private void Start() {
-        GameObject[] fighters = brawlManager.getFighters();
-        pacman = fighters[0];
-        ghost = fighters[1];
+        pacman = brawlManager.GetPacman().gameObject;
+        ghost = brawlManager.GetGhost().gameObject;
 
         shakeDuration = 0;
         initialCamPosition = _camera.transform.position;
