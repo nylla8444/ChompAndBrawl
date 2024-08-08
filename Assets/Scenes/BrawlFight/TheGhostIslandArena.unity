@@ -1050,7 +1050,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.75, y: 0.78}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -1100,7 +1100,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 1581495865, guid: ec829f864673cac41809d2727d1c9e6a, type: 3}
   m_Color: {r: 1, g: 0.9244273, b: 0.62578607, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1150,6 +1150,7 @@ MonoBehaviour:
   DOTDuration: 0
   DOTAttack: {fileID: 0}
   SugarRushDuration: 0
+  isWalking: 0
 --- !u!95 &1024155353
 Animator:
   serializedVersion: 5
@@ -1162,7 +1163,7 @@ Animator:
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 5bb8214c9810bbc44a4c33a81263e948, type: 2}
   m_CullingMode: 0
-  m_UpdateMode: 0
+  m_UpdateMode: 2
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
@@ -1214,6 +1215,7 @@ MonoBehaviour:
   DOTDuration: 0
   DOTAttack: {fileID: 0}
   SugarRushDuration: 0
+  isWalking: 0
 --- !u!50 &1073113144
 Rigidbody2D:
   serializedVersion: 4

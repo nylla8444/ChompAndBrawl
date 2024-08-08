@@ -4,7 +4,9 @@ using UnityEngine;
 public class FighterInfo : ScriptableObject {
     public float DamageMultipler;
     public AttackInfo UniqueAttackInfo;
-    public Sprite spriteSheet;
+    public Animation punchAnimation;
+    public Animation basicAnimation;
+    public Animation uniqueAnimation;
     
     // more sprite specifics here for attacks
 }
