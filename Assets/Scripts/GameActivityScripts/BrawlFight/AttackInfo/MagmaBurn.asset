@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f3a6b651219d9d4a90418b1db029e0c, type: 3}
-  m_Name: Punch
+  m_Name: MagmaBurn
   m_EditorClassIdentifier: 
-  damage: 20
-  stunDuration: 0.6
-  chargeDuration: 0.4
-  hitDuration: 0.5
-  missDuration: 0.8
+  damage: 30
+  stunDuration: 0
+  chargeDuration: 0
+  hitDuration: 0
+  missDuration: 0
   attackCooldown: 0
-  rootVelocity: {x: 4, y: 0}
-  otherVelocity: {x: 5, y: 0}
-  attackBoxOffset: {x: 0.625, y: 0.425}
-  attackBoxSize: {x: 1.25, y: 0.75}
-  nextAttack: {fileID: 11400000, guid: 185b82c4462990d4db901646f297a93a, type: 2}
-  attackCategory: 0
-  shakeCam: 1
-  camShakeStrength: 0.1
-  camShakeDuration: 0.05
+  rootVelocity: {x: 0, y: 0}
+  otherVelocity: {x: 0, y: 0}
+  attackBoxOffset: {x: 0, y: 0}
+  attackBoxSize: {x: 0, y: 0}
+  nextAttack: {fileID: 0}
+  attackCategory: 3
+  shakeCam: 0
+  camShakeStrength: 0
+  camShakeDuration: 0
   isProjectile: 0
   projectileVelocity: {x: 0, y: 0}
   projectileSize: {x: 0, y: 0, z: 0}

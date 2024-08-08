@@ -1,12 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 public enum AttackCategory {
     punch,
     basic,
     unique,
+    DOT
 }
 
 public class BrawlManager : MonoBehaviour {
@@ -23,6 +25,8 @@ public class BrawlManager : MonoBehaviour {
     [SerializeField] private DefaultPlayerData defaultPlayerData;
     [SerializeField] private DefaultInputKeybind defaultInputKeybind;
     [SerializeField] private GameObject arenaFloor;
+    public CameraHandler cameraHandler;
+    [SerializeField] private GameObject projectilePrefab;
     [HideInInspector] public readonly float COLLIDER_MARGIN = 0.02f;
 
     [Space(10), Header("FIGHTER INFORMATION")]
@@ -50,6 +54,7 @@ public class BrawlManager : MonoBehaviour {
 
 
     private MatchState matchState;
+    private float timeCounter;
 
 
     private void Awake() {
@@ -67,6 +72,7 @@ public class BrawlManager : MonoBehaviour {
     private void Update() {
         if (matchState != MatchState.ongoing) { return; }
         UpdateFighterDirection();
+        TickDebuffs();
     }
 
     public DefaultInputKeybind GetDefaultInputKeybind() { return defaultInputKeybind; }
@@ -102,7 +108,7 @@ public class BrawlManager : MonoBehaviour {
             case "Pinky": fighter = FI_Pinky; break;
             case "Inky": fighter = FI_Inky; break;
             default:
-                Debug.Log("'ghost_data.current_fighting' cannot be found. Spawned 'Clyde' in arena instead.");
+                Debug.Log("'ghost_data.current_fighting' cannot be found. Spawned 'Blinky' in arena instead.");
                 fighter = FI_Blinky; break;
         }
 
@@ -157,86 +163,29 @@ public class BrawlManager : MonoBehaviour {
             Ghost.GetAttackHitbox().transform.localScale = new Vector3(1, 1, 1);
         }
     }
-}
 
+    public ProjectileBehavior SpawnProjectile(FighterBehavior owner, AttackInfo attackInfo, int attackDirection) {
+        Vector3 spawnPosition = attackInfo.projectileSpawnOnOwner ? owner.gameObject.transform.position : owner.opponent.gameObject.transform.position + (Vector3.up * 8);
+        GameObject projectile = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
+        ProjectileBehavior projectileBehavior = projectile.GetComponent<ProjectileBehavior>();
 
-// old code
-/*
-public class BrawlManager : MonoBehaviour {
-    public CameraHandler cameraHandler;
-    [SerializeField] private GameObject arenaFloor;
-    [SerializeField] private float characterSpeed;
-    [SerializeField] private float jumpStrength;
-    [SerializeField] private float smoothTime; // for character movement
-    [SerializeField] private GameObject[] fighters;
-
-    private PlayerBehavior[] fighterScript = new PlayerBehavior[2];
-    private Rigidbody2D[] fighterRb = new Rigidbody2D[2];
-    private BoxCollider2D[] fighterColliders = new BoxCollider2D[2];
-    private GameObject pacman;
-    private GameObject ghost;
-    public float blockMoveReduction;
-
-    public GameObject getArenaFloor() { return arenaFloor; }
-    public float getCharacterSpeed() { return characterSpeed; }
-    public float getJumpStrength() { return jumpStrength; }
-    public float getSmoothTime() { return smoothTime; }
-    public GameObject[] getFighters() { return fighters; }
-    public PlayerBehavior[] getFighterScript() { return fighterScript; }
-    public Rigidbody2D[] getFighterRb() { return fighterRb; }
-    public BoxCollider2D[] getFighterCollider() { return fighterColliders; }
-
-    private void Start() {
-        for (int i = 0; i < fighters.Length; i++) {
-            GameObject fighter = fighters[i];
-
-            fighterScript[i] = fighter.GetComponent<PlayerBehavior>();
-            fighterRb[i] = fighter.GetComponent<Rigidbody2D>();
-            fighterColliders[i] = fighter.GetComponent<BoxCollider2D>();
-        }
-
-        pacman = fighters[0];
-        ghost = fighters[1];
+        projectileBehavior.Spawn(owner, attackInfo, attackDirection);
+        return projectileBehavior;
     }
 
-    private void Update() {
-
-        // Make sprites always face opponent
-        if (pacman.transform.position.x < ghost.transform.position.x) {
-            if (fighterScript[0].facingRight) { return; }
-            
-            fighterScript[0].facingRight = true;
-            fighterScript[1].facingRight = false;
-            faceRight(pacman);
-            faceLeft(ghost);
-
-            // Debug.Log("Facing Left");
-        } else {
-            if (fighterScript[1].facingRight) { return; }
-
-            fighterScript[0].facingRight = false;
-            fighterScript[1].facingRight = true;
-            faceRight(ghost);
-            faceLeft(pacman);
-
-            // Debug.Log("Facing Right");
+    private void TickDebuffs() {
+        timeCounter += Time.deltaTime;
+        if (timeCounter < .5f) { return; }
+        timeCounter -= .5f;
+        
+        if (Pacman.DOTDuration > 0) {
+            Pacman.DOTDuration -= .5f;
+            Pacman.Hit(Pacman.DOTAttack, false, 0);
+        }
+        
+        if (Ghost.DOTDuration > 0) {
+            Ghost.DOTDuration -= .5f;
+            Ghost.Hit(Ghost.DOTAttack, false, 0);
         }
     }
-
-    private void faceRight(GameObject fighter) {
-        SpriteRenderer spriteRenderer = fighter.GetComponent<SpriteRenderer>();
-        Transform attackBox = fighter.transform.GetChild(0);
-
-        spriteRenderer.flipX = false;
-        attackBox.localScale = new Vector3(1, 1, 1);
-    }
-
-    private void faceLeft(GameObject fighter) {
-        SpriteRenderer spriteRenderer = fighter.GetComponent<SpriteRenderer>();
-        Transform attackBox = fighter.transform.GetChild(0);
-
-        spriteRenderer.flipX = true;
-        attackBox.localScale = new Vector3(-1, 1, 1);
-    }
 }
-*/

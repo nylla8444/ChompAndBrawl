@@ -10,27 +10,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f3a6b651219d9d4a90418b1db029e0c, type: 3}
-  m_Name: Punch3
+  m_Name: LightningStrike
   m_EditorClassIdentifier: 
-  damage: 45
-  stunDuration: 0.9
-  chargeDuration: 0.7
-  hitDuration: 0.9
-  missDuration: 1.25
-  attackCooldown: 0
-  rootVelocity: {x: -3, y: 15}
-  otherVelocity: {x: 6, y: 20}
-  attackBoxOffset: {x: 0.625, y: 0.425}
-  attackBoxSize: {x: 1.25, y: 0.75}
+  damage: 125
+  stunDuration: 1.2
+  chargeDuration: 0.8
+  hitDuration: 0.5
+  missDuration: 0
+  attackCooldown: 7.5
+  rootVelocity: {x: 0, y: 0}
+  otherVelocity: {x: 0, y: 0}
+  attackBoxOffset: {x: 0, y: 0}
+  attackBoxSize: {x: 1, y: 1}
   nextAttack: {fileID: 0}
-  attackCategory: 0
+  attackCategory: 2
   shakeCam: 1
-  camShakeStrength: 0.5
-  camShakeDuration: 0.1
-  isProjectile: 0
-  projectileVelocity: {x: 0, y: 0}
-  projectileSize: {x: 0, y: 0, z: 0}
+  camShakeStrength: 0.8
+  camShakeDuration: 0.15
+  isProjectile: 1
+  projectileVelocity: {x: 0, y: -20}
+  projectileSize: {x: 1.5, y: 8, z: 1}
   projectileSpawnOnOwner: 0
-  lifetime: 0
+  lifetime: 3
   DOTDuration: 0
   DOTAttack: {fileID: 0}

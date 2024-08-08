@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Clyde
   m_EditorClassIdentifier: 
   DamageMultipler: 1
-  UniqueAttackInfo: {fileID: 0}
+  UniqueAttackInfo: {fileID: 11400000, guid: e4408cf39b3ca394ea6d36bf602da14f, type: 2}

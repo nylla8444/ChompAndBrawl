@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Inky
   m_EditorClassIdentifier: 
   DamageMultipler: 1
-  UniqueAttackInfo: {fileID: 0}
+  UniqueAttackInfo: {fileID: 11400000, guid: 993fb33dc7ee00f418e506c1e436af9d, type: 2}
+  spriteSheet: {fileID: 0}
