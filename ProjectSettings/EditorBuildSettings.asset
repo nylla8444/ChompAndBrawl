@@ -27,6 +27,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Labyrinth/DungeonLabyrinth.unity
     guid: d7a19384c5900574bae919f009db48c8
   - enabled: 1
+    path: Assets/Scenes/Labyrinth/Rainbowtopia.unity
+    guid: 8c5513ae3f0fd4b4db55c347e5e8a27c
+  - enabled: 1
     path: Assets/Scenes/BrawlFight/TheGhostIslandArena.unity
     guid: e41bb886e285eba47b94ce25e7ae5ea9
   m_configObjects: {}

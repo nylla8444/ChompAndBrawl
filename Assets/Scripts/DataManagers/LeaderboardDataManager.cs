@@ -18,6 +18,19 @@ public class LeaderboardData
         public int pac_points;
         public int playtime;
     }
+
+    public void AddRowData(string codeName, string winnerName, int pacPoints, int playtime)
+    {
+        RowData newRow = new RowData
+        {
+            code_name = codeName,
+            winner_name = winnerName,
+            pac_points = pacPoints,
+            playtime = playtime
+        };
+
+        rowData.Add(newRow);
+    }
 }
 
 public static class LeaderboardDataManager

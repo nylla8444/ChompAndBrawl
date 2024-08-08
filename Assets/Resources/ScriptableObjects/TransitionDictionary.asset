@@ -14,7 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transitionIds:
   - maze_to_brawl
+  - brawl_to_maze
+  - checkered_wipe
   transitionInfos:
   - startTransitionName: to_enter
     endTransitionName: to_exit
+    transitionDuration: 4
+  - startTransitionName: to_enter
+    endTransitionName: to_exit
     transitionDuration: 3
+  - startTransitionName: to_enter
+    endTransitionName: to_exit
+    transitionDuration: 2

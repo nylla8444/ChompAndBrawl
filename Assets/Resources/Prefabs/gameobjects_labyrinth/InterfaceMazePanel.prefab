@@ -2589,7 +2589,7 @@ GameObject:
   - component: {fileID: 6834384978110853457}
   - component: {fileID: 7227924989975338607}
   m_Layer: 5
-  m_Name: InterfacePanel
+  m_Name: InterfaceMazePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

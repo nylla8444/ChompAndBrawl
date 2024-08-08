@@ -57,6 +57,8 @@ public class IngamePrepareHandler : MonoBehaviour
         {
             Maze_PrepareUi();
         }
+
+        MazeToBrawlSetUi();
     }
 
     private void ResetKeys()
@@ -319,6 +321,8 @@ public class IngamePrepareHandler : MonoBehaviour
     {
         string ghostFightingName = IngameDataManager.LoadSpecificData<string>("ghost_data.current_fighting");
         bool hasPowerPellet = IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet");
+
+        if (System.String.IsNullOrEmpty(ghostFightingName)) return;
 
         int ghostIndex = ghostFightingName switch
         {

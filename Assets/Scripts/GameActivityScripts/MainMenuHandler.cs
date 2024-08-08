@@ -74,24 +74,24 @@ public class MainMenuHandler : MonoBehaviour
 
     private void SetForCurrentScene()
     {
-        string curentScene = SceneManager.GetActiveScene().name;
-        if (curentScene == mainSceneIds.GetSceneName("main_menu_scene"))
+        string currentScene = SceneManager.GetActiveScene().name;
+        if (currentScene == mainSceneIds.GetSceneName("main_menu_scene"))
         {
             MainMenu_Start();
         }
-        else if (curentScene == mainSceneIds.GetSceneName("map_selection_scene"))
+        else if (currentScene == mainSceneIds.GetSceneName("map_selection_scene"))
         {
             MapSelection_Start();
         }
-        else if (curentScene == mainSceneIds.GetSceneName("game_preparation_scene"))
+        else if (currentScene == mainSceneIds.GetSceneName("game_preparation_scene"))
         {
             GamePreparation_Start();
         }
-        else if (curentScene == mainSceneIds.GetSceneName("leaderboard_scene"))
+        else if (currentScene == mainSceneIds.GetSceneName("leaderboard_scene"))
         {
             Leaderboard_Start();
         }
-        else if (curentScene == mainSceneIds.GetSceneName("settings_scene"))
+        else if (currentScene == mainSceneIds.GetSceneName("settings_scene"))
         {
             Settings_Start();
         }
@@ -341,6 +341,11 @@ public class MainMenuHandler : MonoBehaviour
     {
         gamePreparationScreen.SetActive(false);
         loadingScreen.SetActive(true);
+
+        PlayerData playerData = PlayerDataManager.LoadData();
+        IngameMap map = ingameMapList.ingameMaps.Find(map => map.mapId == playerData.selected_map);
+        loadMapDisplay.sprite = map.mapImage;
+        loadMapTitleText.text = map.translatedName;
     }
     
     private IEnumerator LoadSceneAsync(string sceneName)
