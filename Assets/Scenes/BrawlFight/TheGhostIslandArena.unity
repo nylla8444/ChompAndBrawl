@@ -1150,7 +1150,6 @@ MonoBehaviour:
   DOTDuration: 0
   DOTAttack: {fileID: 0}
   SugarRushDuration: 0
-  isWalking: 0
 --- !u!95 &1024155353
 Animator:
   serializedVersion: 5
@@ -1164,7 +1163,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 5bb8214c9810bbc44a4c33a81263e948, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 2
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -1215,7 +1214,6 @@ MonoBehaviour:
   DOTDuration: 0
   DOTAttack: {fileID: 0}
   SugarRushDuration: 0
-  isWalking: 0
 --- !u!50 &1073113144
 Rigidbody2D:
   serializedVersion: 4

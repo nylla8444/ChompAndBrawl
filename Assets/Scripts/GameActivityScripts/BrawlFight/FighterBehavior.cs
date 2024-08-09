@@ -61,7 +61,6 @@ public class FighterBehavior : MonoBehaviour {
     public float DOTDuration = 0;
     [HideInInspector] public AttackInfo DOTAttack;
     [SerializeField] private float SugarRushDuration = 0f;
-    public bool isWalking = false;
 
     
     // GETTERS AND SETTERS
@@ -133,7 +132,6 @@ private void FixedUpdate() {
         fighterPhysics.velocity = new Vector2(newVelocityX, fighterPhysics.velocity.y);
     }
     
-    isWalking = walkDirection == WalkDirection.left || walkDirection == WalkDirection.right;
     walkDirection = WalkDirection.none;
     if (currentState == State.block_walking || currentState == State.blocking) { currentState = State.grounded; }
 }
@@ -429,7 +427,7 @@ private void FixedUpdate() {
     }
 
     private void HandleAnimations() {
-        animator.SetBool("isWalking", isWalking);
+        animator.SetBool("isWalking", walkDirection == WalkDirection.left || walkDirection == WalkDirection.right);
         animator.SetInteger("CurrentState", (int)currentState);
     }
 }

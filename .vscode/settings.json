@@ -56,7 +56,7 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Pac-man Revamp.sln",
+    "dotnet.defaultSolution": "Inhumane.sln",
     "cSpell.words": [
         "Aftergame",
         "Ingame",
