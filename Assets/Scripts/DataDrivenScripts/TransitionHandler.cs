@@ -14,6 +14,7 @@ public class TransitionHandler : MonoBehaviour
         string transitionId = TransitionData.transitionId;
         string endTransitionName = TransitionData.endTransitionName;
         
+        Debug.Log($"{transitionId} + {endTransitionName}");
         transitionScreen.SetActive(true);
         try
         {
@@ -32,7 +33,7 @@ public class TransitionHandler : MonoBehaviour
         if (_transitionAnimator != null && !string.IsNullOrEmpty(_endTransitionName))
         {
             _transitionAnimator.SetTrigger(_endTransitionName);
-            transitionScreen.SetActive(false);
+            // transitionScreen.SetActive(false);
         }
     }
 }
