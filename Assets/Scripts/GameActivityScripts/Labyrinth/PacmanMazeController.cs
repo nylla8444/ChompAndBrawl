@@ -108,6 +108,7 @@ public class PacmanMazeController : MonoBehaviour
         animator?.SetTrigger("pacman.rest");
         
         UpdateHeartDisplay();
+        InitiatePlaytimeDisplay();
         SetToNormalData();
         
         Timing.RunCoroutine(UpdateEffectItemDisplay());
@@ -122,6 +123,13 @@ public class PacmanMazeController : MonoBehaviour
         {
             heartImages[i].sprite = i < pacmanLives ? heartSprites[1] : heartSprites[0];
         }
+    }
+
+    private void InitiatePlaytimeDisplay()
+    {
+        int playtime = IngameDataManager.LoadSpecificData<int>("pacman_data.playtime");
+        System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(playtime);
+        playtimeText.text = string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
     }
 
     private void SetToNormalData()
