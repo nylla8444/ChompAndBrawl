@@ -49,7 +49,7 @@ public class FighterBehavior : MonoBehaviour {
 
     // DYNAMICS
     [SerializeField] private State currentState;
-    [SerializeField] private float currentHealth;
+    [SerializeField] public float currentHealth;
     [SerializeField] private WalkDirection walkDirection;
     private float horizontalVelocity;
     public bool facingLeft;
@@ -328,7 +328,7 @@ private void FixedUpdate() {
         if (attack.attackCategory == AttackCategory.DOT) {
             currentHealth -= attack.damage;
 
-            Debug.LogWarning("Add Healthbar UI damage");
+            brawlManager.SetHealthUi();
             if (currentHealth <= 0) { brawlManager.EndMatch(); }
             return;
         }
@@ -350,8 +350,7 @@ private void FixedUpdate() {
         }
 
         //  fighterPhysics.velocity = blocked ? attack.otherVelocity : new Vector2(attack.otherVelocity.x, fighterPhysics.velocity.y);
-        Debug.LogWarning("Add Healthbar UI damage");
-        // add healthbar ui damage
+        brawlManager.SetHealthUi();
 
         if (currentHealth <= 0) { brawlManager.EndMatch(); }
     }
@@ -414,12 +413,12 @@ private void FixedUpdate() {
     private void TickSkillCooldowns() {
         if (basicCooldown > 0) {
             basicCooldown -= Time.deltaTime;
-            // Edit Cooldown UI
+            brawlManager.SetBasicCooldownUi(brawlManager.GetPacman() == this ? "pacman" : "ghost", basicCooldown);
         }
 
         if (uniqueCooldown > 0) {
             uniqueCooldown -= Time.deltaTime;
-            // Edit Cooldown UI
+            brawlManager.SetUniqueCooldownUi(brawlManager.GetPacman() == this ? "pacman" : "ghost", uniqueCooldown);
         }
 
         if (SugarRushDuration > 0) {

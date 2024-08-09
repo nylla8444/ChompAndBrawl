@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum AttackCategory {
     punch,
@@ -21,13 +22,39 @@ public class BrawlManager : MonoBehaviour {
     
     // VARIABLES
     [Header("GENERAL INFORMATION")]
+    [Header("Data and GameObjects")]
     [SerializeField] private DefaultIngameData defaultIngameData;
     [SerializeField] private DefaultPlayerData defaultPlayerData;
     [SerializeField] private DefaultInputKeybind defaultInputKeybind;
+    [SerializeField] private IngamePrepareHandler ingamePrepareHandler;
     [SerializeField] private GameObject arenaFloor;
     public CameraHandler cameraHandler;
     [SerializeField] private GameObject projectilePrefab;
     [HideInInspector] public readonly float COLLIDER_MARGIN = 0.02f;
+    
+    [Space(5), Header("Ui Objects")]
+    [SerializeField] private Text pointsText;
+    [SerializeField] private Text playtimeText;
+    [SerializeField] private List<Image> heartImages;
+    [SerializeField] private List<Sprite> heartSprites; // 0: empty_heart, 1: full_heart
+    [SerializeField] private List<Image> ghostImages;
+    [SerializeField] private List<Sprite> ghostEmptySprites;
+    [SerializeField] private List<Sprite> ghostFullSprites;
+    [SerializeField] private Image ghostOnControlImage;
+    [SerializeField] private Text cdText_basicPacman;
+    [SerializeField] private Text cdText_uniquePacman;
+    [SerializeField] private Text cdText_basicGhost;
+    [SerializeField] private Text cdText_uniqueGhost;
+    [SerializeField] private Image cdImage_basicPacman;
+    [SerializeField] private Image cdImage_uniquePacman;
+    [SerializeField] private Image cdImage_basicGhost;
+    [SerializeField] private Image cdImage_uniqueGhost;
+    [SerializeField] private Image cdIcon_uniquePacman;
+    [SerializeField] private Image cdIcon_uniqueGhost;
+    [SerializeField] private List<Sprite> uniqueSkillsPacmanSprites;    // 0: normal, 1: monster
+    [SerializeField] private List<Sprite> uniqueSkillsGhostSprites;     // 0: blinky, 1: clyde, 2: inky, 3: pinky
+    [SerializeField] private Image pacmanHealthImage;
+    [SerializeField] private Image ghostHealthImage;
 
     [Space(10), Header("FIGHTER INFORMATION")]
     [Header("General")]
@@ -66,6 +93,7 @@ public class BrawlManager : MonoBehaviour {
     }
 
     private void Start() {
+        StartCoroutine(SetUi());
         StartMatch(); // add begin countdown before this
     }
 
@@ -103,10 +131,10 @@ public class BrawlManager : MonoBehaviour {
         FighterInfo fighter;
         
         switch (ghostName) {
-            case "Blinky": fighter = FI_Blinky; break;
-            case "Clyde": fighter = FI_Clyde; break;
-            case "Pinky": fighter = FI_Pinky; break;
-            case "Inky": fighter = FI_Inky; break;
+            case "blinky": fighter = FI_Blinky; break;
+            case "clyde": fighter = FI_Clyde; break;
+            case "pinky": fighter = FI_Pinky; break;
+            case "inky": fighter = FI_Inky; break;
             default:
                 Debug.Log("'ghost_data.current_fighting' cannot be found. Spawned 'Blinky' in arena instead.");
                 fighter = FI_Blinky; break;
@@ -126,6 +154,13 @@ public class BrawlManager : MonoBehaviour {
     public void EndMatch() {
         matchState = MatchState.ending;
         StopCoroutine(TickPlaytime());
+
+        if (Pacman.currentHealth <= 0) {
+            ingamePrepareHandler.SetDataForWinning("ghost", "pacman");
+        } else if (Ghost.currentHealth <= 0) {
+            ingamePrepareHandler.SetDataForWinning("pacman", IngameDataManager.LoadSpecificData<string>("ghost_data.current_fighting"));
+        }
+        StartCoroutine(SetUi());
     }
 
     private IEnumerator TickPlaytime() {
@@ -136,7 +171,7 @@ public class BrawlManager : MonoBehaviour {
             IngameDataManager.SaveSpecificData("pacman_data.playtime", playtime + 1);
 
             System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(playtime);
-            // playtimeText.text = string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
+            playtimeText.text = string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
         }
     }
 
@@ -187,5 +222,61 @@ public class BrawlManager : MonoBehaviour {
             Ghost.DOTDuration -= .5f;
             Ghost.Hit(Ghost.DOTAttack, false, 0);
         }
+    }
+
+    private IEnumerator SetUi() {
+        yield return new WaitForSeconds(0.2f);
+        int points = IngameDataManager.LoadSpecificData<int>("pacman_data.points"); 
+        pointsText.text = points.ToString("00,000,000");
+
+        int lives = IngameDataManager.LoadSpecificData<int>("pacman_data.lives");
+        for (int i = 0; i < heartImages.Count; i++) {
+            heartImages[i].sprite = i < lives ? heartSprites[1] : heartSprites[0];
+        }
+
+        List<string> ghostNames = new List<string> { "blinky", "clyde", "inky", "pinky" };
+        List<string> aliveGhosts = IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive");
+        for (int i = 0; i < ghostNames.Count; i++) {
+            ghostImages[i].sprite = (aliveGhosts.Contains(ghostNames[i])) ? ghostFullSprites[i] : ghostEmptySprites[i];
+        }
+
+        int spriteIndex = IngameDataManager.LoadSpecificData<string>("ghost_data.current_fighting") switch {
+            "blinky" => 0, "clyde" => 1, "inky" => 2, "pinky" => 3, _ => -1
+        };
+        ghostOnControlImage.sprite = ghostFullSprites[spriteIndex];
+        cdIcon_uniqueGhost.sprite = uniqueSkillsGhostSprites[spriteIndex];
+
+        cdIcon_uniquePacman.sprite = uniqueSkillsPacmanSprites[IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet") ? 1 : 0];
+        cdImage_basicPacman.enabled = false;
+        cdImage_basicGhost.enabled = false;
+        cdImage_uniquePacman.enabled = false;
+        cdImage_uniqueGhost.enabled = false;
+    }
+
+    public void SetBasicCooldownUi(string character, float cooldown) {
+        if (character == "pacman") {
+            cdImage_basicPacman.enabled = cooldown > 0f ? true : false;
+            cdText_basicPacman.text = cooldown > 0f ? $"{cooldown:F1}s" : "";
+        } else if (character == "ghost") {
+            cdImage_basicGhost.enabled = cooldown > 0f ? true : false;
+            cdText_basicGhost.text = cooldown > 0f ? $"{cooldown:F1}s" : "";
+        }
+    }
+
+    public void SetUniqueCooldownUi(string character, float cooldown) {
+        if (character == "pacman") {
+            cdImage_uniquePacman.enabled = cooldown > 0f ? true : false;
+            cdText_uniquePacman.text = cooldown > 0f ? $"{cooldown:F1}s" : "";
+        } else if (character == "ghost") {
+            cdImage_uniqueGhost.enabled = cooldown > 0f ? true : false;
+            cdText_uniqueGhost.text = cooldown > 0f ? $"{cooldown:F1}s" : "";
+        }
+    }
+
+    public void SetHealthUi() {
+        float pacmanCurrentHealth = Mathf.Clamp(Pacman.currentHealth, 0, maxHealth);
+        pacmanHealthImage.fillAmount = pacmanCurrentHealth / maxHealth;
+        float ghostCurrentHealth = Mathf.Clamp(Ghost.currentHealth, 0, maxHealth);
+        ghostHealthImage.fillAmount = ghostCurrentHealth / maxHealth;
     }
 }

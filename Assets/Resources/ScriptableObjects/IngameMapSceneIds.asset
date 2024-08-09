@@ -25,4 +25,4 @@ MonoBehaviour:
   - sceneAsset: {fileID: 102900000, guid: 8c5513ae3f0fd4b4db55c347e5e8a27c, type: 3}
     sceneName: Rainbowtopia
   - sceneAsset: {fileID: 102900000, guid: e41bb886e285eba47b94ce25e7ae5ea9, type: 3}
-    sceneName: TheGhostIslandArena
+    sceneName: BrawlArena

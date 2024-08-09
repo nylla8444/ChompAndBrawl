@@ -99,11 +99,11 @@ MonoBehaviour:
       holdDown: 0
     - translated_action_name: Basic
       action_name: pacman.basic
-      key_code: 113
+      key_code: 114
       holdDown: 0
     - translated_action_name: Unique
       action_name: pacman.unique
-      key_code: 114
+      key_code: 116
       holdDown: 0
   - category_name: Ghost
     input_keybinds:

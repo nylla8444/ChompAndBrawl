@@ -10,6 +10,7 @@ public class IngamePrepareHandler : MonoBehaviour
     [Header("===General===")]
     [SerializeField] private SceneDictionary mainSceneIds;
     [SerializeField] private SceneDictionary ingameMapSceneIds;
+    [SerializeField] private IngameMapList ingameMapList;
     
     [Header("===Tutorial Misc===")]
     [SerializeField] private GameObject tutorialPanel;
@@ -21,11 +22,17 @@ public class IngamePrepareHandler : MonoBehaviour
     private int currentPacmanTutorialIndex = 0;
     private int currentGhostTutorialIndex = 0;
 
-    [Header("===Countdown Misc===")]
-    [SerializeField] private GameObject countdownPanel;
-    [SerializeField] private Text countdownText;
-    [SerializeField] private List<GameObject> lightsLeft;
-    [SerializeField] private List<GameObject> lightsRight;
+    [Header("===Maze Countdown Misc===")]
+    [SerializeField] private GameObject countdownMazePanel;
+    [SerializeField] private Text countdownMazeText;
+    [SerializeField] private List<GameObject> lightsMazeLeft;
+    [SerializeField] private List<GameObject> lightsMazeRight;
+    
+    [Header("===Brawl Countdown Misc===")]
+    [SerializeField] private GameObject countdownBrawlPanel;
+    [SerializeField] private Image countdownBrawlImgText;
+    [SerializeField] private List<GameObject> lightsBrawlLeft;
+    [SerializeField] private List<GameObject> lightsBrawlRight;
 
     [Header("===Labyrinth Part Misc===")]
     [SerializeField] private PacmanMazeController pacmanMazeController;
@@ -38,6 +45,8 @@ public class IngamePrepareHandler : MonoBehaviour
     [SerializeField] private Image mazeToBrawlGhostImage;
     [SerializeField] private List<Sprite> pacmanBrawlSprites;   // 0: pacman_normal, 1: pacman_monster
     [SerializeField] private List<Sprite> ghostBrawlSprites;    // 0: blinky, 1: clyde, 2: inky, 3: pinky
+    [SerializeField] private Image brawlToMazeMapImage;
+    [SerializeField] private Text brawlToMazeMapText;
     
     /*********************************************************************/
     //
@@ -55,10 +64,11 @@ public class IngamePrepareHandler : MonoBehaviour
         string currentScene = SceneManager.GetActiveScene().name;
         if (currentScene != ingameMapSceneIds.GetSceneName("brawl_arena"))
         {
-            Maze_PrepareUi();
+            StartCoroutine(Maze_PrepareUi());
         }
 
         MazeToBrawlSetUi();
+        BrawlToMazeSetUi();
     }
 
     private void ResetKeys()
@@ -72,21 +82,23 @@ public class IngamePrepareHandler : MonoBehaviour
     //
     /*********************************************************************/
 
-    private void Maze_PrepareUi()
+    private IEnumerator Maze_PrepareUi()
     {
         if (!IsAllReadTutorial())
         {
             tutorialPanel.SetActive(true);
-            countdownPanel.SetActive(false);
+            countdownMazePanel.SetActive(false);
             pacmanWaitingSide.SetActive(false);
             ghostWaitingSide.SetActive(false);
             DisplayPacmanTutorial();
             DisplayGhostTutorial();
             Maze_RegisterKeyActions();
+            yield return null;
         }
         else
         {
-            StartCoroutine(DisplayCountdown());
+            yield return new WaitForSeconds(2.5f);
+            StartCoroutine(DisplayMazeCountdown());
         }
     }
 
@@ -190,7 +202,7 @@ public class IngamePrepareHandler : MonoBehaviour
             tutorialPanel.SetActive(false);
             ResetKeys();
 
-            StartCoroutine(DisplayCountdown());
+            StartCoroutine(DisplayMazeCountdown());
         }
     }
 
@@ -200,52 +212,52 @@ public class IngamePrepareHandler : MonoBehaviour
                IngameDataManager.LoadSpecificData<bool>("ghost_data.has_read_tutorial");
     }
 
-    private IEnumerator DisplayCountdown()
+    private IEnumerator DisplayMazeCountdown()
     {
         Color WHITE = new Color(1.0000f, 1.0000f, 1.0000f);
         Color RED = new Color(1.0000f, 0.0000f, 0.1981f);
         Color YELLOW = new Color(1.0000f, 0.8651f, 0.0000f);
         Color GREEN = new Color(0.2247f, 1.0000f, 0.07075f);
         
-        countdownPanel.SetActive(true);
-        countdownText.text = "Starting in...";
+        countdownMazePanel.SetActive(true);
+        countdownMazeText.text = "Starting in...";
         StartCoroutine(ChangeLightColor(WHITE));
 
         yield return new WaitForSeconds(1.0f);
-        countdownText.text = "3";
+        countdownMazeText.text = "3";
         StartCoroutine(ChangeLightColor(RED));
 
         yield return new WaitForSeconds(1.0f);
-        countdownText.text = "2";
+        countdownMazeText.text = "2";
         StartCoroutine(ChangeLightColor(YELLOW));
 
         yield return new WaitForSeconds(1.0f);
-        countdownText.text = "1";
+        countdownMazeText.text = "1";
         StartCoroutine(ChangeLightColor(GREEN));
 
         yield return new WaitForSeconds(1.0f);
         
-        countdownPanel.SetActive(false);
+        countdownMazePanel.SetActive(false);
         StartControls();
     }
 
     private IEnumerator ChangeLightColor(Color color)
     {
-        int lightCount = lightsLeft.Count;
+        int lightCount = lightsMazeLeft.Count;
 
         for (int i = 0; i < lightCount; i++)
         {
-            lightsLeft[i].SetActive(false);
-            lightsRight[i].SetActive(false);
+            lightsMazeLeft[i].SetActive(false);
+            lightsMazeRight[i].SetActive(false);
         }
 
         for (int j = 0; j < lightCount; j++)
         {
             yield return new WaitForSeconds(0.25f);
-            lightsLeft[j].GetComponent<Image>().color = color;
-            lightsLeft[j].SetActive(true);
-            lightsRight[j].GetComponent<Image>().color = color;
-            lightsRight[j].SetActive(true);
+            lightsMazeLeft[j].GetComponent<Image>().color = color;
+            lightsMazeLeft[j].SetActive(true);
+            lightsMazeRight[j].GetComponent<Image>().color = color;
+            lightsMazeRight[j].SetActive(true);
         }
     }
 
@@ -304,6 +316,44 @@ public class IngamePrepareHandler : MonoBehaviour
         Timing.KillCoroutines();
     }
 
+    public void SetDataForWinning(string winner, string loser)
+    {
+        int points = IngameDataManager.LoadSpecificData<int>("pacman_data.points");
+        if (winner == "pacman")
+        {
+            List<string> listAlive = IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive");
+            listAlive.Remove(loser);
+            IngameDataManager.SaveSpecificData("ghost_data.list_alive", listAlive);
+
+            points += 500 * (int)Mathf.Pow(4 - listAlive.Count, 2);
+        }
+        else if (winner == "ghost")
+        {
+            int lives = IngameDataManager.LoadSpecificData<int>("pacman_data.lives");
+            lives = lives - 1;
+            IngameDataManager.SaveSpecificData("pacman_data.lives", lives);
+
+            points -= 500 * (int)Mathf.Pow(3 - lives, 2);
+        }
+        IngameDataManager.SaveSpecificData("pacman_data.points", points);
+
+        StartCoroutine(SetTransitionFromWinning());
+    }
+
+    private IEnumerator SetTransitionFromWinning()
+    {
+        yield return new WaitForSeconds(3.0f);
+        if (IngameDataManager.LoadSpecificData<int>("pacman_data.lives") <= 0 ||
+            IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive").Count <= 0)
+        {
+            AftergameTransition();
+        }
+        else
+        {
+            BrawlToMazeTransition();
+        }
+    }
+
     /*********************************************************************/
     //
     //                          Transitioning
@@ -335,5 +385,27 @@ public class IngamePrepareHandler : MonoBehaviour
 
         mazeToBrawlPacmanImage.sprite = (hasPowerPellet) ? pacmanBrawlSprites[1] : pacmanBrawlSprites[0];
         mazeToBrawlGhostImage.sprite = ghostBrawlSprites[ghostIndex];
+    }
+
+    private void BrawlToMazeTransition()
+    {
+        PlayerData playerData = PlayerDataManager.LoadData();
+        string sceneName = ingameMapSceneIds.GetSceneName(playerData.selected_map);
+        sceneTransitionManager.LoadScene(sceneName, "brawl_to_maze");
+        BrawlToMazeSetUi();
+    }
+
+    private void BrawlToMazeSetUi()
+    {
+        PlayerData playerData = PlayerDataManager.LoadData();
+        IngameMap map = ingameMapList.ingameMaps.Find(map => map.mapId == playerData.selected_map);
+        brawlToMazeMapImage.sprite = map.mapImage;
+        brawlToMazeMapText.text = map.translatedName;
+    }
+
+    private void AftergameTransition()
+    {
+        string sceneName = mainSceneIds.GetSceneName("aftergame_scene");
+        sceneTransitionManager.LoadScene(sceneName, "checkered_wipe");
     }
 }
