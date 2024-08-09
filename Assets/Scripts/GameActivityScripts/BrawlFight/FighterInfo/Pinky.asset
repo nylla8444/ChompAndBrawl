@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Pinky
   m_EditorClassIdentifier: 
   DamageMultipler: 1
-  UniqueAttackInfo: {fileID: 0}
+  UniqueAttackInfo: {fileID: 11400000, guid: fe7bc0fc56bae7347a05063d8b4c19b9, type: 2}
+  spriteSheet: {fileID: 0}

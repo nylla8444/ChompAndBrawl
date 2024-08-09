@@ -645,13 +645,15 @@ MonoBehaviour:
   defaultPlayerData: {fileID: 11400000, guid: c4ba7b4a78539fd41bd2b9732179c7cb, type: 2}
   defaultInputKeybind: {fileID: 11400000, guid: 71e20637733cb534bb8bf5a0eacc2ebb, type: 2}
   arenaFloor: {fileID: 722577194}
+  cameraHandler: {fileID: 510582411}
+  projectilePrefab: {fileID: 1406748374075728400, guid: b0ebeccb73988ec47b5fc762ac757478, type: 3}
   maxHealth: 1800
   jumpPower: 20
-  walkSpeed: 10
-  blockSpeed: 3
+  walkSpeed: 6
+  blockSpeed: 4
   smoothTime: 0.1
-  punchAttack: {fileID: 0}
-  basicAttack: {fileID: 0}
+  punchAttack: {fileID: 11400000, guid: bb78f12ad7f1a4046b7fe0a96bdf3df7, type: 2}
+  basicAttack: {fileID: 11400000, guid: 9514fcf3fff2658469d52206a9106538, type: 2}
   FI_PacmanRegular: {fileID: 11400000, guid: 3b07d6535e55f774e81c96337c91a9c5, type: 2}
   FI_PacmanMonster: {fileID: 11400000, guid: a06d648f1179fee40aebe205be64c353, type: 2}
   FI_Blinky: {fileID: 11400000, guid: 06cbc760d0c70074aa0d6d18b92fdc50, type: 2}
@@ -977,6 +979,7 @@ GameObject:
   - component: {fileID: 1024155349}
   - component: {fileID: 1024155348}
   - component: {fileID: 1024155352}
+  - component: {fileID: 1024155353}
   m_Layer: 11
   m_Name: Pacman
   m_TagString: Untagged
@@ -1047,7 +1050,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.75, y: 0.78}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -1097,7 +1100,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 1581495865, guid: ec829f864673cac41809d2727d1c9e6a, type: 3}
   m_Color: {r: 1, g: 0.9244273, b: 0.62578607, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1136,7 +1139,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 261c3968aa1f4334289568f06d1e6fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  facingLeft: 0
+  opponent: {fileID: 0}
+  fighterInfo: {fileID: 0}
+  currentState: 0
+  currentHealth: 0
+  walkDirection: 0
+  facingLeft: 1
+  basicCooldown: 0
+  uniqueCooldown: 0
+  DOTDuration: 0
+  DOTAttack: {fileID: 0}
+  SugarRushDuration: 0
+  isWalking: 0
+--- !u!95 &1024155353
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1024155347}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5bb8214c9810bbc44a4c33a81263e948, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 2
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1073113142
 GameObject:
   m_ObjectHideFlags: 0
@@ -1169,7 +1204,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 261c3968aa1f4334289568f06d1e6fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  facingLeft: 0
+  opponent: {fileID: 0}
+  fighterInfo: {fileID: 0}
+  currentState: 0
+  currentHealth: 0
+  walkDirection: 0
+  facingLeft: 1
+  basicCooldown: 0
+  uniqueCooldown: 0
+  DOTDuration: 0
+  DOTAttack: {fileID: 0}
+  SugarRushDuration: 0
+  isWalking: 0
 --- !u!50 &1073113144
 Rigidbody2D:
   serializedVersion: 4

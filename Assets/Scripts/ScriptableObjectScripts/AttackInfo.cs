@@ -20,4 +20,11 @@ public class AttackInfo : ScriptableObject {
     public bool shakeCam;
     public float camShakeStrength;
     public float camShakeDuration;
+    public bool isProjectile;
+    public Vector2 projectileVelocity;
+    public Vector3 projectileSize;
+    public bool projectileSpawnOnOwner; // false = spawn above opponent
+    public float lifetime;
+    public float DOTDuration;
+    public AttackInfo DOTAttack;
 }

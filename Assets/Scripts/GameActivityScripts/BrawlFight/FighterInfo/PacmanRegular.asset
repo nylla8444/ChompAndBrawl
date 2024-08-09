@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: PacmanRegular
   m_EditorClassIdentifier: 
   DamageMultipler: 0.5
-  UniqueAttackInfo: {fileID: 0}
+  UniqueAttackInfo: {fileID: 11400000, guid: 2688212f915215b4b8a3c1e0f3ad027c, type: 2}
+  spriteSheet: {fileID: 21300000, guid: ec829f864673cac41809d2727d1c9e6a, type: 3}

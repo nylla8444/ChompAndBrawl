@@ -71,7 +71,6 @@ public class CameraHandler : MonoBehaviour {
     }
 
     public void Shake(float _shakeDuration, float _shakeStrength) {
-        Debug.Log("Camera shaking");
         shakeDuration = _shakeDuration;
         shakeStrength = _shakeStrength;
         initialCamPosition = _camera.transform.position;

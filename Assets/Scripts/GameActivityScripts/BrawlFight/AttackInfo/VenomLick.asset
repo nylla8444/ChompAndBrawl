@@ -10,27 +10,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f3a6b651219d9d4a90418b1db029e0c, type: 3}
-  m_Name: Punch
+  m_Name: VenomLick
   m_EditorClassIdentifier: 
-  damage: 20
-  stunDuration: 0.6
-  chargeDuration: 0.4
-  hitDuration: 0.5
-  missDuration: 0.8
-  attackCooldown: 0
-  rootVelocity: {x: 4, y: 0}
-  otherVelocity: {x: 5, y: 0}
-  attackBoxOffset: {x: 0.625, y: 0.425}
-  attackBoxSize: {x: 1.25, y: 0.75}
-  nextAttack: {fileID: 11400000, guid: 185b82c4462990d4db901646f297a93a, type: 2}
-  attackCategory: 0
+  damage: 75
+  stunDuration: 0.9
+  chargeDuration: 0.8
+  hitDuration: 0.8
+  missDuration: 0
+  attackCooldown: 10
+  rootVelocity: {x: 0, y: 0}
+  otherVelocity: {x: 6, y: 0}
+  attackBoxOffset: {x: 0.5, y: 0}
+  attackBoxSize: {x: 2, y: 1}
+  nextAttack: {fileID: 0}
+  attackCategory: 2
   shakeCam: 1
-  camShakeStrength: 0.1
-  camShakeDuration: 0.05
+  camShakeStrength: 0.5
+  camShakeDuration: 0.1
   isProjectile: 0
   projectileVelocity: {x: 0, y: 0}
   projectileSize: {x: 0, y: 0, z: 0}
   projectileSpawnOnOwner: 0
   lifetime: 0
-  DOTDuration: 0
-  DOTAttack: {fileID: 0}
+  DOTDuration: 3
+  DOTAttack: {fileID: 11400000, guid: d05bf5ffb397815479b9351b696d5f2b, type: 2}
