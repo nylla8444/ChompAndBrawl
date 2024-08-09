@@ -30,7 +30,7 @@ public class BrawlManager : MonoBehaviour {
     [SerializeField] private GameObject arenaFloor;
     public CameraHandler cameraHandler;
     [SerializeField] private GameObject projectilePrefab;
-    [HideInInspector] public readonly float COLLIDER_MARGIN = 0.02f;
+    [HideInInspector] public readonly float COLLIDER_MARGIN = 1.165001f;
     
     [Space(5), Header("Ui Objects")]
     [SerializeField] private Text pointsText;
@@ -94,7 +94,10 @@ public class BrawlManager : MonoBehaviour {
 
     private void Start() {
         StartCoroutine(SetUi());
-        StartMatch(); // add begin countdown before this
+    }
+
+    public void ToStart() {
+        StartMatch();
     }
 
     private void Update() {
@@ -228,6 +231,10 @@ public class BrawlManager : MonoBehaviour {
         yield return new WaitForSeconds(0.2f);
         int points = IngameDataManager.LoadSpecificData<int>("pacman_data.points"); 
         pointsText.text = points.ToString("00,000,000");
+
+        int playtime = IngameDataManager.LoadSpecificData<int>("pacman_data.playtime");
+        System.TimeSpan timeSpan = System.TimeSpan.FromSeconds(playtime);
+        playtimeText.text = string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
 
         int lives = IngameDataManager.LoadSpecificData<int>("pacman_data.lives");
         for (int i = 0; i < heartImages.Count; i++) {

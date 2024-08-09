@@ -11,6 +11,7 @@ public class IngamePrepareHandler : MonoBehaviour
     [SerializeField] private SceneDictionary mainSceneIds;
     [SerializeField] private SceneDictionary ingameMapSceneIds;
     [SerializeField] private IngameMapList ingameMapList;
+    [SerializeField] private BrawlManager brawlManager;
     
     [Header("===Tutorial Misc===")]
     [SerializeField] private GameObject tutorialPanel;
@@ -30,7 +31,8 @@ public class IngamePrepareHandler : MonoBehaviour
     
     [Header("===Brawl Countdown Misc===")]
     [SerializeField] private GameObject countdownBrawlPanel;
-    [SerializeField] private Image countdownBrawlImgText;
+    [SerializeField] private Image countdownBrawlImageText; 
+    [SerializeField] private List<Sprite> countdownBrawlTextSprites; // 0: ready, 1: fight
     [SerializeField] private List<GameObject> lightsBrawlLeft;
     [SerializeField] private List<GameObject> lightsBrawlRight;
 
@@ -65,6 +67,10 @@ public class IngamePrepareHandler : MonoBehaviour
         if (currentScene != ingameMapSceneIds.GetSceneName("brawl_arena"))
         {
             StartCoroutine(Maze_PrepareUi());
+        }
+        else
+        {
+            StartCoroutine(Brawl_PrepareUi());
         }
 
         MazeToBrawlSetUi();
@@ -221,19 +227,19 @@ public class IngamePrepareHandler : MonoBehaviour
         
         countdownMazePanel.SetActive(true);
         countdownMazeText.text = "Starting in...";
-        StartCoroutine(ChangeLightColor(WHITE));
+        StartCoroutine(ChangeLightMazeColor(WHITE));
 
         yield return new WaitForSeconds(1.0f);
         countdownMazeText.text = "3";
-        StartCoroutine(ChangeLightColor(RED));
+        StartCoroutine(ChangeLightMazeColor(RED));
 
         yield return new WaitForSeconds(1.0f);
         countdownMazeText.text = "2";
-        StartCoroutine(ChangeLightColor(YELLOW));
+        StartCoroutine(ChangeLightMazeColor(YELLOW));
 
         yield return new WaitForSeconds(1.0f);
         countdownMazeText.text = "1";
-        StartCoroutine(ChangeLightColor(GREEN));
+        StartCoroutine(ChangeLightMazeColor(GREEN));
 
         yield return new WaitForSeconds(1.0f);
         
@@ -241,7 +247,7 @@ public class IngamePrepareHandler : MonoBehaviour
         StartControls();
     }
 
-    private IEnumerator ChangeLightColor(Color color)
+    private IEnumerator ChangeLightMazeColor(Color color)
     {
         int lightCount = lightsMazeLeft.Count;
 
@@ -271,6 +277,63 @@ public class IngamePrepareHandler : MonoBehaviour
 
     /*********************************************************************/
     //
+    //                         Brawl Preparation
+    //
+    /*********************************************************************/
+
+    private IEnumerator Brawl_PrepareUi()
+    {
+        yield return new WaitForSeconds(2.5f);
+        StartCoroutine(DisplayBrawlCountdown());
+    }
+    
+    private IEnumerator DisplayBrawlCountdown()
+    {
+        Color WHITE = new Color(1.0000f, 1.0000f, 1.0000f);
+        Color RED = new Color(1.0000f, 0.0000f, 0.1981f);
+        Color GREEN = new Color(0.2247f, 1.0000f, 0.07075f);
+
+        countdownBrawlPanel.SetActive(true);
+        countdownBrawlImageText.enabled = false;
+        StartCoroutine(ChangeLightBrawlColor(WHITE));
+
+        yield return new WaitForSeconds(1.0f);
+        countdownBrawlImageText.enabled = true;
+        countdownBrawlImageText.sprite = countdownBrawlTextSprites[0];
+        StartCoroutine(ChangeLightBrawlColor(RED));
+
+        yield return new WaitForSeconds(1.0f);
+        countdownBrawlImageText.sprite = countdownBrawlTextSprites[1];
+        StartCoroutine(ChangeLightBrawlColor(GREEN));
+
+        yield return new WaitForSeconds(1.0f);
+        countdownBrawlPanel.SetActive(false);
+
+        brawlManager.ToStart();
+    }
+
+    private IEnumerator ChangeLightBrawlColor(Color color)
+    {
+        int lightCount = lightsBrawlLeft.Count;
+
+        for (int i = 0; i < lightCount; i++)
+        {
+            lightsBrawlLeft[i].SetActive(false);
+            lightsBrawlRight[i].SetActive(false);
+        }
+
+        for (int j = 0; j < lightCount; j++)
+        {
+            yield return new WaitForSeconds(0.25f);
+            lightsBrawlLeft[j].GetComponent<Image>().color = color;
+            lightsBrawlLeft[j].SetActive(true);
+            lightsBrawlRight[j].GetComponent<Image>().color = color;
+            lightsBrawlRight[j].SetActive(true);
+        }
+    }
+
+    /*********************************************************************/
+    //
     //                         Collide Detected
     //
     /*********************************************************************/
@@ -279,7 +342,7 @@ public class IngamePrepareHandler : MonoBehaviour
     {
         while (true)
         {
-            yield return Timing.WaitForSeconds(0.02f);
+            yield return Timing.WaitForSeconds(0.01f);
             if (IngameDataManager.LoadSpecificData<bool>("pacman_data.is_immune_to_ghost")) continue;
             
             Vector2 _pacman_coordinate = IngameDataManager.LoadSpecificData<Vector2>("pacman_data.coordinate");
