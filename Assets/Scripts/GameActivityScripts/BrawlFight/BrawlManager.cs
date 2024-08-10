@@ -63,8 +63,10 @@ public class BrawlManager : MonoBehaviour {
     [SerializeField] private Image cdImage_uniquePacman;
     [SerializeField] private Image cdImage_basicGhost;
     [SerializeField] private Image cdImage_uniqueGhost;
-    [SerializeField] private Image cdIcon_uniquePacman;
-    [SerializeField] private Image cdIcon_uniqueGhost;
+    [SerializeField] private Text uniqueTextPacman;
+    [SerializeField] private Text uniqueTextGhost;
+    [SerializeField] private Image uniqueIconPacman;
+    [SerializeField] private Image uniqueIconGhost;
     [SerializeField] private List<Sprite> uniqueSkillsPacmanSprites;    // 0: normal, 1: monster
     [SerializeField] private List<Sprite> uniqueSkillsGhostSprites;     // 0: blinky, 1: clyde, 2: inky, 3: pinky
     [SerializeField] private Image pacmanHealthImage;
@@ -173,6 +175,8 @@ public class BrawlManager : MonoBehaviour {
 
     public void EndMatch() {
         matchState = MatchState.ending;
+        Pacman.ResetKeys();
+        Ghost.ResetKeys();
         StopCoroutine(TickPlaytime());
 
         if (Pacman.currentHealth <= 0) {
@@ -264,13 +268,16 @@ public class BrawlManager : MonoBehaviour {
             ghostImages[i].sprite = (aliveGhosts.Contains(ghostNames[i])) ? ghostFullSprites[i] : ghostEmptySprites[i];
         }
 
-        int spriteIndex = IngameDataManager.LoadSpecificData<string>("ghost_data.current_fighting") switch {
+        List<string> uniqueSkillNames = new List<string> { "Sugar Rush", "Lightning Strike", "Sandstorm", "Magma Slime" };
+        int ghostIndex = IngameDataManager.LoadSpecificData<string>("ghost_data.current_fighting") switch {
             "blinky" => 0, "clyde" => 1, "inky" => 2, "pinky" => 3, _ => -1
         };
-        ghostOnControlImage.sprite = ghostFullSprites[spriteIndex];
-        cdIcon_uniqueGhost.sprite = uniqueSkillsGhostSprites[spriteIndex];
+        ghostOnControlImage.sprite = ghostFullSprites[ghostIndex];
+        uniqueIconGhost.sprite = uniqueSkillsGhostSprites[ghostIndex];
+        uniqueTextGhost.text = uniqueSkillNames[ghostIndex];
 
-        cdIcon_uniquePacman.sprite = uniqueSkillsPacmanSprites[IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet") ? 1 : 0];
+        uniqueIconPacman.sprite = uniqueSkillsPacmanSprites[IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet") ? 1 : 0];
+        uniqueTextPacman.text = IngameDataManager.LoadSpecificData<bool>("pacman_data.has_power_pellet") ? "Venom Lick" : "Pellet Shot";
         cdImage_basicPacman.enabled = false;
         cdImage_basicGhost.enabled = false;
         cdImage_uniquePacman.enabled = false;

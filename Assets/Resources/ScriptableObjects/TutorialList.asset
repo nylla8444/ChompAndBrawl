@@ -15,12 +15,13 @@ MonoBehaviour:
   tutorials:
   - tutorialId: pacman_tutorials
     tutorialSprites:
-    - {fileID: 21300000, guid: 7d9b5fbfcad44cd4f95cb75f5d54062e, type: 3}
-    - {fileID: 21300000, guid: 3241a2cb758f4254895af153502631d3, type: 3}
-    - {fileID: 21300000, guid: 41a5234d6913c6b4cb4616bb13fa9c1f, type: 3}
-    - {fileID: 21300000, guid: e7dc07a68e2ecfe4cbbe9eeea5d74853, type: 3}
+    - {fileID: 21300000, guid: e7e840e94a80b6343b3b1b897d338ee1, type: 3}
+    - {fileID: 21300000, guid: c4729252662049143aef8e02a5337df4, type: 3}
+    - {fileID: 21300000, guid: 0ad3eeb4ca7781e4f98f80df937ffcf7, type: 3}
+    - {fileID: 21300000, guid: e0b2a9f8c39dc884abf83f27fe5727f9, type: 3}
   - tutorialId: ghost_tutorials
     tutorialSprites:
-    - {fileID: 21300000, guid: 41a5234d6913c6b4cb4616bb13fa9c1f, type: 3}
-    - {fileID: 21300000, guid: e7dc07a68e2ecfe4cbbe9eeea5d74853, type: 3}
-    - {fileID: 21300000, guid: 7d9b5fbfcad44cd4f95cb75f5d54062e, type: 3}
+    - {fileID: 21300000, guid: f719eb8abd18e74488985dcf3521ee93, type: 3}
+    - {fileID: 21300000, guid: bf6147d2f91d84447aa72ef3f909eb2c, type: 3}
+    - {fileID: 21300000, guid: 9516db7fbd5da4041b74f0a8b5f9e273, type: 3}
+    - {fileID: 21300000, guid: 14a91ed2f06472c46a4f6be2bb934f21, type: 3}

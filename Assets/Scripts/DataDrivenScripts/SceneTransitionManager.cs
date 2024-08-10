@@ -37,6 +37,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     private IEnumerator LoadSceneAsync(string sceneName)
     {
+        SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().name);
         if (!string.IsNullOrEmpty(startTransitionName))
         {
             transitionAnimator.SetTrigger(startTransitionName);

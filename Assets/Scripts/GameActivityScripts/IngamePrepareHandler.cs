@@ -12,6 +12,7 @@ public class IngamePrepareHandler : MonoBehaviour
     [SerializeField] private SceneDictionary ingameMapSceneIds;
     [SerializeField] private IngameMapList ingameMapList;
     [SerializeField] private BrawlManager brawlManager;
+    [SerializeField] private AudioManager audioManager;
     
     [Header("===Tutorial Misc===")]
     [SerializeField] private GameObject tutorialPanel;
@@ -245,6 +246,7 @@ public class IngamePrepareHandler : MonoBehaviour
         
         countdownMazePanel.SetActive(false);
         StartControls();
+        PlayAudioBgm();
     }
 
     private IEnumerator ChangeLightMazeColor(Color color)
@@ -273,6 +275,24 @@ public class IngamePrepareHandler : MonoBehaviour
         ghostMazeController.StartGhostController(true);
         itemMazeHandler.StartItemController(true);
         Timing.RunCoroutine(CollideDetection());
+    }
+
+    private void PlayAudioBgm()
+    {
+        PlayerData playerData = PlayerDataManager.LoadData();
+        string selectedMap = playerData.selected_map;
+        if (selectedMap == "the_ghost_island")
+        {
+            audioManager.PlayAudio("music.background.the_ghost_island_bgm", true);
+        }
+        else if (selectedMap == "dungeon_labyrinth")
+        {
+            audioManager.PlayAudio("music.background.dungeon_labyrinth_bgm", true);
+        }
+        else if (selectedMap == "rainbowtopia")
+        {
+            audioManager.PlayAudio("music.background.rainbowtopia_bgm", true);
+        }
     }
 
     /*********************************************************************/
@@ -310,6 +330,7 @@ public class IngamePrepareHandler : MonoBehaviour
         countdownBrawlPanel.SetActive(false);
 
         brawlManager.ToStart();
+        audioManager.PlayAudio("music.background.brawl_arena_bgm", true);
     }
 
     private IEnumerator ChangeLightBrawlColor(Color color)
@@ -364,6 +385,7 @@ public class IngamePrepareHandler : MonoBehaviour
     private IEnumerator<float> CollideDetected(string ghostName)
     {
         ResetKeys();
+        itemMazeHandler.StopCorou();
         IngameDataManager.SaveSpecificData("ghost_data.current_fighting", ghostName);
         ghostMazeController.DirectChangeGhost(ghostName);
         

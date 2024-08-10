@@ -66,6 +66,7 @@ public class GeneralManager : MonoBehaviour
     public void PrepareResetData()
     {
         IngameDataManager.DeleteData();
+        PlayerDataManager.DeleteData();
         KeybindDataManager.DeleteKeyBindings();
     }
 

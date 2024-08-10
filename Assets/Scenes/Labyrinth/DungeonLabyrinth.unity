@@ -51728,6 +51728,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1639850684}
     - target: {fileID: 3855979621730343485, guid: 964b602d7d84d3349841d3badee572c3, type: 3}
+      propertyPath: audioManager
+      value: 
+      objectReference: {fileID: 1716229048}
+    - target: {fileID: 3855979621730343485, guid: 964b602d7d84d3349841d3badee572c3, type: 3}
       propertyPath: countdownText
       value: 
       objectReference: {fileID: 1715195155}
@@ -108779,6 +108783,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b1faeb817146e0147bea4963ebe81c6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1716229048 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5292615923430513591, guid: fb8339ca704316d44a7b88861f8635db, type: 3}
+  m_PrefabInstance: {fileID: 1716229046}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f973f18d6d0a15499ab2cd63752da1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1721964406 stripped

@@ -119,6 +119,7 @@ public class MainMenuHandler : MonoBehaviour
     private void MainMenu_Start()
     {
         MainMenu_PrepareObjectListeners();
+        audioManager.PlayAudio("music.background.main_menu_bgm", true);
     }
     
     private void MainMenu_PrepareObjectListeners()

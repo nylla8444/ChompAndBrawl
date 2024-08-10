@@ -95,7 +95,7 @@ public class FighterBehavior : MonoBehaviour {
         RegisterKeyActions();
     }
 
-    private void OnDestroy() {
+    public void ResetKeys() {
         KeybindDataManager.ResetKeyActions();
     }
 
@@ -349,7 +349,6 @@ private void FixedUpdate() {
             currentHealth -= attack.damage;
 
             brawlManager.SetHealthUi();
-            if (currentHealth <= 0) { brawlManager.EndMatch(); }
             return;
         }
 
