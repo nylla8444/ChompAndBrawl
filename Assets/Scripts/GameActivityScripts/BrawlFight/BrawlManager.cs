@@ -158,6 +158,8 @@ public class BrawlManager : MonoBehaviour {
 
     public void EndMatch() {
         matchState = MatchState.ending;
+        Pacman.ResetKeys();
+        Ghost.ResetKeys();
         StopCoroutine(TickPlaytime());
 
         if (Pacman.currentHealth <= 0) {

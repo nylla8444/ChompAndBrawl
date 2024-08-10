@@ -90,7 +90,7 @@ public class AftergamePrepareHandler : MonoBehaviour
     private bool IsPacmanWon()
     {
         return IngameDataManager.LoadSpecificData<int>("pacman_data.lives") > 0 &&
-               IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive").Count > 0;
+               IngameDataManager.LoadSpecificData<List<string>>("ghost_data.list_alive").Count <= 0;
     }
 
     private string GenerateRandomCode()
