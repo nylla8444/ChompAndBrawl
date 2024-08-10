@@ -66,6 +66,11 @@ public class ItemMazeHandler : MonoBehaviour
         InitializePacdots();
     }
 
+    public void StopCorou()
+    {
+        StopAllCoroutines();
+    }
+
     public void StartItemController(bool triggerValue)
     {
         isMazeStarted = triggerValue;

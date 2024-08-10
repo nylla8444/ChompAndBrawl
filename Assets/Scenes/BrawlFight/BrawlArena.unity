@@ -2777,8 +2777,10 @@ MonoBehaviour:
   cdImage_uniquePacman: {fileID: 1179104687}
   cdImage_basicGhost: {fileID: 745415132}
   cdImage_uniqueGhost: {fileID: 102631701}
-  cdIcon_uniquePacman: {fileID: 1924525434}
-  cdIcon_uniqueGhost: {fileID: 1268782028}
+  uniqueTextPacman: {fileID: 1135422628}
+  uniqueTextGhost: {fileID: 243473111}
+  uniqueIconPacman: {fileID: 1924525434}
+  uniqueIconGhost: {fileID: 1268782028}
   uniqueSkillsPacmanSprites:
   - {fileID: -1791094930, guid: 28ae53b6278840a48a4a3366492c1e0b, type: 3}
   - {fileID: -832338266, guid: 28ae53b6278840a48a4a3366492c1e0b, type: 3}
@@ -3112,6 +3114,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 650065868}
   m_CullTransparentMesh: 1
+--- !u!1 &656305252
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 656305254}
+  - component: {fileID: 656305253}
+  m_Layer: 0
+  m_Name: Audio Script
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &656305253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 656305252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f973f18d6d0a15499ab2cd63752da1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioList: {fileID: 11400000, guid: d4956dfff98d330489e6e3b2049b5c27, type: 2}
+--- !u!4 &656305254
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 656305252}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &659229369
 GameObject:
   m_ObjectHideFlags: 0
@@ -5292,6 +5339,7 @@ MonoBehaviour:
   ingameMapSceneIds: {fileID: 11400000, guid: f3e9a418f61a40342ab966eef8c466cc, type: 2}
   ingameMapList: {fileID: 11400000, guid: 6252ddfebf9a82c4e94e2e94557219ed, type: 2}
   brawlManager: {fileID: 510582410}
+  audioManager: {fileID: 656305253}
   tutorialPanel: {fileID: 0}
   tutorialList: {fileID: 0}
   pacmanTutorialSide: {fileID: 0}
@@ -10720,6 +10768,7 @@ SceneRoots:
   - {fileID: 1076364880}
   - {fileID: 1553473802}
   - {fileID: 510582409}
+  - {fileID: 656305254}
   - {fileID: 205543852}
   - {fileID: 6715251010719411545}
   - {fileID: 83616762}

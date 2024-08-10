@@ -12,7 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72d31956a10b0944eb7587364648f479, type: 3}
   m_Name: AudioList
   m_EditorClassIdentifier: 
-  musicCategories: []
+  musicCategories:
+  - name: background
+    audioClips:
+    - id: main_menu_bgm
+      audioClip: {fileID: 8300000, guid: 609127ab3f296224289fc21132b53a5b, type: 3}
+    - id: the_ghost_island_bgm
+      audioClip: {fileID: 8300000, guid: c8cccafe0be685e4eaf16516c179038e, type: 3}
+    - id: dungeon_labyrinth_bgm
+      audioClip: {fileID: 8300000, guid: d7fd98d48ecd84b4d941f35de5259da4, type: 3}
+    - id: rainbowtopia_bgm
+      audioClip: {fileID: 8300000, guid: f256885bab63a724b99732cb2af54723, type: 3}
+    - id: brawl_arena_bgm
+      audioClip: {fileID: 8300000, guid: 338ebc7512723f9488f4098576eefa19, type: 3}
   sfxCategories:
   - name: general
     audioClips:
