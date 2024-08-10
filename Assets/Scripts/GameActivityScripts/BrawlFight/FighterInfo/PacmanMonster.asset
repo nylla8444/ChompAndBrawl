@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: PacmanMonster
   m_EditorClassIdentifier: 
   DamageMultipler: 1.5
-  UniqueAttackInfo: {fileID: 11400000, guid: 115adbedb08b99143848b79c9dd252cd, type: 2}
+  UniqueAttackInfo: {fileID: 11400000, guid: 2688212f915215b4b8a3c1e0f3ad027c, type: 2}
+  BaseInfo: {fileID: 0}

@@ -5,6 +5,7 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewAttackInfo", menuName = "BrawlMode/AttackInfo")]
 public class AttackInfo : ScriptableObject {
+    public AllAttacks specificAttack;
     public int damage;
     public float stunDuration;
     public float chargeDuration;
@@ -27,4 +28,5 @@ public class AttackInfo : ScriptableObject {
     public float lifetime;
     public float DOTDuration;
     public AttackInfo DOTAttack;
+    public Sprite projectileSprite;
 }

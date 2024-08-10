@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f3a6b651219d9d4a90418b1db029e0c, type: 3}
   m_Name: Punch3
   m_EditorClassIdentifier: 
+  specificAttack: 3
   damage: 45
   stunDuration: 0.9
   chargeDuration: 0.7
-  hitDuration: 0.9
-  missDuration: 1.25
+  hitDuration: 1.2
+  missDuration: 1.8
   attackCooldown: 0
   rootVelocity: {x: -3, y: 15}
   otherVelocity: {x: 6, y: 20}

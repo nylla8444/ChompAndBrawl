@@ -12,6 +12,20 @@ public enum AttackCategory {
     DOT
 }
 
+public enum AllAttacks {
+    none,
+    punch1,
+    punch2,
+    punch3,
+    basic,
+    pelletShot,
+    venomLick,
+    sugarRush,
+    lightningStrike,
+    sandstorm,
+    magmaSlime
+}
+
 public class BrawlManager : MonoBehaviour {
     // ENUMS
     private enum MatchState {
@@ -132,17 +146,20 @@ public class BrawlManager : MonoBehaviour {
     private void InitializeGhostInfo() {
         string ghostName = IngameDataManager.LoadSpecificData<string>("ghost_data.current_fighting");
         FighterInfo fighter;
+        Color32 ghostColor;
         
         switch (ghostName) {
-            case "blinky": fighter = FI_Blinky; break;
-            case "clyde": fighter = FI_Clyde; break;
-            case "pinky": fighter = FI_Pinky; break;
-            case "inky": fighter = FI_Inky; break;
+            case "blinky": fighter = FI_Blinky; ghostColor = new Color32(165, 38, 48, 220); break;
+            case "clyde": fighter = FI_Clyde; ghostColor = new Color32(207, 87, 60, 220); break;
+            case "pinky": fighter = FI_Pinky; ghostColor = new Color32(223, 132, 165, 220); break;
+            case "inky": fighter = FI_Inky; ghostColor = new Color32(115, 190, 211, 220); break;
             default:
                 Debug.Log("'ghost_data.current_fighting' cannot be found. Spawned 'Blinky' in arena instead.");
+                ghostColor = new Color32(165, 38, 48, 220);
                 fighter = FI_Blinky; break;
         }
 
+        Ghost.gameObject.GetComponent<SpriteRenderer>().color = ghostColor;
         Ghost.Initialize(this, fighter, Pacman);
     }
 

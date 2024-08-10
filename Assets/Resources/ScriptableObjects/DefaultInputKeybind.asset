@@ -80,7 +80,7 @@ MonoBehaviour:
     - translated_action_name: Jump
       action_name: pacman.jump
       key_code: 119
-      holdDown: 0
+      holdDown: 1
     - translated_action_name: Crouch
       action_name: pacman.crouch
       key_code: 115
@@ -138,7 +138,7 @@ MonoBehaviour:
     - translated_action_name: Jump
       action_name: ghost.jump
       key_code: 273
-      holdDown: 0
+      holdDown: 1
     - translated_action_name: Crouch
       action_name: ghost.crouch
       key_code: 274

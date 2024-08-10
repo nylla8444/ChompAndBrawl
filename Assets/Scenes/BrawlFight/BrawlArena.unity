@@ -283,7 +283,7 @@ GameObject:
   m_Component:
   - component: {fileID: 48737542}
   - component: {fileID: 48737543}
-  m_Layer: 11
+  m_Layer: 12
   m_Name: AttackRange
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -320,7 +320,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 12288
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -2789,7 +2789,7 @@ MonoBehaviour:
   - {fileID: -663458875, guid: 28ae53b6278840a48a4a3366492c1e0b, type: 3}
   pacmanHealthImage: {fileID: 1087007373}
   ghostHealthImage: {fileID: 1559708613}
-  maxHealth: 100
+  maxHealth: 500
   jumpPower: 20
   walkSpeed: 6
   blockSpeed: 4
@@ -3355,7 +3355,7 @@ GameObject:
   - component: {fileID: 687124634}
   - component: {fileID: 687124633}
   - component: {fileID: 687124632}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: LeftWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3749,7 +3749,7 @@ GameObject:
   m_Component:
   - component: {fileID: 717143465}
   - component: {fileID: 717143466}
-  m_Layer: 11
+  m_Layer: 12
   m_Name: AttackRange
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3786,7 +3786,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 12288
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -3827,7 +3827,7 @@ GameObject:
   - component: {fileID: 722577196}
   - component: {fileID: 722577195}
   - component: {fileID: 722577197}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4697,7 +4697,7 @@ GameObject:
   - component: {fileID: 1024155348}
   - component: {fileID: 1024155352}
   - component: {fileID: 1024155353}
-  m_Layer: 11
+  m_Layer: 12
   m_Name: Pacman
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4746,7 +4746,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 4096
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -4763,18 +4763,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.165, y: -0.15}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.75, y: 0.78}
+    oldSize: {x: 1, y: 1}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.65, y: 0.7}
   m_EdgeRadius: 0
 --- !u!212 &1024155350
 SpriteRenderer:
@@ -4817,8 +4817,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -1
-  m_Sprite: {fileID: 1581495865, guid: ec829f864673cac41809d2727d1c9e6a, type: 3}
-  m_Color: {r: 1, g: 0.9244273, b: 0.62578607, a: 1}
+  m_Sprite: {fileID: 21300000, guid: d604c9f5b15c26841801c569ea81599b, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4837,8 +4837,8 @@ Transform:
   m_GameObject: {fileID: 1024155347}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.45, y: -0.5, z: 0}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 1}
+  m_LocalPosition: {x: -6.45, y: 1, z: 0}
+  m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 48737542}
@@ -4867,7 +4867,8 @@ MonoBehaviour:
   DOTDuration: 0
   DOTAttack: {fileID: 0}
   SugarRushDuration: 0
-  isWalking: 0
+  currentAttack: 0
+  lastCurrentAttack: 0
 --- !u!95 &1024155353
 Animator:
   serializedVersion: 5
@@ -4878,7 +4879,7 @@ Animator:
   m_GameObject: {fileID: 1024155347}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 5bb8214c9810bbc44a4c33a81263e948, type: 2}
+  m_Controller: {fileID: 9100000, guid: a50362738ec048949adcf2f3a1e6aed2, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 2
   m_ApplyRootMotion: 0
@@ -5072,7 +5073,8 @@ GameObject:
   - component: {fileID: 1073113145}
   - component: {fileID: 1073113144}
   - component: {fileID: 1073113143}
-  m_Layer: 11
+  - component: {fileID: 1073113148}
+  m_Layer: 12
   m_Name: Ghost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5102,7 +5104,8 @@ MonoBehaviour:
   DOTDuration: 0
   DOTAttack: {fileID: 0}
   SugarRushDuration: 0
-  isWalking: 0
+  currentAttack: 0
+  lastCurrentAttack: 0
 --- !u!50 &1073113144
 Rigidbody2D:
   serializedVersion: 4
@@ -5145,7 +5148,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 4096
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -5162,18 +5165,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.1, y: -0.125}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.64, y: 0.64}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.45, y: 0.55}
   m_EdgeRadius: 0
 --- !u!212 &1073113146
 SpriteRenderer:
@@ -5216,9 +5219,9 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -1
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.8238993, g: 0.37049556, b: 0.3957012, a: 1}
-  m_FlipX: 0
+  m_Sprite: {fileID: -1258393593, guid: 757a6ddb6d2a65d4eb750c8ef73caac6, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 1
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
@@ -5236,13 +5239,34 @@ Transform:
   m_GameObject: {fileID: 1073113142}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.45, y: -0.5, z: 0}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 1}
+  m_LocalPosition: {x: 6.45, y: 1, z: 0}
+  m_LocalScale: {x: 5.5, y: 5.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 717143465}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &1073113148
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1073113142}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f002f73b9104b8e4492abf9f586b6d54, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 2
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1076364879
 GameObject:
   m_ObjectHideFlags: 0
@@ -5668,7 +5692,7 @@ GameObject:
   - component: {fileID: 1111237939}
   - component: {fileID: 1111237938}
   - component: {fileID: 1111237937}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: RightWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}

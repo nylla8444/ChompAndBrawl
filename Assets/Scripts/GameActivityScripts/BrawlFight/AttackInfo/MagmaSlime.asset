@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f3a6b651219d9d4a90418b1db029e0c, type: 3}
   m_Name: MagmaSlime
   m_EditorClassIdentifier: 
+  specificAttack: 10
   damage: 75
   stunDuration: 1
   chargeDuration: 0.8
@@ -29,8 +30,9 @@ MonoBehaviour:
   camShakeDuration: 0.05
   isProjectile: 1
   projectileVelocity: {x: 8, y: 0}
-  projectileSize: {x: 1, y: 1, z: 1}
+  projectileSize: {x: 6, y: 6, z: 1}
   projectileSpawnOnOwner: 1
   lifetime: 10
   DOTDuration: 3
   DOTAttack: {fileID: 11400000, guid: 2142c7b59b0392c4fb85e316dab32c50, type: 2}
+  projectileSprite: {fileID: -1856870251, guid: f39783d06301f4943b42782843d9c110, type: 3}

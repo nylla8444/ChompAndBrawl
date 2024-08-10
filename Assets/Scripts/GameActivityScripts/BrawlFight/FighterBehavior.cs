@@ -61,6 +61,9 @@ public class FighterBehavior : MonoBehaviour {
     public float DOTDuration = 0;
     [HideInInspector] public AttackInfo DOTAttack;
     [SerializeField] private float SugarRushDuration = 0f;
+    public AllAttacks currentAttack;
+    public AllAttacks lastCurrentAttack;
+    private float debuffTimer;
 
     
     // GETTERS AND SETTERS
@@ -156,6 +159,7 @@ private void FixedUpdate() {
 
     private void TickPostInput() {
         HandleAnimations();
+        TickDebuffs();
     }
 
     private bool IsGrounded() {
@@ -195,6 +199,21 @@ private void FixedUpdate() {
                 if (queuedAttack) { currentState = State.pre_attack; return; }
                 currentState = State.grounded;
                 lastAttack = null;
+                currentAttack = AllAttacks.none;
+                return;
+
+            case State.stunned:
+                currentAttack = AllAttacks.none;
+                currentState = State.grounded;
+                return;
+
+            case State.aired:
+                currentAttack = AllAttacks.none;
+                currentState = State.grounded;
+                return;
+
+            case State.knocked:
+                currentAttack = AllAttacks.none;
                 return;
 
             default:
@@ -288,6 +307,7 @@ private void FixedUpdate() {
             queuedAttack = punchAttack;
             timer = punchAttack.chargeDuration * attackChargeBias;
         }
+        currentAttack = queuedAttack.specificAttack;
     }
 
     private void UseBasic() {
@@ -298,6 +318,7 @@ private void FixedUpdate() {
 
         AttackInfo basicAttack = brawlManager.GetBasicAttack();
         queuedAttack = basicAttack;
+        currentAttack = queuedAttack.specificAttack;
         timer = queuedAttack.chargeDuration * attackChargeBias;
     }
 
@@ -318,6 +339,7 @@ private void FixedUpdate() {
         }
 
         queuedAttack = uniqueAttack;
+        currentAttack = queuedAttack.specificAttack;
         timer = queuedAttack.chargeDuration;
     }
 
@@ -332,6 +354,9 @@ private void FixedUpdate() {
         }
 
         // ATTACKS
+        lastAttack = null;
+        queuedAttack = null;
+
         if (blocked && attack) {
             currentHealth -=  attack.damage / 2 * opponent.fighterInfo.DamageMultipler;
             fighterPhysics.velocity = new Vector2(attack.otherVelocity.x / 2 * attackDirection, attack.otherVelocity.y);
@@ -350,7 +375,7 @@ private void FixedUpdate() {
         //  fighterPhysics.velocity = blocked ? attack.otherVelocity : new Vector2(attack.otherVelocity.x, fighterPhysics.velocity.y);
         brawlManager.SetHealthUi();
 
-        if (currentHealth <= 0) { brawlManager.EndMatch(); }
+        if (currentHealth <= 0) { currentState = State.knocked; brawlManager.EndMatch(); }
     }
 
     private void RegisterAttack() {
@@ -428,5 +453,22 @@ private void FixedUpdate() {
     private void HandleAnimations() {
         animator.SetBool("isWalking", walkDirection == WalkDirection.left || walkDirection == WalkDirection.right);
         animator.SetInteger("CurrentState", (int)currentState);
+        animator.SetInteger("currentAttack", (int)currentAttack);
+
+        if (lastCurrentAttack == currentAttack) { return; }
+        lastCurrentAttack = currentAttack;
+        animator.SetTrigger("AttackChanged");
+    }
+
+    void TickDebuffs() {
+        if (DOTDuration <= 0) { return; }
+        debuffTimer += Time.deltaTime;
+
+        if (debuffTimer >= .5f) {
+            debuffTimer -= .5f;
+            DOTDuration -= .5f;
+            currentHealth -= DOTAttack.damage;
+        }
+        
     }
 }

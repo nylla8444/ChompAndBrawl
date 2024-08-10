@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f3a6b651219d9d4a90418b1db029e0c, type: 3}
   m_Name: Basic
   m_EditorClassIdentifier: 
+  specificAttack: 4
   damage: 125
   stunDuration: 1.2
   chargeDuration: 0.8
