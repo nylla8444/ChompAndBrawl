@@ -10,7 +10,7 @@ A Unity project made for [Odyssey Festival](https://www.facebook.com/OdysseyFest
 The objective of the Pac-man is to collect as many points as possible and take down all ghosts, while the ghosts are hunting down. And, the objective of the ghosts is to take down the pacman three times.
 
 ### Acknowledgements
-* [allyn8444](https://github.com/allyn8444): Artist
+* [nylla8444](https://github.com/nylla8444): Artist
 * [IAmLevin40](https://github.com/IamLevin40): Labyrinth Mode Programmer
 * [kurtipopo24](https://github.com/kurtipopo24): Artist
 * [tqcss](https://github.com/tqcss): Brawl Mode Programmer
